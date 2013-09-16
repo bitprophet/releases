@@ -29,7 +29,7 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     issue_no, _, ported = utils.unescape(text).partition(' ')
     # Lol @ access back to Sphinx
     config = inliner.document.settings.env.app.config
-    ref = config.releases_issue_uri + issue_no
+    ref = config.releases_issue_uri % issue_no
     link = nodes.reference(rawtext, '#' + issue_no, refuri=ref, **options)
     # Additional 'new-style changelog' stuff
     if name in issue_types:
