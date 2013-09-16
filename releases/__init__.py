@@ -186,8 +186,6 @@ def construct_releases(entries, app):
             nodes.title('', '',
                 nodes.reference(
                     text="Unreleased",
-                    # TODO: make setting for what one's unreleased branch is
-                    # named
                     refuri=app.config.releases_release_uri % "master",
                     classes=['changelog-release']
                 ),
