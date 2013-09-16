@@ -59,6 +59,24 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
         return [link], []
 
 
+def release_nodes(text, slug, date, config):
+    my_nodes = [
+        nodes.reference(
+            text=text,
+            refuri=config.releases_release_uri % slug,
+        ),
+    ]
+    if date:
+        my_nodes.extend([
+            nodes.inline(text=' '),
+            nodes.raw(text='<span class="release-date">%s</span>' % date, format='html'),
+        ])
+    return nodes.section('',
+        nodes.title('', '', *my_nodes),
+        ids=[text]
+    )
+
+
 year_arg_re = re.compile(r'^(.+?)\s*(?<!\x00)<(.*?)>$', re.DOTALL)
 
 def release_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
@@ -75,21 +93,7 @@ def release_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     number, date = match.group(1), match.group(2)
     # Lol @ access back to Sphinx
     config = inliner.document.settings.env.app.config
-    nodelist = [
-        nodes.section('',
-            nodes.title('', '',
-                nodes.reference(
-                    text=number,
-                    refuri=config.releases_release_uri % number,
-                ),
-                nodes.inline(text=' '),
-                # FIXME: this also needs to be distributed to third parties'
-                # templates
-                nodes.raw(text='<span class="release-date">%s</span>' % date, format='html'),
-            ),
-            ids=[number]
-        )
-    ]
+    nodelist = [release_nodes(number, number, date, config)]
     # Return intermediate node
     node = release(number=number, date=date, nodelist=nodelist)
     return [node], []
@@ -184,17 +188,7 @@ def construct_releases(entries, app):
 
     # Entries not yet released get special 'release' entries (that lack an
     # actual release object).
-    nodelist = [
-        nodes.section('',
-            nodes.title('', '',
-                nodes.reference(
-                    text="Unreleased",
-                    refuri=app.config.releases_release_uri % "master",
-                ),
-            ),
-            ids=['unreleased']
-        )
-    ]
+    nodelist = [release_nodes("Unreleased", "master", None, app.config)]
     releases.append({
         'obj': release(number='unreleased', date=None, nodelist=nodelist),
         'entries': lines['unreleased']
