@@ -65,6 +65,10 @@ In a fit of irony, Releases is too simple for a full Sphinx doc treatment (or
 for multiple release lines) and thus doesn't use itself. Here's a by-hand
 changelog:
 
+* 2013.09.15: **0.2.2**:
+
+    * Python 3 compatibility.
+
 * 2013.09.15: **0.2.1**:
 
     * Fixed a stupid bug causing invalid issue hyperlinks.
