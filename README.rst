@@ -58,6 +58,23 @@ Then build your docs; ``changelog.html`` should show issues grouped by release,
 as per the above rules. Example: `Fabric's rendered changelog
 <http://docs.fabfile.org/en/latest/changelog.html>`_.
 
+Changes
+=======
+
+In a fit of irony, Releases is too simple for a full Sphinx doc treatment (or
+for multiple release lines) and thus doesn't use itself. Here's a by-hand
+changelog:
+
+* 2013.09.15: **0.2.1**:
+
+    * Fixed a stupid bug causing invalid issue hyperlinks.
+    * Added this README.
+
+* 2013.09.15: **0.2.0**:
+
+  * Basic functionality.
+
+
 TODO
 ====
 
