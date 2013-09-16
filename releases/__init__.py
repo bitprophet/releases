@@ -165,7 +165,7 @@ def construct_releases(entries, app):
         # * Everything goes into 'unreleased' so it can be used in new lines.
         # * Bugfixes (but not support or feature entries) go into all release
         # lines, not just 'unreleased'.
-        # * However, support/feature entries marked as 'backport' go into all
+        # * However, support/feature entries marked as 'backported' go into all
         # release lines as well, on the assumption that they were released to
         # all active branches.
         # * The 'rest' variable (which here is the bug description, vitally
