@@ -47,7 +47,8 @@ Mimic the format seen `in Fabric's changelog
   additional elements after release roles.
 
 Then build your docs; ``changelog.html`` should show issues grouped by release,
-as per the above rules.
+as per the above rules. Example: `Fabric's rendered changelog
+<http://docs.fabfile.org/en/latest/changelog.html>`_.
 
 TODO
 ====
