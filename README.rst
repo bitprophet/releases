@@ -57,3 +57,5 @@ TODO
   evolved from a purely role-oriented, prose-embedded setup; roles are no
   longer the right way to do this.
 * Possibly add more keywords to allow control over additional edge cases.
+* Add shortcut format option for the release/issue URI settings - Github users
+  can just give their Github acct/repo and we will fill in the rest.
