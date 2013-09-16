@@ -258,18 +258,12 @@ def generate_changelog(app, doctree):
 def setup(app):
     # Issue base URI setting: releases_issue_uri
     # E.g. 'https://github.com/fabric/fabric/issues/'
-    app.add_config_value(
-        name='releases_issue_uri',
-        default=None,
-        rebuild='html'
-    )
+    app.add_config_value(name='releases_issue_uri', default=None,
+        rebuild='html')
     # Release-tag base URI setting: releases_release_uri
     # E.g. 'https://github.com/fabric/fabric/tree/'
-    app.add_config_value(
-        name='releases_release_uri',
-        default=None,
-        rebuild='html'
-    )
+    app.add_config_value(name='releases_release_uri', default=None,
+        rebuild='html')
     # Register intermediate roles
     for x in issue_types + ('issue',):
         app.add_role(x, issues_role)
