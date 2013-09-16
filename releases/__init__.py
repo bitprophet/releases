@@ -178,14 +178,23 @@ def construct_releases(entries, app):
                 focus = issue(type_='bug', nodelist=[focus], backported=False, major=False, description=[focus])
             else:
                 focus.attributes['description'] = rest
-            # Non-major bugs go into release lines only; major bugs go into
-            # unreleased only.
-            if (focus.type == 'bug' and not focus.major) or focus.backported:
-                for line in [x for x in lines if x != 'unreleased']:
-                    lines[line].append(focus)
-            # Non-bugs only go into unreleased (next release)
+            if focus.type == 'bug':
+                # Regular bugs go into per-line buckets only.
+                if not focus.major:
+                    for line in [x for x in lines if x != 'unreleased']:
+                        lines[line].append(focus)
+                # Major bugs go into feature release bucket only.
+                else:
+                    lines['unreleased'].append(focus)
             else:
-                lines['unreleased'].append(focus)
+                # Backported feature/support items go into all lines.
+                if focus.backported:
+                    for line in lines:
+                        lines[line].append(focus)
+                # Non-backported feature/support items go into feature releases
+                # only.
+                else:
+                    lines['unreleased'].append(focus)
 
     # Entries not yet released get special 'release' entries (that lack an
     # actual release object).
