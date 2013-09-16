@@ -28,6 +28,14 @@ Mimic the format seen `in Fabric's changelog
 
 * Install ``releases`` and update your Sphinx ``conf.py`` to include it in the
   ``extensions`` list setting: ``extensions = ['releases']``.
+
+    * Also set the ``releases_release_uri`` and ``releases_issue_uri`` top
+      level options. Both should have an unevaluated ``%s`` where the
+      release/issue number would go.
+    * See `Fabric's docs/conf.py
+      <https://github.com/fabric/fabric/blob/4afd33e971f1c6831cc33fd3228013f7484fbe35/docs/conf.py#L31>`_
+      for an example.
+
 * Create a docs file named ``changelog.rst`` with a top-level header followed
   by a bulleted list.
 * Bullet list items must use the ``:support:``, ``:feature`` or ``:bug`` roles to
