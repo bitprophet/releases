@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='releases',
-    version='0.2.1',
+    version='0.2.2',
     description='A Sphinx extension for changelog manipulation',
     author='Jeff Forcier',
     author_email='jeff@bitprophet.org',
