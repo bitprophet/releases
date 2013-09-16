@@ -33,7 +33,7 @@ Mimic the format seen `in Fabric's changelog
 * Bullet list items must use the ``:support:``, ``:feature`` or ``:bug`` roles to
   mark issues, or ``:release:`` to mark a release. These special roles must be
   the first element in each list item.
-* Issue roles are of the form ``:type:`number[ keyword]``. Keywords are
+* Issue roles are of the form ``:type:`number[ keyword]```. Keywords are
   optional and may be one of:
 
     * ``backported``: Given on support or feature issues to denote
