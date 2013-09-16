@@ -82,6 +82,7 @@ changelog:
 TODO
 ====
 
+* Tests would be nice.
 * Migrate to a directive-driven (vs role-driven) format? Existing format
   evolved from a purely role-oriented, prose-embedded setup; roles are no
   longer really the right way to do this.
