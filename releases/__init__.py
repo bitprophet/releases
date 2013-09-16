@@ -211,7 +211,7 @@ def construct_nodes(releases):
             # is then copied into 2 different release lists) will end up in the
             # doctree, which makes subsequent parse steps very angry (index()
             # errors).
-            desc = map(lambda x: x.deepcopy(), entry['description'])
+            desc = list(map(lambda x: x.deepcopy(), entry['description']))
             # Additionally, expand any other issue roles found in the
             # description paragraph - sometimes we refer to related issues
             # inline. (They can't be left as issue() objects at render time
@@ -261,7 +261,7 @@ def setup(app):
     app.add_config_value(name='releases_release_uri', default=None,
         rebuild='html')
     # Register intermediate roles
-    for x in issue_types.keys() + ['issue']:
+    for x in list(issue_types) + ['issue']:
         app.add_role(x, issues_role)
     app.add_role('release', release_role)
     # Hook in our changelog transmutation at appropriate step
