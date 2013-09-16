@@ -4,7 +4,12 @@ from docutils.parsers.rst import roles
 from docutils import nodes, utils
 
 
-issue_types = ('bug', 'feature', 'support')
+# Issue type list (keys) + color values
+issue_types = {
+    'bug': 'A04040',
+    'feature': '40A056',
+    'support': '4070A0',
+}
 
 def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     """
@@ -28,9 +33,8 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     link = nodes.reference(rawtext, '#' + issue_no, refuri=ref, **options)
     # Additional 'new-style changelog' stuff
     if name in issue_types:
-        # FIXME: how to insert this shizzle into the project being tweaked?
-        which = '[<span class="changelog-%s">%s</span>]' % (
-            name, name.capitalize()
+        which = '[<span style="color: #%s;">%s</span>]' % (
+            issue_types[name], name.capitalize()
         )
         nodelist = [
             nodes.raw(text=which, format='html'),
@@ -77,7 +81,6 @@ def release_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
                 nodes.reference(
                     text=number,
                     refuri=config.releases_release_uri % number,
-                    classes=['changelog-release']
                 ),
                 nodes.inline(text=' '),
                 # FIXME: this also needs to be distributed to third parties'
@@ -187,7 +190,6 @@ def construct_releases(entries, app):
                 nodes.reference(
                     text="Unreleased",
                     refuri=app.config.releases_release_uri % "master",
-                    classes=['changelog-release']
                 ),
             ),
             ids=['unreleased']
@@ -265,7 +267,7 @@ def setup(app):
     app.add_config_value(name='releases_release_uri', default=None,
         rebuild='html')
     # Register intermediate roles
-    for x in issue_types + ('issue',):
+    for x in issue_types.keys() + ['issue']:
         app.add_role(x, issues_role)
     app.add_role('release', release_role)
     # Hook in our changelog transmutation at appropriate step
