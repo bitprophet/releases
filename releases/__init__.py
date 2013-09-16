@@ -178,9 +178,10 @@ def construct_releases(entries, app):
                 focus = issue(type_='bug', nodelist=[focus], backported=False, major=False, description=[focus])
             else:
                 focus.attributes['description'] = rest
-            # Bugs go errywhere
-            if focus.type == 'bug' or focus.backported:
-                for line in lines:
+            # Non-major bugs go into release lines only; major bugs go into
+            # unreleased only.
+            if (focus.type == 'bug' and not focus.major) or focus.backported:
+                for line in [x for x in lines if x != 'unreleased']:
                     lines[line].append(focus)
             # Non-bugs only go into unreleased (next release)
             else:
