@@ -69,7 +69,7 @@ def release_nodes(text, slug, date, config):
     if date:
         my_nodes.extend([
             nodes.inline(text=' '),
-            nodes.raw(text='<span class="release-date">%s</span>' % date, format='html'),
+            nodes.raw(text='<span style="font-size: 75%%;">%s</span>' % date, format='html'),
         ])
     return nodes.section('',
         nodes.title('', '', *my_nodes),
