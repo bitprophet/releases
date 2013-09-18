@@ -8,12 +8,13 @@ from docutils import nodes, utils
 issue_types = {
     'bug': 'A04040',
     'feature': '40A056',
+    'info': 'FF6600',
     'support': '4070A0',
 }
 
 def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     """
-    Use: :issue|bug|feature|support:`ticket_number`
+    Use: :issue|bug|feature|support:`ticket_number` or :info:`message`
 
     When invoked as :issue:, turns into just a "#NN" hyperlink to Github.
 
@@ -25,23 +26,33 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     was a major bug released in a feature release.
     """
     #from ipdb import set_trace; set_trace()
-    # Old-style 'just the issue link' behavior
-    issue_no, _, ported = utils.unescape(text).partition(' ')
-    # Lol @ access back to Sphinx
-    config = inliner.document.settings.env.app.config
-    ref = config.releases_issue_uri % issue_no
-    link = nodes.reference(rawtext, '#' + issue_no, refuri=ref, **options)
+    if name == 'info':
+        issue_no = ported = ''
+    else:
+        # Old-style 'just the issue link' behavior
+        issue_no, _, ported = utils.unescape(text).partition(' ')
+        # Lol @ access back to Sphinx
+        config = inliner.document.settings.env.app.config
+        ref = config.releases_issue_uri % issue_no
+        link = nodes.reference(rawtext, '#' + issue_no, refuri=ref, **options)
     # Additional 'new-style changelog' stuff
     if name in issue_types:
         which = '[<span style="color: #%s;">%s</span>]' % (
             issue_types[name], name.capitalize()
         )
-        nodelist = [
-            nodes.raw(text=which, format='html'),
-            nodes.inline(text=" "),
-            link,
-            nodes.inline(text=":")
-        ]
+        if name == 'info':
+            nodelist = [
+                nodes.raw(text=which, format='html'),
+                nodes.inline(text=": "),
+                nodes.inline(text=text)
+            ]
+        else:
+            nodelist = [
+                nodes.raw(text=which, format='html'),
+                nodes.inline(text=" "),
+                link,
+                nodes.inline(text=":")
+            ]
         # Sanity check
         if ported not in ('backported', 'major', ''):
             raise ValueError("Gave unknown issue metadata '%s' for issue no. %s" % (ported, issue_no))
@@ -130,7 +141,7 @@ def construct_releases(entries, app):
     # Walk from back to front, consuming entries & copying them into
     # per-release buckets as releases are encountered. Store releases in order.
     releases = []
-    lines = {'unreleased': []}
+    lines = {'unreleased': [], 'info': []}
     for obj in reversed(entries):
         # The 'actual' intermediate object we want to focus on is wrapped first
         # in a LI, then a P.
@@ -146,7 +157,7 @@ def construct_releases(entries, app):
                 lines[line] = []
                 releases.append({
                     'obj': focus,
-                    'entries': [
+                    'entries': lines['info'] + [
                         x
                         for x in lines['unreleased'] 
                         if x.type in ('feature', 'support') or x.major
@@ -158,9 +169,10 @@ def construct_releases(entries, app):
             else:
                 releases.append({
                     'obj': focus,
-                    'entries': [x for x in lines[line] if not x.major],
+                    'entries': lines['info'] + [x for x in lines[line] if not x.major],
                 })
                 lines[line] = []
+            lines['info'] = []
         # Entries get copied into release line buckets as follows:
         # * Everything goes into 'unreleased' so it can be used in new lines.
         # * Bugfixes (but not support or feature entries) go into all release
@@ -181,11 +193,13 @@ def construct_releases(entries, app):
             if focus.type == 'bug':
                 # Regular bugs go into per-line buckets only.
                 if not focus.major:
-                    for line in [x for x in lines if x != 'unreleased']:
+                    for line in [x for x in lines if x not in ('unreleased', 'info')]:
                         lines[line].append(focus)
                 # Major bugs go into feature release bucket only.
                 else:
                     lines['unreleased'].append(focus)
+            elif focus.type == 'info':
+                lines['info'].append(focus)
             else:
                 # Backported feature/support items go into all lines.
                 if focus.backported:

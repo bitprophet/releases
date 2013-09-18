@@ -38,9 +38,13 @@ Mimic the format seen `in Fabric's changelog
 
 * Create a docs file named ``changelog.rst`` with a top-level header followed
   by a bulleted list.
-* Bullet list items must use the ``:support:``, ``:feature`` or ``:bug`` roles to
-  mark issues, or ``:release:`` to mark a release. These special roles must be
-  the first element in each list item.
+* Bullet list items must use the ``:support:``, ``:feature``, ``:bug`` or
+  ``:info:`` roles to mark issues, or ``:release:`` to mark a release. These
+  special roles must be the first element in each list item.
+
+    * ``:info:`` roles are always added to the top of a release's bullet list when rendered
+    * ``:info:`` roles are only applied to the release they belong to
+
 * Issue roles are of the form ``:type:`number[ keyword]```. Keywords are
   optional and may be one of:
 
