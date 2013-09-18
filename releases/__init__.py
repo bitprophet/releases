@@ -1,6 +1,5 @@
 import re
 
-from docutils.parsers.rst import roles
 from docutils import nodes, utils
 
 
@@ -15,7 +14,7 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     """
     Use: :issue|bug|feature|support:`ticket_number`
 
-    When invoked as :issue:, turns into just a "#NN" hyperlink to Github.
+    When invoked as :issue:, turns into just a "#NN" hyperlink to releases_issue_uri.
 
     When invoked otherwise, turns into "[Type] <#NN hyperlink>: ".
 
@@ -24,7 +23,6 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     prior to parsing. May also give 'major' in the same vein, implying the bug
     was a major bug released in a feature release.
     """
-    #from ipdb import set_trace; set_trace()
     # Old-style 'just the issue link' behavior
     issue_no, _, ported = utils.unescape(text).partition(' ')
     # Lol @ access back to Sphinx
@@ -38,9 +36,9 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
         )
         nodelist = [
             nodes.raw(text=which, format='html'),
-            nodes.inline(text=" "),
+            nodes.inline(text=' '),
             link,
-            nodes.inline(text=":")
+            nodes.inline(text=':')
         ]
         # Sanity check
         if ported not in ('backported', 'major', ''):
@@ -79,6 +77,7 @@ def release_nodes(text, slug, date, config):
 
 year_arg_re = re.compile(r'^(.+?)\s*(?<!\x00)<(.*?)>$', re.DOTALL)
 
+
 def release_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     """
     Invoked as :release:`N.N.N <YYYY-MM-DD>`.
@@ -88,7 +87,7 @@ def release_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     # Make sure year has been specified
     match = year_arg_re.match(text)
     if not match:
-        msg = inliner.reporter.error("Must specify release date!")
+        msg = inliner.reporter.error('Must specify release date!')
         return [inliner.problematic(rawtext, rawtext, msg)], [msg]
     number, date = match.group(1), match.group(2)
     # Lol @ access back to Sphinx
@@ -148,7 +147,7 @@ def construct_releases(entries, app):
                     'obj': focus,
                     'entries': [
                         x
-                        for x in lines['unreleased'] 
+                        for x in lines['unreleased']
                         if x.type in ('feature', 'support') or x.major
                     ]
                 })
@@ -198,7 +197,7 @@ def construct_releases(entries, app):
 
     # Entries not yet released get special 'release' entries (that lack an
     # actual release object).
-    nodelist = [release_nodes("Unreleased", "master", None, app.config)]
+    nodelist = [release_nodes('Unreleased', 'master', None, app.config)]
     releases.append({
         'obj': release(number='unreleased', date=None, nodelist=nodelist),
         'entries': lines['unreleased']
@@ -216,7 +215,7 @@ def construct_nodes(releases):
         entries = []
         for entry in d['entries']:
             # Use nodes.Node.deepcopy to deepcopy the description
-            # nodes.  If this is not done, multiple references to the same
+            # nodes. If this is not done, multiple references to the same
             # object (e.g. a reference object in the description of #649, which
             # is then copied into 2 different release lists) will end up in the
             # doctree, which makes subsequent parse steps very angry (index()
