@@ -215,7 +215,7 @@ def construct_releases(entries, app):
     nodelist = [release_nodes("Unreleased", "master", None, app.config)]
     releases.append({
         'obj': release(number='unreleased', date=None, nodelist=nodelist),
-        'entries': lines['unreleased']
+        'entries': lines['info'] + lines['unreleased']
     })
     return releases
 
