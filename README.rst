@@ -20,6 +20,9 @@ Specifically:
   releases, and bugs are only displayed under bugfix releases. This can be
   overridden on a per-issue basis.
 
+Some background on why this tool was created can be found in `this blog post
+<http://bitprophet.org/blog/2013/09/14/a-better-changelog/>`_
+
 Usage
 =====
 
