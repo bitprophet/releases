@@ -6,7 +6,7 @@ About
 =====
 
 Releases is a `Sphinx <http://sphinx-doc.org>`_ extension designed to help you
-keep a source control friendly, merge friendly changelog file & turn it into a
+keep a source control friendly, merge friendly changelog file & turn it into
 useful, human readable HTML output.
 
 Specifically:
@@ -21,7 +21,7 @@ Specifically:
   overridden on a per-issue basis.
 
 Some background on why this tool was created can be found in `this blog post
-<http://bitprophet.org/blog/2013/09/14/a-better-changelog/>`_
+<http://bitprophet.org/blog/2013/09/14/a-better-changelog/>`_.
 
 Usage
 =====
