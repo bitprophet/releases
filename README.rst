@@ -11,10 +11,11 @@ useful, human readable HTML output.
 
 Specifically:
 
-* The source format is a stream-like timeline that plays well with source
-  control & only requires one entry per change (even for changes that exist in
-  multiple release lines).
-* The output is a traditional looking changelog with a section for every
+* The source format (kept in your Sphinx tree as ``changelog.rst``) is a
+  stream-like timeline that plays well with source control & only requires one
+  entry per change (even for changes that exist in multiple release lines).
+* The output (when you have the extension installed and run your Sphinx build
+  command) is a traditional looking changelog page with a section for every
   release; multi-release issues are copied automatically into each release.
 * By default, feature and support issues are only displayed under feature
   releases, and bugs are only displayed under bugfix releases. This can be
