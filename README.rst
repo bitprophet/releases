@@ -43,9 +43,9 @@ Mimic the format seen `in Fabric's changelog
 
 * Create a Sphinx document named ``changelog.rst`` with a top-level header
   followed by a bulleted list.
-* Bullet list items must use the ``:support:``, ``:feature`` or ``:bug`` roles to
-  mark issues, or ``:release:`` to mark a release. These special roles must be
-  the first element in each list item.
+* Bullet list items must use the ``:support:``, ``:feature:`` or ``:bug:``
+  roles to mark issues, or ``:release:`` to mark a release. These special roles
+  must be the first element in each list item.
 * Issue roles are of the form ``:type:`number[ keyword]```. Keywords are
   optional and may be one of:
 
@@ -109,8 +109,8 @@ TODO
       entry is not (IMHO) acceptable.
 
 * Possibly add more keywords to allow control over additional edge cases.
-* Add shortcut format option for the release/issue URI settings - Github users
-  can just give their Github acct/repo and we will fill in the rest.
+* Add shortcut format option for the release/issue URI settings - GitHub users
+  can just give their GitHub acct/repo and we will fill in the rest.
 * Maybe say pre-1.0 releases consider all bugs 'major' (so one can e.g. put out
   an 0.4.0 which is all bugfixes). Iffy because what if you *wanted* regular
   feature-vs-bugfix releases pre-1.0? (which is common.)
