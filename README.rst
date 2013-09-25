@@ -34,14 +34,15 @@ Mimic the format seen `in Fabric's changelog
   ``extensions`` list setting: ``extensions = ['releases']``.
 
     * Also set the ``releases_release_uri`` and ``releases_issue_uri`` top
-      level options. Both should have an unevaluated ``%s`` where the
+      level options - they determine the targets of the issue & release links
+      in the HTML output. Both should have an unevaluated ``%s`` where the
       release/issue number would go.
     * See `Fabric's docs/conf.py
       <https://github.com/fabric/fabric/blob/4afd33e971f1c6831cc33fd3228013f7484fbe35/docs/conf.py#L31>`_
       for an example.
 
-* Create a docs file named ``changelog.rst`` with a top-level header followed
-  by a bulleted list.
+* Create a Sphinx document named ``changelog.rst`` with a top-level header
+  followed by a bulleted list.
 * Bullet list items must use the ``:support:``, ``:feature`` or ``:bug`` roles to
   mark issues, or ``:release:`` to mark a release. These special roles must be
   the first element in each list item.
@@ -54,13 +55,15 @@ Mimic the format seen `in Fabric's changelog
       of bugfix, releases.
 
 * Regular Sphinx content may be given after issue roles and will be preserved
-  as-is when rendering.
+  as-is when rendering. For example, in ``:bug:`123` Fixed a bug, thanks
+  `@somebody`!``, the rendered changelog will preserve/render "Fixed a bug,
+  thanks ``@somebody``!" after the issue link.
 * Release roles are of the form ``:release:`number <date>```. Do not place any
-  additional elements after release roles.
+  additional content after release roles.
 
-Then build your docs; ``changelog.html`` should show issues grouped by release,
-as per the above rules. Example: `Fabric's rendered changelog
-<http://docs.fabfile.org/en/latest/changelog.html>`_.
+Then build your docs; in the rendered output, ``changelog.html`` should show
+issues grouped by release, as per the above rules. Example: `Fabric's rendered
+changelog <http://docs.fabfile.org/en/latest/changelog.html>`_.
 
 Changes
 =======
