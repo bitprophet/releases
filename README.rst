@@ -83,6 +83,10 @@ changelog:
       Markus Zapke-Gründemann.
     * Fix duplicate display of "bare" (not prefixed with an issue role)
       changelog entries. Thanks again to Markus.
+    * Edited the README/docs to be clearer about how Releases works/operates.
+    * Explicitly documented how non-role-prefixed line items are preserved.
+    * Updated non-role-prefixed line items so they get prefixed with a '[Bug]'
+      signifier (since they are otherwise treated as bugfix items.)
 
 * 2013.09.16: **0.2.3**:
 
