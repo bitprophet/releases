@@ -1,6 +1,5 @@
 import re
 
-from docutils.parsers.rst import roles
 from docutils import nodes, utils
 
 
@@ -15,7 +14,8 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     """
     Use: :issue|bug|feature|support:`ticket_number`
 
-    When invoked as :issue:, turns into just a "#NN" hyperlink to Github.
+    When invoked as :issue:, turns into just a "#NN" hyperlink to
+    `releases_issue_uri`.
 
     When invoked otherwise, turns into "[Type] <#NN hyperlink>: ".
 
@@ -198,7 +198,7 @@ def construct_releases(entries, app):
 
     # Entries not yet released get special 'release' entries (that lack an
     # actual release object).
-    nodelist = [release_nodes("Unreleased", "master", None, app.config)]
+    nodelist = [release_nodes("Unreleased", 'master', None, app.config)]
     releases.append({
         'obj': release(number='unreleased', date=None, nodelist=nodelist),
         'entries': lines['unreleased']
