@@ -43,9 +43,14 @@ Mimic the format seen `in Fabric's changelog
 
 * Create a Sphinx document named ``changelog.rst`` with a top-level header
   followed by a bulleted list.
-* Bullet list items must use the ``:support:``, ``:feature:`` or ``:bug:``
+* Bullet list items should use the ``:support:``, ``:feature:`` or ``:bug:``
   roles to mark issues, or ``:release:`` to mark a release. These special roles
   must be the first element in each list item.
+
+    * Line-items that do not start with an issue role will be considered
+      bugs (both in terms of inclusion in releases, and formatting) and,
+      naturally, will not be given a hyperlink.
+
 * Issue roles are of the form ``:type:`number[ keyword]```. Keywords are
   optional and may be one of:
 
