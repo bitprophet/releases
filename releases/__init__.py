@@ -10,6 +10,16 @@ issue_types = {
     'support': '4070A0',
 }
 
+def issue_nodelist(name, link=None):
+    which = '[<span style="color: #%s;">%s</span>]' % (
+        issue_types[name], name.capitalize()
+    )
+    signifier = [nodes.raw(text=which, format='html')]
+    hyperlink = [nodes.inline(text=" "), link] if link else []
+    trail = [] if link else [nodes.inline(text=" ")]
+    return signifier + hyperlink + [nodes.inline(text=":")] + trail
+
+
 def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     """
     Use: :issue|bug|feature|support:`ticket_number`
@@ -32,15 +42,7 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     link = nodes.reference(rawtext, '#' + issue_no, refuri=ref, **options)
     # Additional 'new-style changelog' stuff
     if name in issue_types:
-        which = '[<span style="color: #%s;">%s</span>]' % (
-            issue_types[name], name.capitalize()
-        )
-        nodelist = [
-            nodes.raw(text=which, format='html'),
-            nodes.inline(text=" "),
-            link,
-            nodes.inline(text=":")
-        ]
+        nodelist = issue_nodelist(name, link)
         # Sanity check
         if ported not in ('backported', 'major', ''):
             raise ValueError("Gave unknown issue metadata '%s' for issue no. %s" % (ported, issue_no))
@@ -174,7 +176,13 @@ def construct_releases(entries, app):
             # Handle rare-but-valid non-issue-attached line items, which are
             # always bugs. (They are their own description.)
             if not isinstance(focus, issue):
-                focus = issue(type_='bug', nodelist=[focus], backported=False, major=False, description=[])
+                focus = issue(
+                    type_='bug',
+                    nodelist=issue_nodelist('bug'),
+                    backported=False,
+                    major=False,
+                    description=[focus]
+                )
             else:
                 focus.attributes['description'] = rest
             if focus.type == 'bug':
