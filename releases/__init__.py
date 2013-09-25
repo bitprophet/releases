@@ -24,7 +24,6 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     prior to parsing. May also give 'major' in the same vein, implying the bug
     was a major bug released in a feature release.
     """
-    #from ipdb import set_trace; set_trace()
     # Old-style 'just the issue link' behavior
     issue_no, _, ported = utils.unescape(text).partition(' ')
     # Lol @ access back to Sphinx
