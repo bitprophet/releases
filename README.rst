@@ -81,6 +81,8 @@ changelog:
 
     * Handful of typos, doc tweaks & addition of a .gitignore file. Thanks to
       Markus Zapke-Gründemann.
+    * Fix duplicate display of "bare" (not prefixed with an issue role)
+      changelog entries. Thanks again to Markus.
 
 * 2013.09.16: **0.2.3**:
 
