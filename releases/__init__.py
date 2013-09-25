@@ -175,7 +175,7 @@ def construct_releases(entries, app):
             # Handle rare-but-valid non-issue-attached line items, which are
             # always bugs. (They are their own description.)
             if not isinstance(focus, issue):
-                focus = issue(type_='bug', nodelist=[focus], backported=False, major=False, description=[focus])
+                focus = issue(type_='bug', nodelist=[focus], backported=False, major=False, description=[])
             else:
                 focus.attributes['description'] = rest
             if focus.type == 'bug':
