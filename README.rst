@@ -77,7 +77,7 @@ In a fit of irony, Releases is too simple for a full Sphinx doc treatment (or
 for multiple release lines) and thus doesn't use itself. Here's a by-hand
 changelog:
 
-* 2013.09.25: **0.2.4**:
+* 2013.10.04: **0.2.4**:
 
     * Handful of typos, doc tweaks & addition of a .gitignore file. Thanks to
       Markus Zapke-Gründemann.
