@@ -58,6 +58,8 @@ Mimic the format seen `in Fabric's changelog
       backporting to bugfix releases; will show up in both release types.
     * ``major``: Given on bug issues to denote inclusion in feature, instead
       of bugfix, releases.
+    * If ``number`` is ``0`` no issue link will be generated. You can use this
+      for items without a related issue.
 
 * Regular Sphinx content may be given after issue roles and will be preserved
   as-is when rendering. For example, in ``:bug:`123` Fixed a bug, thanks
