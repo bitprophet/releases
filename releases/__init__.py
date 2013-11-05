@@ -32,14 +32,18 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     May give a 'ticket number' of '<number> backported' to indicate a
     backported feature or support ticket. This extra info will be stripped out
     prior to parsing. May also give 'major' in the same vein, implying the bug
-    was a major bug released in a feature release.
+    was a major bug released in a feature release. May give a 'ticket number'
+    of 0 to generate no hyperlink.
     """
     # Old-style 'just the issue link' behavior
     issue_no, _, ported = utils.unescape(text).partition(' ')
     # Lol @ access back to Sphinx
     config = inliner.document.settings.env.app.config
-    ref = config.releases_issue_uri % issue_no
-    link = nodes.reference(rawtext, '#' + issue_no, refuri=ref, **options)
+    if issue_no != '0':
+        ref = config.releases_issue_uri % issue_no
+        link = nodes.reference(rawtext, '#' + issue_no, refuri=ref, **options)
+    else:
+        link = None
     # Additional 'new-style changelog' stuff
     if name in issue_types:
         nodelist = issue_nodelist(name, link)
