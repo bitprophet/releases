@@ -79,6 +79,20 @@ In a fit of irony, Releases is too simple for a full Sphinx doc treatment (or
 for multiple release lines) and thus doesn't use itself. Here's a by-hand
 changelog:
 
+* 2013.11.05: **0.3.0**:
+
+    * Issue #1/#10 - allow using '0' as a dummy issue number, which will result
+      in no issue number/link being displayed. Thanks to Markus
+      Zapke-Gründemann and Hynek Schlawack for patches & discussion.
+
+        * This feature lets you categorize changes that aren't directly related
+          to issues in your tracker. It's an improvement over, and replacement
+          for, the previous "vanilla bullet list items are treated as bugs"
+          behavior.
+        * Said behavior (non-role-prefixed bullet list items turning into
+          regular bugs) is being retained as there's not a lot to gain from
+          deactivating it.
+
 * 2013.10.04: **0.2.4**:
 
     * Handful of typos, doc tweaks & addition of a .gitignore file. Thanks to
