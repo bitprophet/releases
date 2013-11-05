@@ -46,7 +46,15 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
         link = None
     # Additional 'new-style changelog' stuff
     if name in issue_types:
-        nodelist = issue_nodelist(name, link)
+        which = '[<span style="color: #%s;">%s</span>]' % (
+            issue_types[name], name.capitalize()
+        )
+        nodelist = [
+            nodes.raw(text=which, format='html'),
+        ]
+        if issue_no != '0':
+            nodelist += [nodes.inline(text=" "), link]
+        nodelist.append(nodes.inline(text=":"))
         # Sanity check
         if ported not in ('backported', 'major', ''):
             raise ValueError("Gave unknown issue metadata '%s' for issue no. %s" % (ported, issue_no))
