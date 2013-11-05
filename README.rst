@@ -81,8 +81,8 @@ changelog:
 
 * 2013.11.05: **0.3.0**:
 
-    * Issue #1/#10 - allow using '0' as a dummy issue number, which will result
-      in no issue number/link being displayed. Thanks to Markus
+    * Issues #1, #3, #10 - allow using '0' as a dummy issue number, which will
+      result in no issue number/link being displayed. Thanks to Markus
       Zapke-Gründemann and Hynek Schlawack for patches & discussion.
 
         * This feature lets you categorize changes that aren't directly related
