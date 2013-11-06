@@ -51,6 +51,14 @@ Mimic the format seen `in Fabric's changelog
       (both in terms of inclusion in releases, and formatting) and, naturally,
       will not be given a hyperlink.
 
+* List items are to be ordered chronologically with the newest ones on top.
+
+    * As you fix issues, put them on the top of the list.
+    * As you cut releases, put those on the top of the list and they will
+      include the issues below them.
+    * Issues with no releases above them will end up in a specially marked
+      "Unreleased" section of the rendered changelog.
+
 * Issue roles are of the form ``:type:`number[ keyword]```. Specifically:
   
     * ``number`` is used to generate the link to the actual issue in your issue
