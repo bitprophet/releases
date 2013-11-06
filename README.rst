@@ -96,7 +96,7 @@ In a fit of irony, Releases is too simple for a full Sphinx doc treatment (or
 for multiple release lines) and thus doesn't use itself. Here's a by-hand
 changelog:
 
-* 2013.11.05: **0.3.0**:
+* 2013.11.06: **0.3.0**:
 
     * Issues #1, #3, #10 - allow using '0' as a dummy issue number, which will
       result in no issue number/link being displayed. Thanks to Markus
