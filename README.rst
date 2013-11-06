@@ -47,26 +47,35 @@ Mimic the format seen `in Fabric's changelog
   roles to mark issues, or ``:release:`` to mark a release. These special roles
   must be the first element in each list item.
 
-    * Line-items that do not start with an issue role will be considered
-      bugs (both in terms of inclusion in releases, and formatting) and,
-      naturally, will not be given a hyperlink.
+    * Line-items that do not start with any issue role will be considered bugs
+      (both in terms of inclusion in releases, and formatting) and, naturally,
+      will not be given a hyperlink.
 
-* Issue roles are of the form ``:type:`number[ keyword]```. Keywords are
-  optional and may be one of:
-
-    * ``backported``: Given on support or feature issues to denote
-      backporting to bugfix releases; will show up in both release types.
-    * ``major``: Given on bug issues to denote inclusion in feature, instead
-      of bugfix, releases.
+* Issue roles are of the form ``:type:`number[ keyword]```. Specifically:
+  
+    * ``number`` is used to generate the link to the actual issue in your issue
+      tracker (going by the ``releases_issue_uri`` option). It's used for both
+      the link target & (part of) the link text.
     * If ``number`` is ``0`` no issue link will be generated. You can use this
       for items without a related issue.
+    * Keywords are optional and may be one of:
+
+        * ``backported``: Given on *support* or *feature* issues to denote
+          backporting to bugfix releases; such issues will show up in both
+          release types. E.g. placing ``:support:`123 backported``` in your
+          changelog below releases '1.1.1' and '1.2.0' will cause it to appear
+          in both of those releases' lists.
+        * ``major``: Given on bug issues to denote inclusion in feature,
+          instead of bugfix, releases. E.g. placing ``:bug:`22 major``` below
+          releases '1.1.1' and '1.2.0' will cause it to appear in '1.2.0'
+          **only**.
 
 * Regular Sphinx content may be given after issue roles and will be preserved
   as-is when rendering. For example, in ``:bug:`123` Fixed a bug, thanks
   `@somebody`!``, the rendered changelog will preserve/render "Fixed a bug,
   thanks ``@somebody``!" after the issue link.
 * Release roles are of the form ``:release:`number <date>```. Do not place any
-  additional content after release roles.
+  additional content after release roles - it will be ignored.
 
 Then build your docs; in the rendered output, ``changelog.html`` should show
 issues grouped by release, as per the above rules. Example: `Fabric's rendered
