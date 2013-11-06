@@ -126,20 +126,9 @@ TODO
 ====
 
 * Tests would be nice.
-* Migrate to a directive-driven (vs role-driven) format? Existing format
-  evolved from a purely role-oriented, prose-embedded setup; roles are no
-  longer really the right way to do this.
-
-    * Pro: possibly cleaner code + source formatting
-    * Con: possibly more verbose source formatting if I can't compact things
-      enough. Going from 1 line minimum to a, say, 3 or 4 line minimum per
-      entry is not (IMHO) acceptable.
-
 * Possibly add more keywords to allow control over additional edge cases.
 * Add shortcut format option for the release/issue URI settings - GitHub users
   can just give their GitHub acct/repo and we will fill in the rest.
 * Maybe say pre-1.0 releases consider all bugs 'major' (so one can e.g. put out
   an 0.4.0 which is all bugfixes). Iffy because what if you *wanted* regular
   feature-vs-bugfix releases pre-1.0? (which is common.)
-* Allow skipping the actual issue number link somehow, sometimes you just don't
-  have an issue and it's stupid to make one.
