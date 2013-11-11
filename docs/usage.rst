@@ -64,5 +64,7 @@ Specifically:
   additional content after release roles - it will be ignored.
 
 Then build your docs; in the rendered output, ``changelog.html`` should show
-issues grouped by release, as per the above rules. Example: `Fabric's rendered
-changelog <http://docs.fabfile.org/en/latest/changelog.html>`_.
+issues grouped by release, as per the above rules. Examples: `Releases' own
+rendered changelog
+<http://releases.readthedocs.org/en/latest/changelog.html>`_, `Fabric's
+rendered changelog <http://docs.fabfile.org/en/latest/changelog.html>`_.
