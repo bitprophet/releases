@@ -2,3 +2,4 @@
 *.egg*
 .*.swp
 build/
+docs/_build
