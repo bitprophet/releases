@@ -121,6 +121,7 @@ class issue(nodes.Element):
     def number(self):
         return self.get('number', None)
 
+
 class release(nodes.Element):
     @property
     def number(self):
