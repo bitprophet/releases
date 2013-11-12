@@ -146,8 +146,8 @@ def construct_releases(entries, app):
         # Release lines should have an empty 'rest' so it's ignored.
         if isinstance(focus, release):
             line = get_line(focus)
-            # New release line/branch detected. Create it & dump unreleased into
-            # this new release. Skip non-major bugs.
+            # New release line/branch detected. Create it & dump unreleased
+            # into this new release. Skip non-major bugs.
             if line not in lines:
                 lines[line] = []
                 releases.append({
