@@ -36,23 +36,23 @@ class releases(Spec):
         app.config = config
         self.app = app
 
-    def feature_releases_include_features(self):
+    def feature_releases_include_features_and_support_not_bugs(self):
         f12 = _issue('feature', '12')
+        s5 = _issue('support', '5')
         b15 = _issue('bug', '15')
         entries = construct_releases(
             [
                 _release('1.0.0'),
                 _entry(f12),
                 _entry(b15),
+                _entry(s5),
             ],
             self.app
         )[0]['entries']
-        eq_(len(entries), 1)
+        eq_(len(entries), 2)
         assert f12 in entries
+        assert s5 in entries
         assert b15 not in entries
-
-    def feature_releases_include_support(self):
-        skip()
 
     def feature_releases_include_major_bugs(self):
         skip()
