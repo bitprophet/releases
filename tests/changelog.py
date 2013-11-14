@@ -42,6 +42,8 @@ class releases(Spec):
         self.s = _issue('support', '5')
         self.b = _issue('bug', '15')
         self.mb = _issue('bug', '200', major=True)
+        self.bf = _issue('feature', '27', backported=True)
+        self.bs = _issue('support', '29', backported=True)
 
     def _expect_entries(self, all_entries, in_, not_in):
         # Translate simple objs into changelog-friendly ones
@@ -82,13 +84,29 @@ class releases(Spec):
         )
 
     def bugfix_releases_include_backported_features(self):
-        skip()
+        self._expect_entries(
+            ['1.0.2', self.bf, self.b, self.s],
+            [self.b, self.bf],
+            [self.s]
+        )
 
     def bugfix_releases_include_backported_support(self):
-        skip()
+        self._expect_entries(
+            ['1.0.2', self.f, self.b, self.s, self.bs],
+            [self.b, self.bs],
+            [self.s, self.f]
+        )
 
     def unmarked_bullet_list_items_treated_as_bugs(self):
-        skip()
+        issues = [
+            _release('1.0.2'), _entry(self.f), _entry([]), _release('1.0.0')
+        ]
+        releases = construct_releases(issues, self.app)
+        entries = releases[1]['entries']
+        eq_(len(entries), 1)
+        assert self.f not in entries
+        assert isinstance(entries[0], issue)
+        eq_(entries[0].number, None)
 
 
 class nodes(Spec):
