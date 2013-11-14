@@ -108,6 +108,16 @@ class releases(Spec):
         assert isinstance(entries[0], issue)
         eq_(entries[0].number, None)
 
+    def unreleased_items_go_in_unreleased_release(self):
+        issues = [
+            _release('1.0.2'), _entry(self.f), _entry(self.b), _release('1.0.0')
+        ]
+        releases = construct_releases(issues, self.app)
+        entries = releases[-1]['entries']
+        eq_(len(entries), 1)
+        assert self.f in entries
+        eq_(releases[-1]['obj'].number, 'unreleased')
+
 
 class nodes(Spec):
     """
