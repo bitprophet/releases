@@ -43,7 +43,7 @@ class releases(Spec):
         self.b = _issue('bug', '15')
         self.mb = _issue('bug', '200', major=True)
 
-    def _expect_entries(self, all_entries, size, in_, not_in):
+    def _expect_entries(self, all_entries, in_, not_in):
         # Translate simple objs into changelog-friendly ones
         for index, item in enumerate(all_entries):
             if isinstance(item, basestring):
@@ -54,7 +54,7 @@ class releases(Spec):
         all_entries.append(_release('1.0.0'))
         releases = construct_releases(all_entries, self.app)
         entries = releases[1]['entries'] # 1st release is the one we inserted
-        eq_(len(entries), size)
+        eq_(len(entries), len(in_))
         for x in in_:
             assert x in entries
         for x in not_in:
@@ -63,7 +63,6 @@ class releases(Spec):
     def feature_releases_include_features_and_support_not_bugs(self):
         self._expect_entries(
             ['1.1.0', self.f, self.b, self.s],
-            2,
             [self.f, self.s],
             [self.b]
         )
@@ -71,7 +70,6 @@ class releases(Spec):
     def feature_releases_include_major_bugs(self):
         self._expect_entries(
             ['1.1.0', self.f, self.b, self.mb],
-            2,
             [self.f, self.mb],
             [self.b]
         )
@@ -79,7 +77,6 @@ class releases(Spec):
     def bugfix_releases_include_bugs(self):
         self._expect_entries(
             ['1.0.2', self.f, self.b, self.mb],
-            1,
             [self.b],
             [self.mb, self.f],
         )
