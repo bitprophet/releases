@@ -167,25 +167,32 @@ def construct_releases(entries, app):
         # Release lines should have an empty 'rest' so it's ignored.
         if isinstance(focus, release):
             line = get_line(focus)
+            log("release for line %r" % line)
             # New release line/branch detected. Create it & dump unreleased
             # into this new release. Skip non-major bugs.
             if line not in lines:
+                log("not seen prior, making feature release")
                 lines[line] = []
+                entries = [
+                    x
+                    for x in lines['unreleased']
+                    if x.type in ('feature', 'support') or x.major
+                ]
+                log("entries in this release: %r" % (entries,))
                 releases.append({
                     'obj': focus,
-                    'entries': [
-                        x
-                        for x in lines['unreleased'] 
-                        if x.type in ('feature', 'support') or x.major
-                    ]
+                    'entries': entries
                 })
                 lines['unreleased'] = []
             # Existing line -> empty out its bucket into new release.
             # Skip 'major' bugs as those "belong" to the next release.
             else:
+                log("pre-existing, making bugfix release")
+                entries = [x for x in lines[line] if not x.major]
+                log("entries in this release: %r" % (entries,))
                 releases.append({
                     'obj': focus,
-                    'entries': [x for x in lines[line] if not x.major],
+                    'entries': entries,
                 })
                 lines[line] = []
         # Entries get copied into release line buckets as follows:
