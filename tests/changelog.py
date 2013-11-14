@@ -44,14 +44,17 @@ class releases(Spec):
         self.mb = _issue('bug', '200', major=True)
 
     def _process(self, *entries):
-        return construct_releases(entries, self.app)[0]['entries']
+        result = construct_releases(entries, self.app)
+        # Return 2nd release, 1st is the 'initial' (empty) one
+        return result[1]['entries']
 
     def feature_releases_include_features_and_support_not_bugs(self):
         entries = self._process(
-            _release('1.0.0'),
+            _release('1.1.0'),
             _entry(self.f),
             _entry(self.b),
             _entry(self.s),
+            _release('1.0.0'),
         )
         eq_(len(entries), 2)
         assert self.f in entries
@@ -60,10 +63,11 @@ class releases(Spec):
 
     def feature_releases_include_major_bugs(self):
         entries = self._process(
-            _release('1.0.0'),
+            _release('1.1.0'),
             _entry(self.f),
             _entry(self.b),
             _entry(self.mb),
+            _release('1.0.0'),
         )
         eq_(len(entries), 2)
         assert self.f in entries
@@ -72,10 +76,11 @@ class releases(Spec):
 
     def bugfix_releases_include_bugs(self):
         entries = self._process(
-            _release('1.0.2'),
+            _release('1.1.2'),
             _entry(self.f),
             _entry(self.b),
             _entry(self.mb),
+            _release('1.1.0'),
         )
         eq_(len(entries), 1)
         assert self.f not in entries

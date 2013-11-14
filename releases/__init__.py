@@ -239,6 +239,7 @@ def construct_releases(entries, app):
     # Entries not yet released get special 'release' entries (that lack an
     # actual release object).
     nodelist = [release_nodes("Unreleased", 'master', None, app.config)]
+    log("Creating 'unreleased' faux-release with %r" % (lines['unreleased'],))
     releases.append({
         'obj': release(number='unreleased', date=None, nodelist=nodelist),
         'entries': lines['unreleased']
