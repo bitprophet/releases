@@ -34,6 +34,7 @@ class releases(Spec):
         config = Mock('config')
         config.releases_release_uri = 'foo_%s'
         config.releases_issue_uri = 'bar_%s'
+        config.releases_debug = False
         app.config = config
         self.app = app
         # Changelog components

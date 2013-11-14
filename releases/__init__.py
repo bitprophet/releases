@@ -1,6 +1,19 @@
 import re
+import sys
+from functools import partial
 
 from docutils import nodes, utils
+
+
+def _log(txt, config):
+    """
+    Log debug output if debug setting is on.
+
+    Intended to be partial'd w/ config at top of functions. Meh.
+    """
+    if config.releases_debug:
+        sys.stderr.write(str(txt))
+        sys.stderr.flush()
 
 
 # Issue type list (keys) + color values
@@ -133,11 +146,13 @@ def get_line(obj):
     return '.'.join(obj.number.split('.')[:-1])
 
 def construct_releases(entries, app):
+    log = partial(_log, config=app.config)
     # Walk from back to front, consuming entries & copying them into
     # per-release buckets as releases are encountered. Store releases in order.
     releases = []
     lines = {'unreleased': []}
     for obj in reversed(entries):
+        log(obj)
         # The 'actual' intermediate object we want to focus on is wrapped first
         # in a LI, then a P.
         focus, rest = obj[0][0], obj[0][1:]
@@ -282,6 +297,8 @@ def setup(app):
     # E.g. 'https://github.com/fabric/fabric/tree/'
     app.add_config_value(name='releases_release_uri', default=None,
         rebuild='html')
+    # Debug output
+    app.add_config_value(name='releases_debug', default=False, rebuild='html')
     # Register intermediate roles
     for x in list(issue_types) + ['issue']:
         app.add_role(x, issues_role)
