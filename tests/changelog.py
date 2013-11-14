@@ -71,7 +71,16 @@ class releases(Spec):
         assert self.b not in entries
 
     def bugfix_releases_include_bugs(self):
-        skip()
+        entries = self._process(
+            _release('1.0.2'),
+            _entry(self.f),
+            _entry(self.b),
+            _entry(self.mb),
+        )
+        eq_(len(entries), 1)
+        assert self.f not in entries
+        assert self.mb not in entries
+        assert self.b in entries
 
     def bugfix_releases_include_backported_features(self):
         skip()
