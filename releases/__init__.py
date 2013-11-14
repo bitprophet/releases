@@ -12,7 +12,7 @@ def _log(txt, config):
     Intended to be partial'd w/ config at top of functions. Meh.
     """
     if config.releases_debug:
-        sys.stderr.write(str(txt))
+        sys.stderr.write(str(txt) + "\n")
         sys.stderr.flush()
 
 
