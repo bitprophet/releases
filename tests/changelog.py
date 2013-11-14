@@ -43,49 +43,46 @@ class releases(Spec):
         self.b = _issue('bug', '15')
         self.mb = _issue('bug', '200', major=True)
 
-    def _process(self, *entries):
-        result = construct_releases(entries, self.app)
-        # Return 2nd release, 1st is the 'initial' (empty) one
-        return result[1]['entries']
+    def _expect_entries(self, all_entries, size, in_, not_in):
+        # Translate simple objs into changelog-friendly ones
+        for index, item in enumerate(all_entries):
+            if isinstance(item, basestring):
+                all_entries[index] = _release(item)
+            elif isinstance(item, issue):
+                all_entries[index] = _entry(item)
+        # Insert initial/empty 1st release to start timeline
+        all_entries.append(_release('1.0.0'))
+        releases = construct_releases(all_entries, self.app)
+        entries = releases[1]['entries'] # 1st release is the one we inserted
+        eq_(len(entries), size)
+        for x in in_:
+            assert x in entries
+        for x in not_in:
+            assert x not in entries
 
     def feature_releases_include_features_and_support_not_bugs(self):
-        entries = self._process(
-            _release('1.1.0'),
-            _entry(self.f),
-            _entry(self.b),
-            _entry(self.s),
-            _release('1.0.0'),
+        self._expect_entries(
+            ['1.1.0', self.f, self.b, self.s],
+            2,
+            [self.f, self.s],
+            [self.b]
         )
-        eq_(len(entries), 2)
-        assert self.f in entries
-        assert self.s in entries
-        assert self.b not in entries
 
     def feature_releases_include_major_bugs(self):
-        entries = self._process(
-            _release('1.1.0'),
-            _entry(self.f),
-            _entry(self.b),
-            _entry(self.mb),
-            _release('1.0.0'),
+        self._expect_entries(
+            ['1.1.0', self.f, self.b, self.mb],
+            2,
+            [self.f, self.mb],
+            [self.b]
         )
-        eq_(len(entries), 2)
-        assert self.f in entries
-        assert self.mb in entries
-        assert self.b not in entries
 
     def bugfix_releases_include_bugs(self):
-        entries = self._process(
-            _release('1.1.2'),
-            _entry(self.f),
-            _entry(self.b),
-            _entry(self.mb),
-            _release('1.1.0'),
+        self._expect_entries(
+            ['1.0.2', self.f, self.b, self.mb],
+            1,
+            [self.b],
+            [self.mb, self.f],
         )
-        eq_(len(entries), 1)
-        assert self.f not in entries
-        assert self.mb not in entries
-        assert self.b in entries
 
     def bugfix_releases_include_backported_features(self):
         skip()
