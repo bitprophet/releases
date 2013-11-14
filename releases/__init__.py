@@ -134,11 +134,17 @@ class issue(nodes.Element):
     def number(self):
         return self.get('number', None)
 
+    def __repr__(self):
+        return "<%s #%s>" % (self.type, self.number)
+
 
 class release(nodes.Element):
     @property
     def number(self):
         return self['number']
+
+    def __repr__(self):
+        return "<release %s>" % self.number
 
 
 def get_line(obj):
@@ -152,10 +158,10 @@ def construct_releases(entries, app):
     releases = []
     lines = {'unreleased': []}
     for obj in reversed(entries):
-        log(obj)
         # The 'actual' intermediate object we want to focus on is wrapped first
         # in a LI, then a P.
         focus, rest = obj[0][0], obj[0][1:]
+        log(repr(focus))
         # Releases 'eat' the entries in their line's list and get added to the
         # final data structure. They also inform new release-line 'buffers'.
         # Release lines should have an empty 'rest' so it's ignored.
