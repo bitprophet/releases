@@ -45,7 +45,8 @@ class releases(Spec):
         self.bf = _issue('feature', '27', backported=True)
         self.bs = _issue('support', '29', backported=True)
 
-    def _releases(self, entries):
+    def _releases(self, *entries):
+        entries = list(entries) # lol tuples
         # Translate simple objs into changelog-friendly ones
         for index, item in enumerate(entries):
             if isinstance(item, basestring):
@@ -58,7 +59,7 @@ class releases(Spec):
 
     def _expect_entries(self, all_entries, in_, not_in):
         # Grab 2nd release as 1st is the empty 'beginning of time' one
-        entries = self._releases(all_entries)[1]['entries']
+        entries = self._releases(*all_entries)[1]['entries']
         eq_(len(entries), len(in_))
         for x in in_:
             assert x in entries
@@ -103,14 +104,14 @@ class releases(Spec):
     def unmarked_bullet_list_items_treated_as_bugs(self):
         # Empty list item here stands in for just-a-list-of-nodes,
         # which is what a non-issue/release changelog list item looks like
-        entries = self._releases(['1.0.2', self.f, []])[1]['entries']
+        entries = self._releases('1.0.2', self.f, [])[1]['entries']
         eq_(len(entries), 1)
         assert self.f not in entries
         assert isinstance(entries[0], issue)
         eq_(entries[0].number, None)
 
     def unreleased_items_go_in_unreleased_release(self):
-        releases = self._releases(['1.0.2', self.f, self.b])
+        releases = self._releases('1.0.2', self.f, self.b)
         r = releases[-1]
         eq_(len(r['entries']), 1)
         assert self.f in r['entries']
