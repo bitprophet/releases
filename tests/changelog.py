@@ -45,17 +45,20 @@ class releases(Spec):
         self.bf = _issue('feature', '27', backported=True)
         self.bs = _issue('support', '29', backported=True)
 
-    def _expect_entries(self, all_entries, in_, not_in):
+    def _releases(self, entries):
         # Translate simple objs into changelog-friendly ones
-        for index, item in enumerate(all_entries):
+        for index, item in enumerate(entries):
             if isinstance(item, basestring):
-                all_entries[index] = _release(item)
-            elif isinstance(item, issue):
-                all_entries[index] = _entry(item)
+                entries[index] = _release(item)
+            else:
+                entries[index] = _entry(item)
         # Insert initial/empty 1st release to start timeline
-        all_entries.append(_release('1.0.0'))
-        releases = construct_releases(all_entries, self.app)
-        entries = releases[1]['entries'] # 1st release is the one we inserted
+        entries.append(_release('1.0.0'))
+        return construct_releases(entries, self.app)
+
+    def _expect_entries(self, all_entries, in_, not_in):
+        # Grab 2nd release as 1st is the empty 'beginning of time' one
+        entries = self._releases(all_entries)[1]['entries']
         eq_(len(entries), len(in_))
         for x in in_:
             assert x in entries
@@ -98,25 +101,20 @@ class releases(Spec):
         )
 
     def unmarked_bullet_list_items_treated_as_bugs(self):
-        issues = [
-            _release('1.0.2'), _entry(self.f), _entry([]), _release('1.0.0')
-        ]
-        releases = construct_releases(issues, self.app)
-        entries = releases[1]['entries']
+        # Empty list item here stands in for just-a-list-of-nodes,
+        # which is what a non-issue/release changelog list item looks like
+        entries = self._releases(['1.0.2', self.f, []])[1]['entries']
         eq_(len(entries), 1)
         assert self.f not in entries
         assert isinstance(entries[0], issue)
         eq_(entries[0].number, None)
 
     def unreleased_items_go_in_unreleased_release(self):
-        issues = [
-            _release('1.0.2'), _entry(self.f), _entry(self.b), _release('1.0.0')
-        ]
-        releases = construct_releases(issues, self.app)
-        entries = releases[-1]['entries']
-        eq_(len(entries), 1)
-        assert self.f in entries
-        eq_(releases[-1]['obj'].number, 'unreleased')
+        releases = self._releases(['1.0.2', self.f, self.b])
+        r = releases[-1]
+        eq_(len(r['entries']), 1)
+        assert self.f in r['entries']
+        eq_(r['obj'].number, 'unreleased')
 
 
 class nodes(Spec):
