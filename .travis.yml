@@ -1,0 +1,13 @@
+language: python
+python:
+  - "2.6"
+  - "2.7"
+  - "3.2"
+  - "3.3"
+  - "pypy"
+install:
+  - pip install -r dev-requirements.txt
+script:
+  - inv test
+  # Jinja2, used by Sphinx, does not work on Python 3.2 (but does on 3.3)
+  - "if [[ $TRAVIS_PYTHON_VERSION != '3.2' ]]; then inv docs; fi"
