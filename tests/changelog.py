@@ -117,6 +117,20 @@ class releases(Spec):
         assert self.f in r['entries']
         eq_(r['obj'].number, 'unreleased')
 
+    def issues_consumed_by_releases_are_not_in_unreleased(self):
+        releases = self._releases('1.0.2', self.f, self.b, self.s, self.bs)
+        release = releases[1]['entries']
+        unreleased = releases[-1]['entries']
+        assert self.b in release
+        assert self.b not in unreleased
+
+    def unreleased_catches_bugs_and_features(self):
+        entries = [self.f, self.b, self.mb, self.s, self.bs, self.bf]
+        releases = self._releases(*entries)
+        unreleased = releases[-1]['entries']
+        for x in entries:
+            assert x in unreleased
+
 
 class nodes(Spec):
     """
