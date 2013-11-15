@@ -135,7 +135,14 @@ class issue(nodes.Element):
         return self.get('number', None)
 
     def __repr__(self):
-        return "<%s #%s>" % (self.type, self.number)
+        flag = ""
+        if self.backported:
+            flag = "backported"
+        elif self.major:
+            flag = "major"
+        if flag:
+            flag = " (%s)" % flag
+        return "<%s #%s%s>" % (self.type, self.number, flag)
 
 
 class release(nodes.Element):
