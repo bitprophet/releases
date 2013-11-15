@@ -23,21 +23,23 @@ def _release(number, **kwargs):
     r = release(number=number, **kwargs)
     return [[r]]
 
+def _app():
+    # Fake app obj
+    app = Mock('app')
+    config = Mock('config')
+    config.releases_release_uri = 'foo_%s'
+    config.releases_issue_uri = 'bar_%s'
+    config.releases_debug = False
+    app.config = config
+    return app
+
 
 class releases(Spec):
     """
     Organization of issues into releases
     """
     def setup(self):
-        # Fake app obj
-        app = Mock('app')
-        config = Mock('config')
-        config.releases_release_uri = 'foo_%s'
-        config.releases_issue_uri = 'bar_%s'
-        config.releases_debug = False
-        app.config = config
-        self.app = app
-        # Changelog components
+        self.app = _app()
         self.f = _issue('feature', '12')
         self.s = _issue('support', '5')
         self.b = _issue('bug', '15')
@@ -136,6 +138,9 @@ class nodes(Spec):
     """
     Expansion/extension of docutils nodes
     """
+    def setup(self):
+        self.app = _app()
+
     def issues_with_numbers_appear_as_number_links(self):
         skip()
 
@@ -149,4 +154,7 @@ class nodes(Spec):
         skip()
 
     def zeroed_issues_appear_as_unlinked_issues(self):
+        skip()
+
+    def issues_wrapped_in_unordered_list_nodes(self):
         skip()
