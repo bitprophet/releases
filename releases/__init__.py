@@ -192,7 +192,8 @@ def construct_releases(entries, app):
                 })
                 lines['unreleased'] = []
             # Existing line -> empty out its bucket into new release.
-            # Skip 'major' bugs as those "belong" to the next release.
+            # Skip 'major' bugs as those "belong" to the next release (and will
+            # also be in 'unreleased' - so safe to nuke the entire line)
             else:
                 log("pre-existing, making bugfix release")
                 entries = [x for x in lines[line] if not x.major]
@@ -202,6 +203,9 @@ def construct_releases(entries, app):
                     'entries': entries,
                 })
                 lines[line] = []
+                # Clean out the items we just released from 'unreleased'
+                for x in entries:
+                    lines['unreleased'].remove(x)
         # Entries get copied into release line buckets as follows:
         # * Everything goes into 'unreleased' so it can be used in new lines.
         # * Bugfixes (but not support or feature entries) go into all release
@@ -216,6 +220,7 @@ def construct_releases(entries, app):
             # Handle rare-but-valid non-issue-attached line items, which are
             # always bugs. (They are their own description.)
             if not isinstance(focus, issue):
+                log("Found line item w/ no real issue object, creating bug")
                 focus = issue(
                     type_='bug',
                     nodelist=issue_nodelist('bug'),
@@ -226,21 +231,25 @@ def construct_releases(entries, app):
             else:
                 focus.attributes['description'] = rest
             if focus.type == 'bug':
-                # Regular bugs go into per-line buckets only.
+                # All bugs go into 'unreleased'
+                lines['unreleased'].append(focus)
+                log("Adding to unreleased")
+                # Regular bugs also go into per-line buckets ('major' bugs do
+                # not - they stay in 'unreleased' until next feature release)
                 if not focus.major:
                     for line in [x for x in lines if x != 'unreleased']:
+                        log("Adding to release line %r" % line)
                         lines[line].append(focus)
-                # Major bugs go into feature release bucket only.
-                else:
-                    lines['unreleased'].append(focus)
             else:
                 # Backported feature/support items go into all lines.
                 if focus.backported:
                     for line in lines:
+                        log("Adding to release line %r" % line)
                         lines[line].append(focus)
                 # Non-backported feature/support items go into feature releases
                 # only.
                 else:
+                    log("Adding to unreleased")
                     lines['unreleased'].append(focus)
 
     # Entries not yet released get special 'release' entries (that lack an
