@@ -39,7 +39,6 @@ class releases(Spec):
     Organization of issues into releases
     """
     def setup(self):
-        self.app = _app()
         self.f = _issue('feature', '12')
         self.s = _issue('support', '5')
         self.b = _issue('bug', '15')
@@ -57,7 +56,7 @@ class releases(Spec):
                 entries[index] = _entry(item)
         # Insert initial/empty 1st release to start timeline
         entries.append(_release('1.0.0'))
-        return construct_releases(entries, self.app)
+        return construct_releases(entries, _app())
 
     def _expect_entries(self, all_entries, in_, not_in):
         # Grab 2nd release as 1st is the empty 'beginning of time' one
