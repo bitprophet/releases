@@ -3,25 +3,12 @@ from mock import Mock
 
 from releases import (
     issue,
+    issues_role,
     release,
-    construct_releases
+    construct_releases,
+    construct_nodes
 )
 
-
-# Wrap dumb nodeutils-derived shit for easier creation
-def _issue(type_, number, **kwargs):
-    kwargs['type_'] = type_
-    kwargs['number'] = number
-    kwargs.setdefault('major', False)
-    kwargs.setdefault('backported', False)
-    return issue(**kwargs)
-
-def _entry(i):
-    return [[i, []]]
-
-def _release(number, **kwargs):
-    r = release(number=number, **kwargs)
-    return [[r]]
 
 def _app():
     # Fake app obj
@@ -32,6 +19,30 @@ def _app():
     config.releases_debug = False
     app.config = config
     return app
+
+# Obtain issue() object w/o wrapping all parse steps
+def _issue(type_, number, **kwargs):
+    # lollllllllll
+    inliner = Mock(document=Mock(settings=Mock(env=Mock(app=_app()))))
+    text = str(number)
+    if kwargs.get('backported', False):
+        text += " backported"
+    if kwargs.get('major', False):
+        text += " major"
+    return issues_role(
+        name=type_,
+        rawtext='',
+        text=text,
+        lineno=None,
+        inliner=inliner,
+    )[0][0]
+
+def _entry(i):
+    return [[i]]
+
+def _release(number, **kwargs):
+    r = release(number=number, **kwargs)
+    return [[r]]
 
 def _releases(*entries):
     entries = list(entries) # lol tuples
@@ -45,18 +56,21 @@ def _releases(*entries):
     entries.append(_release('1.0.0'))
     return construct_releases(entries, _app())
 
+def _setup_issues(self):
+    self.f = _issue('feature', '12')
+    self.s = _issue('support', '5')
+    self.b = _issue('bug', '15')
+    self.mb = _issue('bug', '200', major=True)
+    self.bf = _issue('feature', '27', backported=True)
+    self.bs = _issue('support', '29', backported=True)
+
 
 class releases(Spec):
     """
     Organization of issues into releases
     """
     def setup(self):
-        self.f = _issue('feature', '12')
-        self.s = _issue('support', '5')
-        self.b = _issue('bug', '15')
-        self.mb = _issue('bug', '200', major=True)
-        self.bf = _issue('feature', '27', backported=True)
-        self.bs = _issue('support', '29', backported=True)
+        _setup_issues(self)
 
     def _expect_entries(self, all_entries, in_, not_in):
         # Grab 2nd release as 1st is the empty 'beginning of time' one
