@@ -9,7 +9,7 @@ from releases import (
     construct_releases,
     construct_nodes
 )
-from docutils.nodes import reference, bullet_list, list_item
+from docutils.nodes import reference, bullet_list, list_item, raw
 
 
 def _app():
@@ -155,6 +155,17 @@ class releases(Spec):
             assert x in unreleased
 
 
+def _obj2name(obj):
+    cls = obj if isinstance(obj, type) else obj.__class__
+    return cls.__name__.split('.')[-1]
+
+def _expect_type(node, cls):
+    type_ = _obj2name(node)
+    name = _obj2name(cls)
+    msg = "Expected %r to be a %s, but it's a %s" % (node, name, type_)
+    assert isinstance(node, cls), msg
+
+
 class nodes(Spec):
     """
     Expansion/extension of docutils nodes
@@ -170,7 +181,7 @@ class nodes(Spec):
     def issues_with_numbers_appear_as_number_links(self):
         nodes = self._generate('1.0.2', self.b)
         link = nodes[0][2]
-        assert isinstance(link, reference)
+        _expect_type(link, reference)
         assert link['refuri'] == 'bar_15'
 
     def _assert_prefix(self, entries, expectation):
@@ -190,7 +201,10 @@ class nodes(Spec):
 
     def issues_wrapped_in_unordered_list_nodes(self):
         node = self._generate('1.0.2', self.b, raw=True)[0][1]
-        type_ = node.__class__.__name__.split('.')[-1]
-        msg = "Expected %r to be a bullet_list, but it's a %s" % (node, type_)
-        assert isinstance(node, bullet_list), msg
-        assert isinstance(node[0], list_item)
+        _expect_type(node, bullet_list)
+        _expect_type(node[0], list_item)
+
+    def release_headers_have_local_style_tweaks(self):
+        title = self._generate('1.0.2', self.b, raw=True)[0][0]
+        _expect_type(title, raw)
+        assert 'style="margin-bottom: 0.3em"' in title
