@@ -167,12 +167,13 @@ class nodes(Spec):
 
     def issues_with_numbers_appear_as_number_links(self):
         nodes = self._generate('1.0.2', self.b)
-        link = nodes[0].children[1].children[0].children[2]
+        link = nodes[0][1][0][2]
         assert isinstance(link, reference)
         assert link['refuri'] == 'bar_15'
 
     def bugs_marked_as_bugs(self):
-        skip()
+        nodes = self._generate('1.0.2', self.b)
+        assert 'Bug' in nodes[0][1][0][0][0]
 
     def features_marked_as_features(self):
         skip()
