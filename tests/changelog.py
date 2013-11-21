@@ -9,7 +9,7 @@ from releases import (
     construct_releases,
     construct_nodes
 )
-from docutils.nodes import reference
+from docutils.nodes import reference, bullet_list, list_item
 
 
 def _app():
@@ -162,8 +162,9 @@ class nodes(Spec):
     def setup(self):
         _setup_issues(self)
 
-    def _generate(self, *entries):
-        return construct_nodes(_releases(*entries))[0][1]
+    def _generate(self, *entries, **kwargs):
+        nodes = construct_nodes(_releases(*entries))
+        return nodes if kwargs.get('raw', False) else nodes[0][1]
 
     def issues_with_numbers_appear_as_number_links(self):
         nodes = self._generate('1.0.2', self.b)
@@ -187,4 +188,8 @@ class nodes(Spec):
         self._assert_prefix(['1.0.2', _issue('bug', '0')], 'Bug')
 
     def issues_wrapped_in_unordered_list_nodes(self):
-        skip()
+        node = self._generate('1.0.2', self.b, raw=True)[0][1]
+        type_ = node.__class__.__name__.split('.')[-1]
+        msg = "Expected %r to be a bullet_list, but it's a %s" % (node, type_)
+        assert isinstance(node, bullet_list), msg
+        assert isinstance(node[0], list_item)
