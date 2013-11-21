@@ -1,3 +1,4 @@
+import six
 from spec import Spec, skip, eq_
 from mock import Mock
 
@@ -56,7 +57,7 @@ def _releases(*entries):
     entries = list(entries) # lol tuples
     # Translate simple objs into changelog-friendly ones
     for index, item in enumerate(entries):
-        if isinstance(item, basestring):
+        if isinstance(item, six.string_types):
             entries[index] = _release(item)
         else:
             entries[index] = _entry(item)
