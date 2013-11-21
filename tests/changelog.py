@@ -208,6 +208,6 @@ class nodes(Spec):
         node = self._generate('1.0.2', self.b, raw=True)[0][0]
         _expect_type(node, raw)
         # Header w/ bottom margin
-        assert '<h2 style="margin-bottom' in node
+        assert '<h2 style="margin-bottom' in str(node)
         # Date span w/ font-size
-        assert '<span style="font-size' in node
+        assert '<span style="font-size' in str(node)

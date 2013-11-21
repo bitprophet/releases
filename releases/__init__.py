@@ -78,19 +78,20 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
 
 
 def release_nodes(text, slug, date, config):
-    my_nodes = [
-        nodes.reference(
-            text=text,
-            refuri=config.releases_release_uri % slug,
-        ),
-    ]
+    # Doesn't seem possible to do this "cleanly" (i.e. just say "make me a
+    # title and give it these HTML attributes during render time) so...fuckit.
+    # We were already doing fully raw elements elsewhere anyway. And who cares
+    # about a PDF of a changelog? :x
+    link = '<a class="reference external" href="{0}">{1}</a>'.format(
+        config.releases_release_uri % slug,
+        text,
+    )
+    datespan = ''
     if date:
-        my_nodes.extend([
-            nodes.inline(text=' '),
-            nodes.raw(text='<span style="font-size: 75%%;">%s</span>' % date, format='html'),
-        ])
+        datespan = ' <span style="font-size: 75%%;">{0}</span>'.format(date)
+    header = '<h2 style="margin-bottom: 0.3em;">{0}{1}</h2>'.format(link, datespan)
     return nodes.section('',
-        nodes.title('', '', *my_nodes),
+        nodes.raw(rawtext='', text=header, format='html'),
         ids=[text]
     )
 
