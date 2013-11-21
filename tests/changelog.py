@@ -176,10 +176,12 @@ class nodes(Spec):
         assert 'Bug' in nodes[0][1][0][0][0]
 
     def features_marked_as_features(self):
-        skip()
+        nodes = self._generate('1.1.0', self.f)
+        assert 'Feature' in nodes[0][1][0][0][0]
 
     def support_marked_as_suppot(self):
-        skip()
+        nodes = self._generate('1.1.0', self.s)
+        assert 'Support' in nodes[0][1][0][0][0]
 
     def zeroed_issues_appear_as_unlinked_issues(self):
         skip()
