@@ -5,9 +5,11 @@ from releases import (
     issue,
     issues_role,
     release,
+    release_role,
     construct_releases,
     construct_nodes
 )
+from docutils.nodes import reference
 
 
 def _app():
@@ -20,10 +22,11 @@ def _app():
     app.config = config
     return app
 
+def _inliner():
+    return Mock(document=Mock(settings=Mock(env=Mock(app=_app()))))
+
 # Obtain issue() object w/o wrapping all parse steps
 def _issue(type_, number, **kwargs):
-    # lollllllllll
-    inliner = Mock(document=Mock(settings=Mock(env=Mock(app=_app()))))
     text = str(number)
     if kwargs.get('backported', False):
         text += " backported"
@@ -34,15 +37,20 @@ def _issue(type_, number, **kwargs):
         rawtext='',
         text=text,
         lineno=None,
-        inliner=inliner,
+        inliner=_inliner(),
     )[0][0]
 
 def _entry(i):
     return [[i]]
 
 def _release(number, **kwargs):
-    r = release(number=number, **kwargs)
-    return [[r]]
+    return release_role(
+        name=None,
+        rawtext='',
+        text='%s <2013-11-20>' % number,
+        lineno=None,
+        inliner=_inliner(),
+    )
 
 def _releases(*entries):
     entries = list(entries) # lol tuples
@@ -152,10 +160,16 @@ class nodes(Spec):
     Expansion/extension of docutils nodes
     """
     def setup(self):
-        self.app = _app()
+        _setup_issues(self)
+
+    def _generate(self, *entries):
+        return construct_nodes(_releases(*entries))
 
     def issues_with_numbers_appear_as_number_links(self):
-        skip()
+        nodes = self._generate('1.0.2', self.b)
+        link = nodes[0].children[1].children[0].children[2]
+        assert isinstance(link, reference)
+        assert link['refuri'] == 'bar_15'
 
     def bugs_marked_as_bugs(self):
         skip()
