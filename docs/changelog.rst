@@ -11,8 +11,8 @@ Changelog
 * :bug:`9` Clean up additional 'unreleased' display/organization behavior,
   including making sure ALL unreleased issues show up as 'unreleased'. Thanks
   to Donald Stufft for the report.
-* :feature:`1` (also :issue:`3`, :issue:`10`) Allow using ``0`` as a dummy
-  issue number, which will result in no issue number/link being displayed.
+* :feature:`1` (also :issue:`3`, :issue:`10`) Allow using ``-`` as a dummy
+  issue 'number', which will result in no issue number/link being displayed.
   Thanks to Markus Zapke-Gründemann and Hynek Schlawack for patches &
   discussion.
 

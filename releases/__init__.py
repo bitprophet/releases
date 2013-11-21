@@ -46,7 +46,7 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     backported feature or support ticket. This extra info will be stripped out
     prior to parsing. May also give 'major' in the same vein, implying the bug
     was a major bug released in a feature release. May give a 'ticket number'
-    of 0 to generate no hyperlink.
+    of ``-`` to generate no hyperlink.
     """
     # Old-style 'just the issue link' behavior
     issue_no, _, ported = utils.unescape(text).partition(' ')

@@ -42,8 +42,8 @@ Specifically:
     * ``number`` is used to generate the link to the actual issue in your issue
       tracker (going by the ``releases_issue_uri`` option). It's used for both
       the link target & (part of) the link text.
-    * If ``number`` is ``0`` no issue link will be generated. You can use this
-      for items without a related issue.
+    * If ``number`` is simply ``-`` no issue link will be generated. You can
+      use this for items without a related issue.
     * Keywords are optional and may be one of:
 
         * ``backported``: Given on *support* or *feature* issues to denote
