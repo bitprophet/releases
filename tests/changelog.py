@@ -196,8 +196,8 @@ class nodes(Spec):
     def support_marked_as_suppot(self):
         self._assert_prefix(['1.1.0', self.s], 'Support')
 
-    def zeroed_issues_appear_as_unlinked_issues(self):
-        self._assert_prefix(['1.0.2', _issue('bug', '0')], 'Bug')
+    def dashed_issues_appear_as_unlinked_issues(self):
+        self._assert_prefix(['1.0.2', _issue('bug', '-')], 'Bug')
 
     def issues_wrapped_in_unordered_list_nodes(self):
         node = self._generate('1.0.2', self.b, raw=True)[0][1]
