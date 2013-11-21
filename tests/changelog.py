@@ -171,20 +171,20 @@ class nodes(Spec):
         assert isinstance(link, reference)
         assert link['refuri'] == 'bar_15'
 
+    def _assert_prefix(self, entries, expectation):
+        assert expectation in self._generate(*entries)[0][0][0]
+
     def bugs_marked_as_bugs(self):
-        nodes = self._generate('1.0.2', self.b)
-        assert 'Bug' in nodes[0][0][0]
+        self._assert_prefix(['1.0.2', self.b], 'Bug')
 
     def features_marked_as_features(self):
-        nodes = self._generate('1.1.0', self.f)
-        assert 'Feature' in nodes[0][0][0]
+        self._assert_prefix(['1.1.0', self.f], 'Feature')
 
     def support_marked_as_suppot(self):
-        nodes = self._generate('1.1.0', self.s)
-        assert 'Support' in nodes[0][0][0]
+        self._assert_prefix(['1.1.0', self.s], 'Support')
 
     def zeroed_issues_appear_as_unlinked_issues(self):
-        skip()
+        self._assert_prefix(['1.0.2', _issue('bug', '0')], 'Bug')
 
     def issues_wrapped_in_unordered_list_nodes(self):
         skip()
