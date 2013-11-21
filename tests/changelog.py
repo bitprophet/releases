@@ -9,7 +9,7 @@ from releases import (
     construct_releases,
     construct_nodes
 )
-from docutils.nodes import reference, bullet_list, list_item, raw
+from docutils.nodes import reference, bullet_list, list_item, title, raw
 
 
 def _app():
@@ -205,6 +205,9 @@ class nodes(Spec):
         _expect_type(node[0], list_item)
 
     def release_headers_have_local_style_tweaks(self):
-        title = self._generate('1.0.2', self.b, raw=True)[0][0]
-        _expect_type(title, raw)
-        assert 'style="margin-bottom: 0.3em"' in title
+        node = self._generate('1.0.2', self.b, raw=True)[0][0]
+        _expect_type(node, raw)
+        # Header w/ bottom margin
+        assert '<h2 style="margin-bottom' in node
+        # Date span w/ font-size
+        assert '<span style="font-size' in node
