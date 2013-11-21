@@ -163,25 +163,25 @@ class nodes(Spec):
         _setup_issues(self)
 
     def _generate(self, *entries):
-        return construct_nodes(_releases(*entries))
+        return construct_nodes(_releases(*entries))[0][1]
 
     def issues_with_numbers_appear_as_number_links(self):
         nodes = self._generate('1.0.2', self.b)
-        link = nodes[0][1][0][2]
+        link = nodes[0][2]
         assert isinstance(link, reference)
         assert link['refuri'] == 'bar_15'
 
     def bugs_marked_as_bugs(self):
         nodes = self._generate('1.0.2', self.b)
-        assert 'Bug' in nodes[0][1][0][0][0]
+        assert 'Bug' in nodes[0][0][0]
 
     def features_marked_as_features(self):
         nodes = self._generate('1.1.0', self.f)
-        assert 'Feature' in nodes[0][1][0][0][0]
+        assert 'Feature' in nodes[0][0][0]
 
     def support_marked_as_suppot(self):
         nodes = self._generate('1.1.0', self.s)
-        assert 'Support' in nodes[0][1][0][0][0]
+        assert 'Support' in nodes[0][0][0]
 
     def zeroed_issues_appear_as_unlinked_issues(self):
         skip()
