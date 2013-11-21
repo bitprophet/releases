@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* :release:`0.3.0 <2013-11-21>`
 * :feature:`11` Fix up styling so changelogs don't look suboptimal under `the
   new Read The Docs theme
   <http://ericholscher.com/blog/2013/nov/4/new-theme-read-the-docs/>`_. Still
