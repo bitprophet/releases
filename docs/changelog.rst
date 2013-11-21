@@ -2,12 +2,12 @@
 Changelog
 =========
 
-* :feature:`11` Fix up styling so changelogs don't look like ass under `the new
-  Read The Docs theme
+* :feature:`11` Fix up styling so changelogs don't look suboptimal under `the
+  new Read The Docs theme
   <http://ericholscher.com/blog/2013/nov/4/new-theme-read-the-docs/>`_. Still
   looks OK under their old theme too!
-* :support:`0` Set up for-reals Sphinx docs. We're dogfooding!
-* :support:`0` Created a basic test suite. Yup.
+* :support:`0` Move to actual Sphinx docs so we can use ourselves.
+* :support:`0` Created a basic test suite to protect against regressions.
 * :bug:`9` Clean up additional 'unreleased' display/organization behavior,
   including making sure ALL unreleased issues show up as 'unreleased'. Thanks
   to Donald Stufft for the report.
