@@ -2,9 +2,15 @@
 
 from setuptools import setup
 
+# Version info -- read without importing
+_locals = {}
+with open('releases/_version.py') as fp:
+    exec(fp.read(), None, _locals)
+version = _locals['__version__']
+
 setup(
     name='releases',
-    version='0.2.4',
+    version=version,
     description='A Sphinx extension for changelog manipulation',
     author='Jeff Forcier',
     author_email='jeff@bitprophet.org',
