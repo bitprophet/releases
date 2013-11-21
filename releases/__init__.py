@@ -296,7 +296,7 @@ def construct_nodes(releases):
         # Entry list
         list_ = nodes.bullet_list('', *entries)
         # Insert list into release nodelist (as it's a section)
-        obj['nodelist'][0].extend(list_)
+        obj['nodelist'][0].append(list_)
         # Release header
         header = nodes.paragraph('', '', *obj['nodelist'])
         result.extend(header)

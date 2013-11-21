@@ -164,7 +164,8 @@ class nodes(Spec):
 
     def _generate(self, *entries, **kwargs):
         nodes = construct_nodes(_releases(*entries))
-        return nodes if kwargs.get('raw', False) else nodes[0][1]
+        # By default, yield the contents of the bullet list.
+        return nodes if kwargs.get('raw', False) else nodes[0][1][0]
 
     def issues_with_numbers_appear_as_number_links(self):
         nodes = self._generate('1.0.2', self.b)
