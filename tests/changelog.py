@@ -155,6 +155,17 @@ class releases(Spec):
         for x in entries:
             assert x in unreleased
 
+    def oddly_ordered_bugfix_releases_and_unreleased_list(self):
+        # Scenario: bugfix commit followeded by feature release which is then
+        # followed by *more entries* and *then* a bugfix release. This is
+        # atypical; usually all feature releases are accompanied by bugfix
+        # releases so 'unreleased' does not get cleaned out funny.
+        b2 = _issue('bug', '2')
+        f3 = _issue('feature', '3')
+        changelog = _releases('1.0.2', self.f, b2, '1.1.0', f3, self.b)
+        assert f3 in releases[-2] # first feature release
+        assert b2 in releases[-1] # first (& problematic) bugfix release
+
 
 def _obj2name(obj):
     cls = obj if isinstance(obj, type) else obj.__class__
