@@ -134,12 +134,17 @@ class releases(Spec):
         assert isinstance(entries[0], issue)
         eq_(entries[0].number, None)
 
-    def unreleased_items_go_in_unreleased_release(self):
-        releases = _releases('1.0.2', self.f, self.b)
-        r = releases[-1]
-        eq_(len(r['entries']), 1)
-        assert self.f in r['entries']
-        eq_(r['obj'].number, 'unreleased')
+    def unreleased_items_go_in_unreleased_releases(self):
+        releases = _releases(self.f, self.b)
+        # Should have two unreleased lists, one minor w/ feature, one bugfix
+        # w/ bugfix.
+        bugfix, minor = releases[1:]
+        eq_(len(minor['entries']), 1)
+        eq_(len(bugfix['entries']), 1)
+        assert self.f in minor['entries']
+        assert self.b in bugfix['entries']
+        eq_(minor['obj'].number, 'unreleased_minor')
+        eq_(bugfix['obj'].number, 'unreleased_bugfix')
 
     def issues_consumed_by_releases_are_not_in_unreleased(self):
         releases = _releases('1.0.2', self.f, self.b, self.s, self.bs)
@@ -147,13 +152,6 @@ class releases(Spec):
         unreleased = releases[-1]['entries']
         assert self.b in release
         assert self.b not in unreleased
-
-    def unreleased_catches_bugs_and_features(self):
-        entries = [self.f, self.b, self.mb, self.s, self.bs, self.bf]
-        releases = _releases(*entries)
-        unreleased = releases[-1]['entries']
-        for x in entries:
-            assert x in unreleased
 
     def oddly_ordered_bugfix_releases_and_unreleased_list(self):
         # Scenario: bugfix commit followeded by feature release which is then
@@ -163,8 +161,12 @@ class releases(Spec):
         b2 = _issue('bug', '2')
         f3 = _issue('feature', '3')
         changelog = _releases('1.0.2', self.f, b2, '1.1.0', f3, self.b)
-        assert f3 in releases[-2] # first feature release
-        assert b2 in releases[-1] # first (& problematic) bugfix release
+        # last two releases are the 'unreleased' items; then comes 1.0.2; then
+        # 1.1.0. We expect feature 3 to be in 1.1.0 and bug 2 to be in 1.0.2,
+        # and for things to not explode. (When the bug this is testing against
+        # exists, things just explode before we even get here.)
+        assert f3 in changelog[-4]['entries']
+        assert b2 in changelog[-3]['entries']
 
 
 def _obj2name(obj):

@@ -164,7 +164,7 @@ def construct_releases(entries, app):
     # Walk from back to front, consuming entries & copying them into
     # per-release buckets as releases are encountered. Store releases in order.
     releases = []
-    lines = {'unreleased': []}
+    lines = {'unreleased_bugfix': [], 'unreleased_minor': []}
     for obj in reversed(entries):
         # The 'actual' intermediate object we want to focus on is wrapped first
         # in a LI, then a P.
@@ -177,13 +177,13 @@ def construct_releases(entries, app):
             line = get_line(focus)
             log("release for line %r" % line)
             # New release line/branch detected. Create it & dump unreleased
-            # into this new release. Skip non-major bugs.
+            # features.
             if line not in lines:
                 log("not seen prior, making feature release")
                 lines[line] = []
                 entries = [
                     x
-                    for x in lines['unreleased']
+                    for x in lines['unreleased_minor']
                     if x.type in ('feature', 'support') or x.major
                 ]
                 log("entries in this release: %r" % (entries,))
@@ -191,10 +191,11 @@ def construct_releases(entries, app):
                     'obj': focus,
                     'entries': entries
                 })
-                lines['unreleased'] = []
+                lines['unreleased_minor'] = []
             # Existing line -> empty out its bucket into new release.
             # Skip 'major' bugs as those "belong" to the next release (and will
-            # also be in 'unreleased' - so safe to nuke the entire line)
+            # also be in 'unreleased_minor' - so safe to nuke the entire
+            # line)
             else:
                 log("pre-existing, making bugfix release")
                 entries = [x for x in lines[line] if not x.major]
@@ -204,14 +205,18 @@ def construct_releases(entries, app):
                     'entries': entries,
                 })
                 lines[line] = []
-                # Clean out the items we just released from 'unreleased'
+                # Clean out the items we just released from 'unreleased_bugfix'.
+                # (Can't nuke it because there might be some unreleased bugs
+                # for other release lines.)
                 for x in entries:
-                    lines['unreleased'].remove(x)
+                    lines['unreleased_bugfix'].remove(x)
         # Entries get copied into release line buckets as follows:
-        # * Everything goes into 'unreleased' so it can be used in new lines.
-        # * Bugfixes (but not support or feature entries) go into all release
-        # lines, not just 'unreleased'.
-        # * However, support/feature entries marked as 'backported' go into all
+        # * Features and support go into 'unreleased_minor' for use in new
+        # feature releases.
+        # * Bugfixes go into all release lines (so they can be printed in >1
+        # bugfix release as appropriate) as well as 'unreleased_bugfix' (so they
+        # can be displayed prior to release')
+        # * Support/feature entries marked as 'backported' go into all
         # release lines as well, on the assumption that they were released to
         # all active branches.
         # * The 'rest' variable (which here is the bug description, vitally
@@ -232,17 +237,19 @@ def construct_releases(entries, app):
             else:
                 focus.attributes['description'] = rest
             if focus.type == 'bug':
-                # All bugs go into 'unreleased'
-                lines['unreleased'].append(focus)
-                log("Adding to unreleased")
-                # Regular bugs also go into per-line buckets ('major' bugs do
-                # not - they stay in 'unreleased' until next feature release)
-                if not focus.major:
-                    for line in [x for x in lines if x != 'unreleased']:
-                        log("Adding to release line %r" % line)
+                # Major bugs go into unreleased_minor
+                if focus.major:
+                    lines['unreleased_minor'].append(focus)
+                    log("Adding to unreleased_minor")
+                # Regular bugs go into per-line buckets ('major' bugs do
+                # not as well as unreleased_bugfix
+                else:
+                    for line in [x for x in lines if x != 'unreleased_minor']:
+                        log("Adding to %r" % line)
                         lines[line].append(focus)
             else:
-                # Backported feature/support items go into all lines.
+                # Backported feature/support items go into all lines, including
+                # both 'unreleased' lists
                 if focus.backported:
                     for line in lines:
                         log("Adding to release line %r" % line)
@@ -250,17 +257,24 @@ def construct_releases(entries, app):
                 # Non-backported feature/support items go into feature releases
                 # only.
                 else:
-                    log("Adding to unreleased")
-                    lines['unreleased'].append(focus)
+                    log("Adding to unreleased_minor")
+                    lines['unreleased_minor'].append(focus)
 
     # Entries not yet released get special 'release' entries (that lack an
     # actual release object).
-    nodelist = [release_nodes("Unreleased", 'master', None, app.config)]
-    log("Creating 'unreleased' faux-release with %r" % (lines['unreleased'],))
-    releases.append({
-        'obj': release(number='unreleased', date=None, nodelist=nodelist),
-        'entries': lines['unreleased']
-    })
+    for which in ('bugfix', 'minor'):
+        nodelist = [release_nodes(
+            "Issues for next %s release" % which,
+            'master',
+            None,
+            app.config
+        )]
+        line = 'unreleased_%s' % which
+        log("Creating '%s' faux-release with %r" % (line, lines[line]))
+        releases.append({
+            'obj': release(number=line, date=None, nodelist=nodelist),
+            'entries': lines[line]
+        })
     return releases
 
 
