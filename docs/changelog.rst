@@ -2,6 +2,8 @@
 Changelog
 =========
 
+* :support:`15` Add :doc:`</concepts>` to flesh out some assumptions not
+  adequately explained in :doc:`/usage`.
 * :release:`0.3.0 <2013-11-21>`
 * :feature:`11` Fix up styling so changelogs don't look suboptimal under `the
   new Read The Docs theme
