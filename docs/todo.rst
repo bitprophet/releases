@@ -2,7 +2,6 @@
 TODO
 ====
 
-* Tests would be nice.
 * Possibly add more keywords to allow control over additional edge cases.
 * Add shortcut format option for the release/issue URI settings - GitHub users
   can just give their GitHub acct/repo and we will fill in the rest.
