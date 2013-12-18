@@ -205,9 +205,9 @@ def construct_releases(entries, app):
                     'entries': entries,
                 })
                 lines[line] = []
-                # Clean out the items we just released from 'unreleased_bugfix'.
-                # (Can't nuke it because there might be some unreleased bugs
-                # for other release lines.)
+                # Clean out the items we just released from
+                # 'unreleased_bugfix'.  (Can't nuke it because there might be
+                # some unreleased bugs for other release lines.)
                 for x in entries:
                     lines['unreleased_bugfix'].remove(x)
         # Entries get copied into release line buckets as follows:
