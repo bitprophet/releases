@@ -32,10 +32,6 @@ Issue and release types
       major/complex bug fixes which are too risky to include in a bugfix
       release.
       
-        * Feature releases are implicitly assumed to include all bugfixes
-          released before them, in addition to their own contents. In other
-          words, bugs fixed in older release lines are always forward-ported
-          when possible.
         * The second version number is incremented for these, e.g.  ``1.1.0``.
 
     * **Bugfix releases** (sometimes called **tertiary**) focus on fixing
@@ -105,3 +101,27 @@ for details on formatting/etc.
 
         * ``1.0.1``: bug #1, feature #2, bug #4
         * ``1.1.0``: feature #2, feature #3
+
+* **Releases implicitly include all issues from their own, and prior, release
+  lines.**
+
+    * For example, in the below changelog (remembering that changelogs are
+      written in descending order from newest to oldest entry) the code
+      released as ``1.1.0`` includes the changes from bugs #1 and #3, in
+      addition to its explicitly stated contents of feature #2::
+
+        * :release:`1.1.0 <date>`
+        * :release:`1.0.1 <date>`
+        * :bug:`3` Another bugfix
+        * :feature:`2` Implemented new feature
+        * :bug:`1` Fixed a bug
+        * :release:`1.0.0 <date>`
+
+    * Again, to be explicit, the rendered changelog displays this breakdown:
+
+        * ``1.0.1``: bug #1, bug #3
+        * ``1.1.0``: feature #2
+
+      But it's implied that ``1.1.0`` includes the contents of ``1.0.1``
+      because it released afterwards/simultaneously and is a higher release
+      line.
