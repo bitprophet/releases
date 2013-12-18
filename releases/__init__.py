@@ -209,7 +209,8 @@ def construct_releases(entries, app):
                 # 'unreleased_bugfix'.  (Can't nuke it because there might be
                 # some unreleased bugs for other release lines.)
                 for x in entries:
-                    lines['unreleased_bugfix'].remove(x)
+                    if x in lines['unreleased_bugfix']:
+                        lines['unreleased_bugfix'].remove(x)
         # Entries get copied into release line buckets as follows:
         # * Features and support go into 'unreleased_minor' for use in new
         # feature releases.
