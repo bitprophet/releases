@@ -5,9 +5,10 @@ Releases
 .. include:: ../README.rst
 
 
-.. toctree::
+.. toctree:: Table of Contents
     :maxdepth: 2
 
+    concepts
     usage
     changelog
     todo
