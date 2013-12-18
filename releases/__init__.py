@@ -263,8 +263,9 @@ def construct_releases(entries, app):
     # Entries not yet released get special 'release' entries (that lack an
     # actual release object).
     for which in ('bugfix', 'minor'):
+        name = 'feature' if which == 'minor' else which
         nodelist = [release_nodes(
-            "Issues for next %s release" % which,
+            "Next %s release" % name,
             'master',
             None,
             app.config
