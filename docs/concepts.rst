@@ -68,6 +68,27 @@ for details on formatting/etc.
         * ``1.0.1``: bug #1, bug #3
         * ``1.1.0``: feature #2, support #4
 
+* **Bugfixes are assumed to backport to all stable release lines, and are
+  displayed as such.**
+
+    * Input::
+
+        * :release:`1.1.1 <date>`
+        * :release:`1.0.2 <date>`
+        * :bug:`3` Fixed another bug, onoes
+        * :release:`1.1.0 <date>`
+        * :release:`1.0.1 <date>`
+        * :feature:`2` Implemented new feature
+        * :bug:`1` Fixed a bug
+        * :release:`1.0.0 <date>`
+
+    * Result:
+
+        * ``1.0.1``: bug #1
+        * ``1.1.0``: feature #2
+        * ``1.0.2``: bug #3
+        * ``1.1.1``: bug #3
+
 * **Bugfixes marked 'major' go into feature releases instead.**
 
     * Input::
