@@ -18,6 +18,8 @@ Specifically:
     * See `Fabric's docs/conf.py
       <https://github.com/fabric/fabric/blob/4afd33e971f1c6831cc33fd3228013f7484fbe35/docs/conf.py#L31>`_
       for an example.
+    * You may optionally set ``releases_debug = True`` to see debug output
+      while building your docs.
 
 * Create a Sphinx document named ``changelog.rst`` with a top-level header
   followed by a bulleted list.
