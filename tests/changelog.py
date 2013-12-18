@@ -154,19 +154,16 @@ class releases(Spec):
         assert self.b not in unreleased
 
     def oddly_ordered_bugfix_releases_and_unreleased_list(self):
-        # Scenario: bugfix commit followeded by feature release which is then
-        # followed by *more entries* and *then* a bugfix release. This is
-        # atypical; usually all feature releases are accompanied by bugfix
-        # releases so 'unreleased' does not get cleaned out funny.
+        # Release set up w/ non-contiguous feature+bugfix releases; catches
+        # funky problems with 'unreleased' buckets
         b2 = _issue('bug', '2')
         f3 = _issue('feature', '3')
-        changelog = _releases('1.0.2', self.f, b2, '1.1.0', f3, self.b)
-        # last two releases are the 'unreleased' items; then comes 1.0.2; then
-        # 1.1.0. We expect feature 3 to be in 1.1.0 and bug 2 to be in 1.0.2,
-        # and for things to not explode. (When the bug this is testing against
-        # exists, things just explode before we even get here.)
-        assert f3 in changelog[-4]['entries']
-        assert b2 in changelog[-3]['entries']
+        changelog = _releases(
+            '1.1.1', '1.0.2', self.f, b2, '1.1.0', f3, self.b
+        )
+        assert f3 in changelog[1]['entries']
+        assert b2 in changelog[2]['entries']
+        assert b2 in changelog[3]['entries']
 
 
 def _obj2name(obj):
