@@ -53,7 +53,7 @@ def _release(number, **kwargs):
         inliner=_inliner(),
     )
 
-def _releases(*entries):
+def _release_list(*entries):
     entries = list(entries) # lol tuples
     # Translate simple objs into changelog-friendly ones
     for index, item in enumerate(entries):
@@ -63,7 +63,10 @@ def _releases(*entries):
             entries[index] = _entry(item)
     # Insert initial/empty 1st release to start timeline
     entries.append(_release('1.0.0'))
-    return construct_releases(entries, _app())
+    return entries
+
+def _releases(*entries):
+    return construct_releases(_release_list(*entries), _app())
 
 def _setup_issues(self):
     self.f = _issue('feature', '12')
@@ -164,6 +167,30 @@ class releases(Spec):
         assert f3 in changelog[1]['entries']
         assert b2 in changelog[2]['entries']
         assert b2 in changelog[3]['entries']
+
+    def releases_can_specify_issues_explicitly(self):
+        # Build regular list-o-entries
+        b2 = _issue('bug', '2')
+        b3 = _issue('bug', '3')
+        changelog = _release_list(
+            '1.0.1', '1.1.1', b3, b2, '1.1.0', self.f, self.b
+        )
+        # Modify 1.0.1 release to be speshul
+        changelog[0] = [changelog[0][0], ["2, 3"]]
+        rendered = construct_releases(changelog, _app())
+        # 1.0.1 includes just 2 and 3, not bug 1
+        one_0_1 = rendered[3]['entries']
+        one_1_1 = rendered[2]['entries']
+        assert self.b not in one_0_1
+        assert self.b2 in one_0_1
+        assert self.b3 in one_0_1
+        # 1.1.1 includes all 3
+        assert self.b in one_1_1
+        assert self.b2 in one_1_1
+        assert self.b3 in one_1_1
+        # Also ensure it affected 'unreleased' (both should be empty)
+        assert len(rendered[-1]['entries']) == 0
+        assert len(rendered[-2]['entries']) == 0
 
 
 def _obj2name(obj):
