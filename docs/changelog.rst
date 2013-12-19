@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* :release:`0.3.1 <2013-12-18>`
 * :bug:`16` Fix some edge cases regarding release ordering & unreleased issue
   display. Includes splitting unreleased display info into two 'Next release'
   pseudo-release entries.
