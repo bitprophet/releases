@@ -69,7 +69,8 @@ for details on formatting/etc.
         * ``1.1.0``: feature #2, support #4
 
 * **Bugfixes are assumed to backport to all stable release lines, and are
-  displayed as such.**
+  displayed as such.** (Unless the release explicitly states - see later
+  bullet points.)
 
     * Input::
 
@@ -124,7 +125,7 @@ for details on formatting/etc.
         * ``1.1.0``: feature #2, feature #3
 
 * **Releases implicitly include all issues from their own, and prior, release
-  lines.**
+  lines.** (Again, unless the release explicitly states otherwise - see below.)
 
     * For example, in the below changelog (remembering that changelogs are
       written in descending order from newest to oldest entry) the code
@@ -146,3 +147,24 @@ for details on formatting/etc.
       But it's implied that ``1.1.0`` includes the contents of ``1.0.1``
       because it released afterwards/simultaneously and is a higher release
       line.
+
+* **Releases may be told explicitly which issues to include** (using a
+  comma-separated list.)
+
+    * Input::
+    
+        * :release:`1.0.1 <date>` 1, 5
+        * :release:`1.1.1 <date>`
+        * :bug:`5` This one did get backported to 1.0
+        * :bug:`4` Another one that didn't apply to 1.0
+        * :bug:`3` Bugfix only backported to 1.1, not 1.0
+        * :release:`1.1.0 <date>`
+        * :feature:`2` Implemented new feature
+        * :bug:`1` Fixed a 1.0.0 bug
+        * :release:`1.0.0 <date>`
+
+    * Result:
+
+        * ``1.1.0``: feature #2
+        * ``1.1.1``: bugs #3, #4 and #5
+        * ``1.0.1``: bugs #1 and #5 only

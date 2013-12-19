@@ -63,8 +63,13 @@ Specifically:
   as-is when rendering. For example, in ``:bug:`123` Fixed a bug, thanks
   `@somebody`!``, the rendered changelog will preserve/render "Fixed a bug,
   thanks ``@somebody``!" after the issue link.
-* Release roles are of the form ``:release:`number <date>```. Do not place any
-  additional content after release roles - it will be ignored.
+* Release roles are of the form ``:release:`number <date>```.
+
+    * You may place a comma-separated (whitespace optional) list of issue
+      numbers after the release role, and this will limit the issues included
+      in that release to that explicit list.
+    * Otherwise, releases include all relevant issues as outlined above and
+      in :doc:`/concepts`.
 
 Then build your docs; in the rendered output, ``changelog.html`` should show
 issues grouped by release, as per the above rules. Examples: `Releases' own
