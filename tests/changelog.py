@@ -184,13 +184,24 @@ class releases(Spec):
         assert self.b not in one_0_1
         assert self.b2 in one_0_1
         assert self.b3 in one_0_1
-        # 1.1.1 includes all 3
+        # 1.1.1 includes all 3 (i.e. the explicitness of 1.0.1 didn't affect
+        # the 1.1 line bucket.)
         assert self.b in one_1_1
         assert self.b2 in one_1_1
         assert self.b3 in one_1_1
-        # Also ensure it affected 'unreleased' (both should be empty)
-        assert len(rendered[-1]['entries']) == 0
-        assert len(rendered[-2]['entries']) == 0
+
+    def explicit_minor_releases_dont_clear_entire_unreleased_minor(self):
+        f1 = _issue('feature', '1')
+        f2 = _issue('feature', '2')
+        changelog = _release_list('1.2', '1.1', f1, f2)
+        # Ensure that 1.1 specifies feature 2
+        changelog[0][1].append("2")
+        rendered = construct_releases(changelog, _app())
+        # 1.1 should have feature 2 only
+        assert f2 in rendered[1]['entries']
+        assert f1 not in rendered[1]['entries']
+        # 1.2 should still get/see feature 1
+        assert f1 in rendered[2]['entries']
 
 
 def _obj2name(obj):
