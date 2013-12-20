@@ -176,7 +176,7 @@ class releases(Spec):
             '1.0.1', '1.1.1', b3, b2, '1.1.0', self.f, self.b
         )
         # Modify 1.0.1 release to be speshul
-        changelog[0] = [changelog[0][0], ["2, 3"]]
+        changelog[0][0].append("2, 3")
         rendered = construct_releases(changelog, _app())
         # 1.0.1 includes just 2 and 3, not bug 1
         one_0_1 = rendered[3]['entries']
