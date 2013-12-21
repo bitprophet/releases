@@ -193,15 +193,42 @@ class releases(Spec):
     def explicit_minor_releases_dont_clear_entire_unreleased_minor(self):
         f1 = _issue('feature', '1')
         f2 = _issue('feature', '2')
-        changelog = _release_list('1.2', '1.1', f1, f2)
+        changelog = _release_list('1.1', f1, f2)
         # Ensure that 1.1 specifies feature 2
-        changelog[0][1].append("2")
+        changelog[1][0].append("2")
         rendered = construct_releases(changelog, _app())
         # 1.1 should have feature 2 only
         assert f2 in rendered[1]['entries']
         assert f1 not in rendered[1]['entries']
-        # 1.2 should still get/see feature 1
+        # unreleased feature list should still get/see feature 1
         assert f1 in rendered[2]['entries']
+
+    def explicit_bugfix_releases_dont_clear_entire_unreleased_bugfix(self):
+        b1 = _issue('bug', '1')
+        b2 = _issue('bug', '2')
+        changelog = _release_list('1.0.1', b1, b2)
+        # Ensure that 1.0.1 specifies bug 2
+        print changelog
+        changelog[1][0].append("2")
+        rendered = construct_releases(changelog, _app())
+        # 1.0.1 should have bug 2 only
+        assert b2 in rendered[1]['entries']
+        assert b1 not in rendered[1]['entries']
+        # unreleased bug list should still get/see bug 1
+        assert b1 in rendered[3]['entries']
+
+    def explicit_bugfix_releases_dont_clear_other_line_buckets(self):
+        b1 = _issue('bug', '1')
+        b2 = _issue('bug', '2')
+        changelog = _release_list('1.1.1', '1.0.2', b1, '1.1.0', '1.0.1', b2)
+        # Ensure that 1.0.2 specifies bugs 1 + 2
+        changelog[1][0].append("2")
+        rendered = construct_releases(changelog, _app())
+        # 1.0.1 should have bug 2 only
+        assert b2 in rendered[1]['entries']
+        assert b1 not in rendered[1]['entries']
+        # unreleased bug list should still get/see bug 1
+        assert b1 in rendered[3]['entries']
 
 
 def _obj2name(obj):
