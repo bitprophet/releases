@@ -175,45 +175,64 @@ def construct_releases(entries, app):
         log(repr(focus))
         # Releases 'eat' the entries in their line's list and get added to the
         # final data structure. They also inform new release-line 'buffers'.
-        # Release lines should have an empty 'rest' so it's ignored.
+        # Release lines' "rest" should be empty or a comma-separated list of
+        # issue numbers.
         if isinstance(focus, release):
             line = get_line(focus)
             log("release for line %r" % line)
-            # New release line/branch detected. Create it & dump unreleased
-            # features.
-            if line not in lines:
-                log("not seen prior, making feature release")
-                lines[line] = []
-                entries = [
-                    x
-                    for x in lines['unreleased_minor']
-                    if x.type in ('feature', 'support') or x.major
-                ]
-                log("entries in this release: %r" % (entries,))
-                releases.append({
-                    'obj': focus,
-                    'entries': entries
-                })
-                lines['unreleased_minor'] = []
-            # Existing line -> empty out its bucket into new release.
-            # Skip 'major' bugs as those "belong" to the next release (and will
-            # also be in 'unreleased_minor' - so safe to nuke the entire
-            # line)
+            # Check for explicitly listed issues first
+            explicit = map(str.strip, rest[0].split(',')) if rest else None
+            # Do those by themselves since they override all other logic
+            if explicit:
+                log("Explicit issues requested: %r" % (explicit,))
+                # First scan global issue dict, dying if not found
+                for i in explicit:
+                    if i not in issues:
+                        raise ValueError("Couldn't find issue #%s in the changelog!" % i)
+                # Bugfix release:
+                # * detect 'line' of release
+                # * remove from that bucket only
+                # * if not found in that bucket, check unreleased_feature
+                # * remove from unreleased_bugfix
+                # Minor release:
+                # *
+            # Implicit behavior otherwise
             else:
-                log("pre-existing, making bugfix release")
-                entries = [x for x in lines[line] if not x.major]
-                log("entries in this release: %r" % (entries,))
-                releases.append({
-                    'obj': focus,
-                    'entries': entries,
-                })
-                lines[line] = []
-                # Clean out the items we just released from
-                # 'unreleased_bugfix'.  (Can't nuke it because there might be
-                # some unreleased bugs for other release lines.)
-                for x in entries:
-                    if x in lines['unreleased_bugfix']:
-                        lines['unreleased_bugfix'].remove(x)
+                # New release line/branch detected. Create it & dump unreleased
+                # features.
+                if line not in lines:
+                    log("not seen prior, making feature release")
+                    lines[line] = []
+                    entries = [
+                        x
+                        for x in lines['unreleased_minor']
+                        if x.type in ('feature', 'support') or x.major
+                    ]
+                    log("entries in this release: %r" % (entries,))
+                    releases.append({
+                        'obj': focus,
+                        'entries': entries
+                    })
+                    lines['unreleased_minor'] = []
+                # Existing line -> empty out its bucket into new release.
+                # Skip 'major' bugs as those "belong" to the next release (and will
+                # also be in 'unreleased_minor' - so safe to nuke the entire
+                # line)
+                else:
+                    log("pre-existing, making bugfix release")
+                    entries = [x for x in lines[line] if not x.major]
+                    log("entries in this release: %r" % (entries,))
+                    releases.append({
+                        'obj': focus,
+                        'entries': entries,
+                    })
+                    lines[line] = []
+                    # Clean out the items we just released from
+                    # 'unreleased_bugfix'.  (Can't nuke it because there might be
+                    # some unreleased bugs for other release lines.)
+                    for x in entries:
+                        if x in lines['unreleased_bugfix']:
+                            lines['unreleased_bugfix'].remove(x)
         # Entries get copied into release line buckets as follows:
         # * Features and support go into 'unreleased_minor' for use in new
         # feature releases.
