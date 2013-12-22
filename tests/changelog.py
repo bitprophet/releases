@@ -1,5 +1,5 @@
 import six
-from spec import Spec, skip, eq_
+from spec import Spec, skip, eq_, raises
 from mock import Mock
 
 from releases import (
@@ -229,6 +229,15 @@ class releases(Spec):
         assert b1 not in rendered[1]['entries']
         # unreleased bug list should still get/see bug 1
         assert b1 in rendered[3]['entries']
+
+    @raises(ValueError)
+    def explicit_releases_error_on_unfound_issues(self):
+        # Just a release - result will have 1.0.0, 1.0.1, and unreleased
+        changelog = _release_list('1.0.1')
+        # No issues listed -> this clearly doesn't exist in any buckets
+        changelog[1][0].append("25")
+        # This should asplode
+        construct_releases(changelog, _app())
 
 
 def _obj2name(obj):
