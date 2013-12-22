@@ -65,6 +65,12 @@ def _release_list(*entries):
     entries.append(_release('1.0.0'))
     return entries
 
+def _changelog2dict(changelog):
+    d = {}
+    for r in changelog:
+        d[r['obj'].number] = r['entries']
+    return d
+
 def _releases(*entries):
     return construct_releases(_release_list(*entries), _app())
 
@@ -196,12 +202,14 @@ class releases(Spec):
         changelog = _release_list('1.1', f1, f2)
         # Ensure that 1.1 specifies feature 2
         changelog[0][0].append("2")
-        rendered = construct_releases(changelog, _app())
+        rendered = _changelog2dict(construct_releases(changelog, _app()))
         # 1.1 should have feature 2 only
-        assert f2 in rendered[1]['entries']
-        assert f1 not in rendered[1]['entries']
+        assert f2 in rendered['1.1']
+        assert f1 not in rendered['1.1']
         # unreleased feature list should still get/see feature 1
-        assert f1 in rendered[3]['entries']
+        assert f1 in rendered['unreleased_minor']
+        # now-released feature 2 should not be in unreleased_minor
+        assert f2 not in rendered['unreleased_minor']
 
     def explicit_bugfix_releases_dont_clear_entire_unreleased_bugfix(self):
         b1 = _issue('bug', '1')
