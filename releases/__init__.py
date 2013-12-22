@@ -165,6 +165,9 @@ def construct_releases(entries, app):
     # per-release buckets as releases are encountered. Store releases in order.
     releases = []
     lines = {'unreleased_bugfix': [], 'unreleased_minor': []}
+    # Also keep a master hash of issues by number to detect duplicates & assist
+    # in explicitly defined release lists.
+    issues = {}
     for obj in reversed(entries):
         # The 'actual' intermediate object we want to focus on is wrapped first
         # in a LI, then a P.
@@ -237,6 +240,11 @@ def construct_releases(entries, app):
                 )
             else:
                 focus.attributes['description'] = rest
+            # Add to global list or die trying
+            if focus.number in issues:
+                raise ValueError("You seem to have defined issue #%s twice! Please double check." % focus.number)
+            else:
+                issues[focus.number] = focus
             if focus.type == 'bug':
                 # Major bugs go into unreleased_minor
                 if focus.major:
