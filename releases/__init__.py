@@ -189,9 +189,17 @@ def construct_releases(entries, app):
                 missing = [i for i in explicit if i not in issues]
                 if missing:
                     raise ValueError("Couldn't find issue(s) #%s in the changelog!" % (', '.join(i)))
-                # Obtain objects from global list, using attributes to
-                # determine which buckets they should be removed from:
-                for obj in [issues[i] for i in explicit]:
+                # Obtain objects from global list
+                entries = [issues[i] for i in explicit]
+                # Create release
+                log("entries in this release: %r" % (entries,))
+                releases.append({
+                    'obj': focus,
+                    'entries': entries,
+                })
+                # Introspect entries to determine which buckets they should get
+                # removed from
+                for obj in entries:
                     if obj.type == 'bug':
                         # Major bugfix: remove from unreleased_minor
                         if obj.major:
@@ -221,7 +229,6 @@ def construct_releases(entries, app):
                         for x in lines['unreleased_minor']
                         if x.type in ('feature', 'support') or x.major
                     ]
-                    log("entries in this release: %r" % (entries,))
                     releases.append({
                         'obj': focus,
                         'entries': entries

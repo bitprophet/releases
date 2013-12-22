@@ -182,13 +182,13 @@ class releases(Spec):
         one_0_1 = rendered[3]['entries']
         one_1_1 = rendered[2]['entries']
         assert self.b not in one_0_1
-        assert self.b2 in one_0_1
-        assert self.b3 in one_0_1
+        assert b2 in one_0_1
+        assert b3 in one_0_1
         # 1.1.1 includes all 3 (i.e. the explicitness of 1.0.1 didn't affect
         # the 1.1 line bucket.)
         assert self.b in one_1_1
-        assert self.b2 in one_1_1
-        assert self.b3 in one_1_1
+        assert b2 in one_1_1
+        assert b3 in one_1_1
 
     def explicit_minor_releases_dont_clear_entire_unreleased_minor(self):
         f1 = _issue('feature', '1')
