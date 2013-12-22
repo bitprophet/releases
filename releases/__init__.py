@@ -186,9 +186,9 @@ def construct_releases(entries, app):
             if explicit:
                 log("Explicit issues requested: %r" % (explicit,))
                 # First scan global issue dict, dying if not found
-                for i in explicit:
-                    if i not in issues:
-                        raise ValueError("Couldn't find issue #%s in the changelog!" % i)
+                missing = [i for i in explicit if i not in issues]
+                if missing:
+                    raise ValueError("Couldn't find issue(s) #%s in the changelog!" % (', '.join(i)))
                 # Bugfix release:
                 # * detect 'line' of release
                 # * remove from that bucket only
