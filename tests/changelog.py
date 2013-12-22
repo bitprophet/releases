@@ -208,7 +208,6 @@ class releases(Spec):
         b2 = _issue('bug', '2')
         changelog = _release_list('1.0.1', b1, b2)
         # Ensure that 1.0.1 specifies bug 2
-        print changelog
         changelog[1][0].append("2")
         rendered = construct_releases(changelog, _app())
         # 1.0.1 should have bug 2 only
