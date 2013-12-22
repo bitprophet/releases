@@ -196,7 +196,7 @@ class releases(Spec):
         assert b2 in one_1_1
         assert b3 in one_1_1
 
-    def explicit_minor_releases_dont_clear_entire_unreleased_minor(self):
+    def explicit_minor_release_features_are_removed_from_unreleased(self):
         f1 = _issue('feature', '1')
         f2 = _issue('feature', '2')
         changelog = _release_list('1.1', f1, f2)
@@ -211,7 +211,7 @@ class releases(Spec):
         # now-released feature 2 should not be in unreleased_minor
         assert f2 not in rendered['unreleased_minor']
 
-    def explicit_bugfix_releases_dont_clear_entire_unreleased_bugfix(self):
+    def explicit_bugfix_releases_get_removed_from_unreleased(self):
         b1 = _issue('bug', '1')
         b2 = _issue('bug', '2')
         changelog = _release_list('1.0.1', b1, b2)
