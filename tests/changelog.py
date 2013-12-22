@@ -239,6 +239,10 @@ class releases(Spec):
         # This should asplode
         construct_releases(changelog, _app())
 
+    @raises(ValueError)
+    def duplicate_issue_numbers_raises_error(self):
+        _releases('1.0.1', self.b, self.b)
+
 
 def _obj2name(obj):
     cls = obj if isinstance(obj, type) else obj.__class__
