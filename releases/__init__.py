@@ -189,13 +189,26 @@ def construct_releases(entries, app):
                 missing = [i for i in explicit if i not in issues]
                 if missing:
                     raise ValueError("Couldn't find issue(s) #%s in the changelog!" % (', '.join(i)))
-                # Bugfix release:
-                # * detect 'line' of release
-                # * remove from that bucket only
-                # * if not found in that bucket, check unreleased_feature
-                # * remove from unreleased_bugfix
-                # Minor release:
-                # *
+                # Obtain objects from global list, using attributes to
+                # determine which buckets they should be removed from:
+                for obj in [issues[i] for i in explicit]:
+                    if obj.type == 'bug':
+                        # Major bugfix: remove from unreleased_minor
+                        if obj.major:
+                            log("Removing #%s from unreleased" % obj.number)
+                            lines['unreleased_minor'].remove(obj)
+                        # Regular bugfix: remove from bucket for this release's
+                        # line + unreleased_bugfix
+                        else:
+                            if obj in lines['unreleased_bugfix']:
+                                log("Removing #%s from unreleased" % obj.number)
+                                lines['unreleased_bugfix'].remove(obj)
+                            if obj in lines[line]:
+                                log("Removing #%s from %s" % (obj.number, line))
+                                lines[line].remove(obj)
+                    # Regular feature/support: remove from unreleased_minor
+                    # Backported feature/support: remove from bucket for this
+                    # release's line (if applicable) + unreleased_minor
             # Implicit behavior otherwise
             else:
                 # New release line/branch detected. Create it & dump unreleased
