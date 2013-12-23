@@ -57,6 +57,7 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
         link = nodes.reference(rawtext, '#' + issue_no, refuri=ref, **options)
     else:
         link = None
+        issue_no = None # So it doesn't gum up dupe detection later
     # Additional 'new-style changelog' stuff
     if name in issue_types:
         nodelist = issue_nodelist(name, link)
@@ -286,7 +287,7 @@ def construct_releases(entries, app):
             else:
                 focus.attributes['description'] = rest
             # Add to global list or die trying
-            if focus.number in issues:
+            if focus.number and focus.number in issues:
                 raise ValueError("You seem to have defined issue #%s twice! Please double check." % focus.number)
             else:
                 issues[focus.number] = focus

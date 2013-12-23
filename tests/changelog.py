@@ -237,6 +237,11 @@ class releases(Spec):
     def duplicate_issue_numbers_raises_error(self):
         _releases('1.0.1', self.b, self.b)
 
+    def duplicate_zeroes_dont_error(self):
+        cl = _releases('1.0.1', _issue('bug', '0'), _issue('bug', '0'))
+        cl = _changelog2dict(cl)
+        assert len(cl['1.0.1']) == 2
+
 
 def _obj2name(obj):
     cls = obj if isinstance(obj, type) else obj.__class__
