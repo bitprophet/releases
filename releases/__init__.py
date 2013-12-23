@@ -189,7 +189,7 @@ def construct_releases(entries, app):
                 # First scan global issue dict, dying if not found
                 missing = [i for i in explicit if i not in issues]
                 if missing:
-                    raise ValueError("Couldn't find issue(s) #%s in the changelog!" % (', '.join(i)))
+                    raise ValueError("Couldn't find issue(s) #%s in the changelog!" % (', '.join(missing)))
                 # Obtain objects from global list
                 entries = [issues[i] for i in explicit]
                 # Create release
