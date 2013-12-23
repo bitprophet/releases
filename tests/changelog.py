@@ -199,13 +199,13 @@ class releases(Spec):
     def explicit_minor_release_features_are_removed_from_unreleased(self):
         f1 = _issue('feature', '1')
         f2 = _issue('feature', '2')
-        changelog = _release_list('1.1', f1, f2)
-        # Ensure that 1.1 specifies feature 2
+        changelog = _release_list('1.1.0', f1, f2)
+        # Ensure that 1.1.0 specifies feature 2
         changelog[0][0].append("2")
         rendered = _changelog2dict(construct_releases(changelog, _app()))
-        # 1.1 should have feature 2 only
-        assert f2 in rendered['1.1']
-        assert f1 not in rendered['1.1']
+        # 1.1.0 should have feature 2 only
+        assert f2 in rendered['1.1.0']
+        assert f1 not in rendered['1.1.0']
         # unreleased feature list should still get/see feature 1
         assert f1 in rendered['unreleased_minor']
         # now-released feature 2 should not be in unreleased_minor

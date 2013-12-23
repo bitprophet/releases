@@ -217,6 +217,12 @@ def construct_releases(entries, app):
                     # Regular feature/support: remove from unreleased_minor
                     # Backported feature/support: remove from bucket for this
                     # release's line (if applicable) + unreleased_minor
+                    else:
+                        log("Removing #%s from unreleased" % obj.number)
+                        lines['unreleased_minor'].remove(obj)
+                        if obj in lines.get(line, []):
+                            lines[line].remove(obj)
+
             # Implicit behavior otherwise
             else:
                 # New release line/branch detected. Create it & dump unreleased
