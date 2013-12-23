@@ -182,7 +182,9 @@ def construct_releases(entries, app):
             line = get_line(focus)
             log("release for line %r" % line)
             # Check for explicitly listed issues first
-            explicit = map(str.strip, rest[0].split(',')) if rest else None
+            explicit = None
+            if rest:
+                explicit = list(map(str.strip, rest[0].split(',')))
             # Do those by themselves since they override all other logic
             if explicit:
                 log("Explicit issues requested: %r" % (explicit,))
