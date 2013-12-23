@@ -224,19 +224,6 @@ class releases(Spec):
         # unreleased bug list should still get/see bug 1
         assert b1 in rendered[2]['entries']
 
-    def explicit_bugfix_releases_dont_clear_other_line_buckets(self):
-        b1 = _issue('bug', '1')
-        b2 = _issue('bug', '2')
-        changelog = _release_list('1.1.1', '1.0.2', b1, '1.1.0', '1.0.1', b2)
-        # Ensure that 1.0.2 specifies bugs 1 + 2
-        changelog[1][0].append("2")
-        rendered = construct_releases(changelog, _app())
-        # 1.0.1 should have bug 2 only
-        assert b2 in rendered[1]['entries']
-        assert b1 not in rendered[1]['entries']
-        # unreleased bug list should still get/see bug 1
-        assert b1 in rendered[3]['entries']
-
     @raises(ValueError)
     def explicit_releases_error_on_unfound_issues(self):
         # Just a release - result will have 1.0.0, 1.0.1, and unreleased
