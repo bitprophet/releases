@@ -199,7 +199,7 @@ class releases(Spec):
     def explicit_release_list_split_works_with_unicode(self):
         b = _issue('bug', '17')
         changelog = _release_list('1.0.1', b)
-        changelog[0][0].append(u'17')
+        changelog[0][0].append(six.text_type('17'))
         # When using naive method calls, this explodes
         construct_releases(changelog, _app())
 
