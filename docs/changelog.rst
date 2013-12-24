@@ -10,7 +10,7 @@ Changelog
 * :bug:`16` Fix some edge cases regarding release ordering & unreleased issue
   display. Includes splitting unreleased display info into two 'Next release'
   pseudo-release entries.
-* :support:`15` Add :doc:`</concepts>` to flesh out some assumptions not
+* :support:`15` Add :doc:`/concepts` to flesh out some assumptions not
   adequately explained in :doc:`/usage`.
 * :release:`0.3.0 <2013-11-21>`
 * :feature:`11` Fix up styling so changelogs don't look suboptimal under `the

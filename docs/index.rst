@@ -5,7 +5,10 @@ Releases
 .. include:: ../README.rst
 
 
-.. toctree:: Table of Contents
+Table of Contents
+=================
+
+.. toctree::
     :maxdepth: 2
 
     concepts
