@@ -2,6 +2,9 @@
 Changelog
 =========
 
+* :feature:`17` Allow releases to explicitly define which issues they include.
+  Useful for overriding default assumptions (e.g. a special bugfix release from
+  an otherwise dormant line.)
 * :release:`0.3.1 <2013-12-18>`
 * :bug:`16` Fix some edge cases regarding release ordering & unreleased issue
   display. Includes splitting unreleased display info into two 'Next release'
