@@ -196,6 +196,13 @@ class releases(Spec):
         assert b2 in one_1_1
         assert b3 in one_1_1
 
+    def explicit_release_list_split_works_with_unicode(self):
+        b = _issue('bug', '17')
+        changelog = _release_list('1.0.1', b)
+        changelog[0][0].append(u'17')
+        # When using naive method calls, this explodes
+        construct_releases(changelog, _app())
+
     def explicit_minor_release_features_are_removed_from_unreleased(self):
         f1 = _issue('feature', '1')
         f2 = _issue('feature', '2')

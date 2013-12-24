@@ -184,7 +184,7 @@ def construct_releases(entries, app):
             # Check for explicitly listed issues first
             explicit = None
             if rest:
-                explicit = list(map(str.strip, rest[0].split(',')))
+                explicit = [x.strip() for x in rest[0].split(',')]
             # Do those by themselves since they override all other logic
             if explicit:
                 log("Explicit issues requested: %r" % (explicit,))
