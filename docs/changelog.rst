@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* :release:`0.4.0 <2013-12-24>`
 * :feature:`17` Allow releases to explicitly define which issues they include.
   Useful for overriding default assumptions (e.g. a special bugfix release from
   an otherwise dormant line.)
