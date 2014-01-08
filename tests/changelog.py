@@ -145,14 +145,14 @@ class releases(Spec):
 
     def unreleased_items_go_in_unreleased_releases(self):
         releases = _releases(self.f, self.b)
-        # Should have two unreleased lists, one minor w/ feature, one bugfix
+        # Should have two unreleased lists, one feature w/ feature, one bugfix
         # w/ bugfix.
-        bugfix, minor = releases[1:]
-        eq_(len(minor['entries']), 1)
+        bugfix, feature = releases[1:]
+        eq_(len(feature['entries']), 1)
         eq_(len(bugfix['entries']), 1)
-        assert self.f in minor['entries']
+        assert self.f in feature['entries']
         assert self.b in bugfix['entries']
-        eq_(minor['obj'].number, 'unreleased_minor')
+        eq_(feature['obj'].number, 'unreleased_feature')
         eq_(bugfix['obj'].number, 'unreleased_bugfix')
 
     def issues_consumed_by_releases_are_not_in_unreleased(self):
@@ -203,7 +203,7 @@ class releases(Spec):
         # When using naive method calls, this explodes
         construct_releases(changelog, _app())
 
-    def explicit_minor_release_features_are_removed_from_unreleased(self):
+    def explicit_feature_release_features_are_removed_from_unreleased(self):
         f1 = _issue('feature', '1')
         f2 = _issue('feature', '2')
         changelog = _release_list('1.1.0', f1, f2)
@@ -214,9 +214,9 @@ class releases(Spec):
         assert f2 in rendered['1.1.0']
         assert f1 not in rendered['1.1.0']
         # unreleased feature list should still get/see feature 1
-        assert f1 in rendered['unreleased_minor']
-        # now-released feature 2 should not be in unreleased_minor
-        assert f2 not in rendered['unreleased_minor']
+        assert f1 in rendered['unreleased_feature']
+        # now-released feature 2 should not be in unreleased_feature
+        assert f2 not in rendered['unreleased_feature']
 
     def explicit_bugfix_releases_get_removed_from_unreleased(self):
         b1 = _issue('bug', '1')

@@ -165,7 +165,7 @@ def construct_releases(entries, app):
     # Walk from back to front, consuming entries & copying them into
     # per-release buckets as releases are encountered. Store releases in order.
     releases = []
-    lines = {'unreleased_bugfix': [], 'unreleased_minor': []}
+    lines = {'unreleased_bugfix': [], 'unreleased_feature': []}
     # Also keep a master hash of issues by number to detect duplicates & assist
     # in explicitly defined release lists.
     issues = {}
@@ -204,10 +204,10 @@ def construct_releases(entries, app):
                 # removed from
                 for obj in entries:
                     if obj.type == 'bug':
-                        # Major bugfix: remove from unreleased_minor
+                        # Major bugfix: remove from unreleased_feature
                         if obj.major:
                             log("Removing #%s from unreleased" % obj.number)
-                            lines['unreleased_minor'].remove(obj)
+                            lines['unreleased_feature'].remove(obj)
                         # Regular bugfix: remove from bucket for this release's
                         # line + unreleased_bugfix
                         else:
@@ -217,12 +217,12 @@ def construct_releases(entries, app):
                             if obj in lines[line]:
                                 log("Removing #%s from %s" % (obj.number, line))
                                 lines[line].remove(obj)
-                    # Regular feature/support: remove from unreleased_minor
+                    # Regular feature/support: remove from unreleased_feature
                     # Backported feature/support: remove from bucket for this
-                    # release's line (if applicable) + unreleased_minor
+                    # release's line (if applicable) + unreleased_feature
                     else:
                         log("Removing #%s from unreleased" % obj.number)
-                        lines['unreleased_minor'].remove(obj)
+                        lines['unreleased_feature'].remove(obj)
                         if obj in lines.get(line, []):
                             lines[line].remove(obj)
 
@@ -235,17 +235,17 @@ def construct_releases(entries, app):
                     lines[line] = []
                     entries = [
                         x
-                        for x in lines['unreleased_minor']
+                        for x in lines['unreleased_feature']
                         if x.type in ('feature', 'support') or x.major
                     ]
                     releases.append({
                         'obj': focus,
                         'entries': entries
                     })
-                    lines['unreleased_minor'] = []
+                    lines['unreleased_feature'] = []
                 # Existing line -> empty out its bucket into new release.
                 # Skip 'major' bugs as those "belong" to the next release (and will
-                # also be in 'unreleased_minor' - so safe to nuke the entire
+                # also be in 'unreleased_feature' - so safe to nuke the entire
                 # line)
                 else:
                     log("pre-existing, making bugfix release")
@@ -263,7 +263,7 @@ def construct_releases(entries, app):
                         if x in lines['unreleased_bugfix']:
                             lines['unreleased_bugfix'].remove(x)
         # Entries get copied into release line buckets as follows:
-        # * Features and support go into 'unreleased_minor' for use in new
+        # * Features and support go into 'unreleased_feature' for use in new
         # feature releases.
         # * Bugfixes go into all release lines (so they can be printed in >1
         # bugfix release as appropriate) as well as 'unreleased_bugfix' (so they
@@ -294,14 +294,14 @@ def construct_releases(entries, app):
             else:
                 issues[focus.number] = focus
             if focus.type == 'bug':
-                # Major bugs go into unreleased_minor
+                # Major bugs go into unreleased_feature
                 if focus.major:
-                    lines['unreleased_minor'].append(focus)
-                    log("Adding to unreleased_minor")
+                    lines['unreleased_feature'].append(focus)
+                    log("Adding to unreleased_feature")
                 # Regular bugs go into per-line buckets ('major' bugs do
                 # not as well as unreleased_bugfix
                 else:
-                    for line in [x for x in lines if x != 'unreleased_minor']:
+                    for line in [x for x in lines if x != 'unreleased_feature']:
                         log("Adding to %r" % line)
                         lines[line].append(focus)
             else:
@@ -314,15 +314,14 @@ def construct_releases(entries, app):
                 # Non-backported feature/support items go into feature releases
                 # only.
                 else:
-                    log("Adding to unreleased_minor")
-                    lines['unreleased_minor'].append(focus)
+                    log("Adding to unreleased_feature")
+                    lines['unreleased_feature'].append(focus)
 
     # Entries not yet released get special 'release' entries (that lack an
     # actual release object).
-    for which in ('bugfix', 'minor'):
-        name = 'feature' if which == 'minor' else which
+    for which in ('bugfix', 'feature'):
         nodelist = [release_nodes(
-            "Next %s release" % name,
+            "Next %s release" % which,
             'master',
             None,
             app.config
