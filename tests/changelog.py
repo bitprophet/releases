@@ -33,6 +33,8 @@ def _issue(type_, number, **kwargs):
         text += " backported"
     if kwargs.get('major', False):
         text += " major"
+    if kwargs.get('line', None):
+        text += " (%s+)" % kwargs['line']
     return issues_role(
         name=type_,
         rawtext='',
@@ -173,6 +175,35 @@ class releases(Spec):
         assert f3 in changelog[1]['entries']
         assert b2 in changelog[2]['entries']
         assert b2 in changelog[3]['entries']
+
+    def release_line_bugfix_specifier(self):
+        b50 = _issue('bug', '50')
+        b42 = _issue('bug', '42', line='1.1')
+        f25 = _issue('feature', '25')
+        b35 = _issue('bug', '35')
+        b34 = _issue('bug', '34')
+        f22 = _issue('feature', '22')
+        b20 = _issue('bug', '20')
+        c = _changelog2dict(_releases(
+            '1.2.1', '1.1.2', '1.0.3',
+            b50, b42,
+            '1.2.0', '1.1.1', '1.0.2',
+            f25, b35, b34,
+            '1.1.0', '1.0.1',
+            f22, b20
+        ))
+        for rel, issues in (
+            ('1.0.1', [b20]),
+            ('1.1.0', [f22]),
+            ('1.0.2', [b34, b35]),
+            ('1.1.1', [b34, b35]),
+            ('1.2.0', [f25]),
+            ('1.0.3', [b50]), # the crux - is not b50 + b42
+            ('1.1.2', [b50, b42]),
+            ('1.2.1', [b50, b42]),
+        ):
+            eq_(set(c[rel]), set(issues))
+
 
     def releases_can_specify_issues_explicitly(self):
         # Build regular list-o-entries
