@@ -322,8 +322,11 @@ def construct_releases(entries, app):
                     if focus.line:
                         bug_lines = [
                             x for x in bug_lines
-                            if LooseVersion(x) >= LooseVersion(focus.line)
-                        ]
+                            if (
+                                x != 'unreleased_bugfix'
+                                and LooseVersion(x) >= LooseVersion(focus.line)
+                            )
+                        ] + ['unreleased_bugfix']
                     for line in bug_lines:
                         log("Adding to %r" % line)
                         lines[line].append(focus)
