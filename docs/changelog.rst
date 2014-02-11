@@ -2,6 +2,9 @@
 Changelog
 =========
 
+* :feature:`20` Allow specifying minimum release line in bugfixes that don't
+  apply to all active lines (e.g. because they pertain to a recently added
+  feature.)
 * :release:`0.4.0 <2013-12-24>`
 * :feature:`17` Allow releases to explicitly define which issues they include.
   Useful for overriding default assumptions (e.g. a special bugfix release from
