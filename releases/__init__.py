@@ -1,6 +1,7 @@
 import re
 import sys
 from functools import partial
+from distutils.version import LooseVersion
 
 from docutils import nodes, utils
 
@@ -281,7 +282,10 @@ def construct_releases(entries, app):
         # feature releases.
         # * Bugfixes go into all release lines (so they can be printed in >1
         # bugfix release as appropriate) as well as 'unreleased_bugfix' (so
-        # they can be displayed prior to release')
+        # they can be displayed prior to release'). Caveats include bugs marked
+        # 'major' (they go into unreleased_feature instead) or with 'N.N+'
+        # (meaning they only go into release line buckets for that release and
+        # up.)
         # * Support/feature entries marked as 'backported' go into all
         # release lines as well, on the assumption that they were released to
         # all active branches.
@@ -311,9 +315,16 @@ def construct_releases(entries, app):
                     lines['unreleased_feature'].append(focus)
                     log("Adding to unreleased_feature")
                 # Regular bugs go into per-line buckets ('major' bugs do
-                # not as well as unreleased_bugfix
+                # not) as well as unreleased_bugfix. Adjust for bugs with a
+                # 'line' (minimum line no.) attribute.
                 else:
-                    for line in [x for x in lines if x != 'unreleased_feature']:
+                    bug_lines = [x for x in lines if x != 'unreleased_feature']
+                    if focus.line:
+                        bug_lines = [
+                            x for x in bug_lines
+                            if LooseVersion(x) >= LooseVersion(focus.line)
+                        ]
+                    for line in bug_lines:
                         log("Adding to %r" % line)
                         lines[line].append(focus)
             else:
