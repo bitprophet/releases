@@ -54,10 +54,15 @@ Specifically:
           release types. E.g. placing ``:support:`123 backported``` in your
           changelog below releases '1.1.1' and '1.2.0' will cause it to appear
           in both of those releases' lists.
-        * ``major``: Given on bug issues to denote inclusion in feature,
+        * ``major``: Given on *bug* issues to denote inclusion in feature,
           instead of bugfix, releases. E.g. placing ``:bug:`22 major``` below
           releases '1.1.1' and '1.2.0' will cause it to appear in '1.2.0'
           **only**.
+        * ``(N.N+)`` where ``N.N`` is a valid release line, e.g. ``1.1`` or
+          ``2.10``: Given on *bug* issues to denote minimum release line. E.g.
+          when actively backporting most bugs to release lines 1.2, 1.3 and
+          1.4, you might specify ``:bug:`55 (1.3+)``` to note that bug 55 only
+          applies to releases in 1.3 and above - not 1.2.
 
 * Regular Sphinx content may be given after issue roles and will be preserved
   as-is when rendering. For example, in ``:bug:`123` Fixed a bug, thanks

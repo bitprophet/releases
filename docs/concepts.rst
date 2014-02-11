@@ -68,9 +68,9 @@ for details on formatting/etc.
         * ``1.0.1``: bug #1, bug #3
         * ``1.1.0``: feature #2, support #4
 
-* **Bugfixes are assumed to backport to all stable release lines, and are
-  displayed as such.** (Unless the release explicitly states - see later
-  bullet points.)
+* **Bugfixes are assumed to backport to all stable release lines by default,
+  and are displayed as such.** However, this can be overridden on a per-release
+  and/or per-bug basis - see later bullet points.
 
     * Input::
 
@@ -174,3 +174,40 @@ for details on formatting/etc.
         * ``1.1.0``: feature #2
         * ``1.1.1``: bugs #3, #4 and #5
         * ``1.0.1``: bugs #1 and #5 only
+
+* **Bugfix issues may be told explicitly which release line they 'start' in.**
+  This is useful for bugs that don't go back all the way to the oldest actively
+  supported line - it keeps them from showing up in "too-old" releases.
+
+  The below example includes a project actively supporting 1.5, 1.6 and 1.7
+  release lines, with a couple of bugfixes that only applied to 1.6+.
+
+    * Input::
+        
+        * :release:`1.7.1 <date>`
+        * :release:`1.6.2 <date>`
+        * :release:`1.5.3 <date>`
+        * :bug:`50` Bug applying to all lines
+        * :bug:`42 (1.6+)` A bug only applying to the new feature in 1.6
+        * :release:`1.7.0 <date>`
+        * :release:`1.6.1 <date>`
+        * :release:`1.5.2 <date>`
+        * :feature:`25` Another new feature
+        * :bug:`35` Bug that applies to all lines
+        * :bug:`34` Bug that applies to all lines
+        * :release:`1.6.0 <date>`
+        * :release:`1.5.1 <date>`
+        * :feature:`22` Some new feature
+        * :bug:`20` Bugfix
+        * :release:`1.5.0 <date>`
+
+    * Result:
+
+        * ``1.5.1``: bug #20
+        * ``1.6.0``: feature #22
+        * ``1.5.2``: bugs #34, #35
+        * ``1.6.1``: bugs #34, #35
+        * ``1.7.0``: feature #25
+        * ``1.5.3``: bug #50 only
+        * ``1.6.2``: bugs #50 and #42
+        * ``1.7.1``: bugs #50 and #42
