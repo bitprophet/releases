@@ -271,8 +271,8 @@ def construct_releases(entries, app):
                     })
                     lines[line] = []
                     # Clean out the items we just released from
-                    # 'unreleased_bugfix'.  (Can't nuke it because there might be
-                    # some unreleased bugs for other release lines.)
+                    # 'unreleased_bugfix'.  (Can't nuke it because there might
+                    # be some unreleased bugs for other release lines.)
                     for x in entries:
                         if x in lines['unreleased_bugfix']:
                             lines['unreleased_bugfix'].remove(x)
@@ -280,8 +280,8 @@ def construct_releases(entries, app):
         # * Features and support go into 'unreleased_feature' for use in new
         # feature releases.
         # * Bugfixes go into all release lines (so they can be printed in >1
-        # bugfix release as appropriate) as well as 'unreleased_bugfix' (so they
-        # can be displayed prior to release')
+        # bugfix release as appropriate) as well as 'unreleased_bugfix' (so
+        # they can be displayed prior to release')
         # * Support/feature entries marked as 'backported' go into all
         # release lines as well, on the assumption that they were released to
         # all active branches.
