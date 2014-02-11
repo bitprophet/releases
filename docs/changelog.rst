@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* :release:`0.5.1 <2014-02-11>`
 * :bug:`-` Fix silly bug in :issue:`20` that cropped up on Python 3.x.
 * :release:`0.5.0 <2014-02-11>`
 * :feature:`20` Allow specifying minimum release line in bugfixes that don't
