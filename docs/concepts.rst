@@ -144,20 +144,26 @@ for details on formatting/etc.
         * ``1.0.1``: bug #1, bug #3
         * ``1.1.0``: feature #2
 
-      But it's implied that ``1.1.0`` includes the contents of ``1.0.1``
+      But it's *implied* that ``1.1.0`` includes the contents of ``1.0.1``
       because it released afterwards/simultaneously and is a higher release
       line.
 
 * **Releases may be told explicitly which issues to include** (using a
-  comma-separated list.)
+  comma-separated list.) This is useful for the rare bugfix that gets
+  backported beyond the actively supported release lines.
+
+  For example, below shows a project whose lifecycle is "release 1.0; release
+  1.1 and drop active support for 1.0; put out a special 1.0.x release."
+  Without the explicit issue list for 1.0.1, Releases would roll up all
+  bugfixes, including the two that didn't actually apply to the 1.0 line.
 
     * Input::
     
         * :release:`1.0.1 <date>` 1, 5
         * :release:`1.1.1 <date>`
-        * :bug:`5` This one did get backported to 1.0
-        * :bug:`4` Another one that didn't apply to 1.0
-        * :bug:`3` Bugfix only backported to 1.1, not 1.0
+        * :bug:`5` Bugfix that applied back to 1.0.
+        * :bug:`4` Bugfix that didn't apply to 1.0, only 1.1
+        * :bug:`3` Bugfix that didn't apply to 1.0, only 1.1
         * :release:`1.1.0 <date>`
         * :feature:`2` Implemented new feature
         * :bug:`1` Fixed a 1.0.0 bug
