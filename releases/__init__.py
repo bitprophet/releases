@@ -33,6 +33,8 @@ def issue_nodelist(name, link=None):
     return signifier + hyperlink + [nodes.inline(text=":")] + trail
 
 
+release_line_re = re.compile(r'\((\d+\.\d+)\+\)') # e.g. '(1.2+)'
+
 def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     """
     Use: :issue|bug|feature|support:`ticket_number`
@@ -61,9 +63,14 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     # Additional 'new-style changelog' stuff
     if name in issue_types:
         nodelist = issue_nodelist(name, link)
+        line = None
         # Sanity check
         if ported not in ('backported', 'major', ''):
-            raise ValueError("Gave unknown issue metadata '%s' for issue no. %s" % (ported, issue_no))
+            match = release_line_re.match(ported)
+            if not match:
+                raise ValueError("Gave unknown issue metadata '%s' for issue no. %s" % (ported, issue_no))
+            else:
+                line = match.groups()[0]
         # Create temporary node w/ data & final nodes to publish
         node = issue(
             number=issue_no,
@@ -71,6 +78,7 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
             nodelist=nodelist,
             backported=(ported == 'backported'),
             major=(ported == 'major'),
+            line=line,
         )
         return [node], []
     # Return old style info for 'issue' for older changelog entries
@@ -136,12 +144,18 @@ class issue(nodes.Element):
     def number(self):
         return self.get('number', None)
 
+    @property
+    def line(self):
+        return self.get('line', None)
+
     def __repr__(self):
         flag = ""
         if self.backported:
             flag = "backported"
         elif self.major:
             flag = "major"
+        elif self.line:
+            flag = self.line + "+"
         if flag:
             flag = " (%s)" % flag
         return "<%s #%s%s>" % (self.type, self.number, flag)
