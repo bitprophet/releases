@@ -134,11 +134,11 @@ class issue(nodes.Element):
 
     @property
     def backported(self):
-        return self['backported']
+        return self.get('backported', False)
 
     @property
     def major(self):
-        return self['major']
+        return self.get('major', False)
 
     @property
     def number(self):
@@ -296,8 +296,6 @@ def construct_releases(entries, app):
                 focus = issue(
                     type_='bug',
                     nodelist=issue_nodelist('bug'),
-                    backported=False,
-                    major=False,
                     description=[focus]
                 )
             else:
