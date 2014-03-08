@@ -10,7 +10,9 @@ from releases import (
     construct_releases,
     construct_nodes
 )
-from docutils.nodes import reference, bullet_list, list_item, title, raw
+from docutils.nodes import (
+    reference, bullet_list, list_item, title, raw
+)
 
 
 def _app():
@@ -44,7 +46,18 @@ def _issue(type_, number, **kwargs):
     )[0][0]
 
 def _entry(i):
-    return [[i]]
+    """
+    Maps simplerish values to a fake list_item + contents, as would be found
+    in a real docutils/sphinx changelog document.
+
+    When given a non-iterable, creates [[i]]; outer list is the list_item,
+    inner list is the (1st, usually only) paragraph, and 'i' is the actual
+    object/node in question.
+
+    When given an iterable, simply returns it as-is (this is as _entry is
+    frequently called within another helper.)
+    """
+    return i if hasattr(i, '__iter__') else [[i]]
 
 def _release(number, **kwargs):
     return release_role(
@@ -137,9 +150,10 @@ class releases(Spec):
         )
 
     def unmarked_bullet_list_items_treated_as_bugs(self):
-        # Empty list item here stands in for just-a-list-of-nodes,
-        # which is what a non-issue/release changelog list item looks like
-        entries = _releases('1.0.2', self.f, [])[1]['entries']
+        # Empty nested list stands in for just-a-list-of-nodes,
+        # which is what a non-issue/release changelog list item looks like.
+        # E.g. list_item(paragraph(more_nodes))
+        entries = _releases('1.0.2', self.f, [[[]]])[1]['entries']
         eq_(len(entries), 1)
         assert self.f not in entries
         assert isinstance(entries[0], issue)
@@ -342,3 +356,16 @@ class nodes(Spec):
         assert '<h2 style="margin-bottom' in str(node)
         # Date span w/ font-size
         assert '<span style="font-size' in str(node)
+
+    def descriptions_are_preserved(self):
+        # Changelog containing an issue item w/ trailing node
+        issue = [[self.b, raw('', 'x')]]
+        node = self._generate('1.0.2', issue, raw=True)[0][1]
+        # Trailing nodes should appear post-processing after the link/etc
+        rest = node[0][0]
+        eq_(len(rest), 5)
+        _expect_type(rest[4], raw)
+        eq_(rest[4].astext(), 'x')
+
+    def sub_bullet_lists_are_preserved(self):
+        pass
