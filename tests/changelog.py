@@ -368,4 +368,19 @@ class nodes(Spec):
         eq_(rest[4].astext(), 'x')
 
     def sub_bullet_lists_are_preserved(self):
-        pass
+        # Complex 'entry' mapping to an outer list_item (list) containing two
+        # paragraphs (raw cuz easier to handle), one w/ the real issue + desc,
+        # another simply a 2nd text paragraph.
+        issue = [[self.b, raw('', 'x')], raw('', 'y')]
+        node = self._generate('1.0.2', issue, raw=True)[0][1]
+        # Expect that the machinery parsing issue nodes/nodelists, is not
+        # discarding our 2nd 'paragraph'
+        li = node[0]
+        eq_(len(li), 2)
+        p1, p2 = li
+        # Last item in 1st para is our 1st raw node
+        _expect_type(p1[4], raw)
+        eq_(pi[4].astext(), 'x')
+        # Only item in 2nd para is our 2nd raw node
+        _expect_type(p2[0], raw)
+        eq_(p2[0].astext(), 'y')
