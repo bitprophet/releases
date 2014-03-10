@@ -185,21 +185,23 @@ def construct_releases(entries, app):
     # in explicitly defined release lists.
     issues = {}
     for obj in reversed(entries):
-        # The 'actual' intermediate object we want to focus on is wrapped first
-        # in a LI, then a P.
-        focus, rest = obj[0][0], obj[0][1:]
+        # Issue object is always found in obj (LI) index 0 (first, often only
+        # P) and is the 1st item within that (index 0 again).
+        # Preserve all other contents of 'obj'.
+        focus = obj[0].pop(0)
+        rest = obj
         log(repr(focus))
         # Releases 'eat' the entries in their line's list and get added to the
         # final data structure. They also inform new release-line 'buffers'.
-        # Release lines' "rest" should be empty or a comma-separated list of
-        # issue numbers.
+        # Release lines, once the release obj is removed, should be empty or a
+        # comma-separated list of issue numbers.
         if isinstance(focus, release):
             line = get_line(focus)
             log("release for line %r" % line)
             # Check for explicitly listed issues first
             explicit = None
-            if rest:
-                explicit = [x.strip() for x in rest[0].split(',')]
+            if rest[0].children:
+                explicit = [x.strip() for x in rest[0][0].split(',')]
             # Do those by themselves since they override all other logic
             if explicit:
                 log("Explicit issues requested: %r" % (explicit,))
@@ -291,7 +293,7 @@ def construct_releases(entries, app):
         # all active branches.
         # * The 'rest' variable (which here is the bug description, vitally
         # important!) is preserved by stuffing it into the focus (issue)
-        # object.
+        # object - it will get unpacked by construct_nodes() later.
         else:
             # Handle rare-but-valid non-issue-attached line items, which are
             # always bugs. (They are their own description.)
@@ -371,26 +373,27 @@ def construct_nodes(releases):
         entries = []
         for entry in d['entries']:
             # Use nodes.Node.deepcopy to deepcopy the description
-            # nodes.  If this is not done, multiple references to the same
+            # node.  If this is not done, multiple references to the same
             # object (e.g. a reference object in the description of #649, which
             # is then copied into 2 different release lists) will end up in the
             # doctree, which makes subsequent parse steps very angry (index()
             # errors).
-            desc = list(map(lambda x: x.deepcopy(), entry['description']))
+            desc = entry['description'].deepcopy()
             # Additionally, expand any other issue roles found in the
-            # description paragraph - sometimes we refer to related issues
-            # inline. (They can't be left as issue() objects at render time
-            # since that's undefined.)
-            for i, node in enumerate(desc[:]): # Copy to avoid self-mutation during loop
+            # description - sometimes we refer to related issues inline. (They
+            # can't be left as issue() objects at render time since that's
+            # undefined.)
+            for i, node in enumerate(desc[:]): # Copy to avoid self-mutation
                 if isinstance(node, issue):
                     desc[i:i+1] = node['nodelist']
-            # Tack on to end of this entry's own nodelist (which is the link +
-            # etc)
-            entries.append(
-                nodes.list_item('',
-                    nodes.paragraph('', '', *entry['nodelist'] + desc)
-                )
-            )
+            # Rework this entry to insert the now-rendered issue nodes in front
+            # of the 1st paragraph of the 'description' nodes (which should be
+            # the preserved LI + nested paragraph-or-more from original
+            # markup.)
+            # FIXME: why is there no "prepend a list" method?
+            for node in reversed(entry['nodelist']):
+                desc[0].insert(0, node)
+            entries.append(desc)
         # Entry list
         list_ = nodes.bullet_list('', *entries)
         # Insert list into release nodelist (as it's a section)
