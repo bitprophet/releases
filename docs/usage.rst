@@ -81,3 +81,24 @@ issues grouped by release, as per the above rules. Examples: `Releases' own
 rendered changelog
 <http://releases.readthedocs.org/en/latest/changelog.html>`_, `Fabric's
 rendered changelog <http://docs.fabfile.org/en/latest/changelog.html>`_.
+
+
+Optional styling additions
+==========================
+
+If you have any nontrivial changelog entries (e.g. whose description spans
+multiple paragraphs or includes their own bulleted lists, etc) you may run into
+`docutils' rather enthusiastic bulleted list massaging
+<http://docutils.sourceforge.net/sandbox/html4strict/data/simple-lists.html>`_
+which can then make your releases look different from one another.
+
+To help combat this, it may be useful to add the following rule to the Sphinx
+theme you're using::
+
+    div#changelog > div.section > ul > li > p:only-child {
+        margin-bottom: 0;
+    }
+
+.. note::
+    Some themes, like `Alabaster <http://github.com/bitprophet/alabaster>`_,
+    may already include this style rule.
