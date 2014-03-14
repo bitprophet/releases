@@ -48,7 +48,14 @@ def _issue(type_, number, **kwargs):
 def _entry(i):
     """
     Easy wrapper for issue/release objects.
+
+    Default is to give eg an issue/release object that gets wrapped in a LI->P.
+
+    May give your own (non-issue/release) object to skip auto wrapping. (Useful
+    since _entry() is often called a few levels deep.)
     """
+    if not isinstance(i, (issue, release)):
+        return i
     return list_item('', paragraph('', '', i))
 
 def _release(number, **kwargs):
@@ -146,7 +153,9 @@ class releases(Spec):
         # Empty nested list stands in for just-a-list-of-nodes,
         # which is what a non-issue/release changelog list item looks like.
         # E.g. list_item(paragraph(more_nodes))
-        entries = _releases('1.0.2', self.f, _entry(raw('wut')))[1]['entries']
+        fake = list_item('', paragraph('', '', raw('', 'whatever')))
+        releases = _releases('1.0.2', self.f, fake)
+        entries = releases[1]['entries']
         eq_(len(entries), 1)
         assert self.f not in entries
         assert isinstance(entries[0], issue)
@@ -352,7 +361,9 @@ class nodes(Spec):
 
     def descriptions_are_preserved(self):
         # Changelog containing an issue item w/ trailing node
-        issue = self.b.deepcopy()
+        issue = list_item('',
+            paragraph('', '', self.b.deepcopy(), raw('', 'x')),
+        )
         # Trailing nodes should appear post-processing after the link/etc
         rest = self._generate('1.0.2', issue)[0]
         eq_(len(rest), 5)
@@ -363,16 +374,18 @@ class nodes(Spec):
         # Complex 'entry' mapping to an outer list_item (list) containing two
         # paragraphs, one w/ the real issue + desc, another simply a 2nd text
         # paragraph. Using 'raw' nodes for filler as needed.
-        issue = [[self.b, raw('', 'x')], raw('', 'y')]
-        node = self._generate('1.0.2', issue, raw=True)[0][1]
+        issue = list_item('',
+            paragraph('', '', self.b.deepcopy(), raw('', 'x')),
+            paragraph('', '', raw('', 'y')),
+        )
+        li = self._generate('1.0.2', issue)
         # Expect that the machinery parsing issue nodes/nodelists, is not
         # discarding our 2nd 'paragraph'
-        li = node[0]
         eq_(len(li), 2)
         p1, p2 = li
         # Last item in 1st para is our 1st raw node
         _expect_type(p1[4], raw)
-        eq_(pi[4].astext(), 'x')
+        eq_(p1[4].astext(), 'x')
         # Only item in 2nd para is our 2nd raw node
         _expect_type(p2[0], raw)
         eq_(p2[0].astext(), 'y')
