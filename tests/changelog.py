@@ -11,7 +11,7 @@ from releases import (
     construct_nodes
 )
 from docutils.nodes import (
-    reference, bullet_list, list_item, title, raw
+    reference, bullet_list, list_item, title, raw, paragraph, Text
 )
 
 
@@ -47,26 +47,19 @@ def _issue(type_, number, **kwargs):
 
 def _entry(i):
     """
-    Maps simplerish values to a fake list_item + contents, as would be found
-    in a real docutils/sphinx changelog document.
-
-    When given a non-iterable, creates [[i]]; outer list is the list_item,
-    inner list is the (1st, usually only) paragraph, and 'i' is the actual
-    object/node in question.
-
-    When given an iterable, simply returns it as-is (this is as _entry is
-    frequently called within another helper.)
+    Easy wrapper for issue/release objects.
     """
-    return i if hasattr(i, '__iter__') else [[i]]
+    return list_item('', paragraph('', '', i))
 
 def _release(number, **kwargs):
-    return release_role(
+    nodes = release_role(
         name=None,
         rawtext='',
         text='%s <2013-11-20>' % number,
         lineno=None,
         inliner=_inliner(),
-    )
+    )[0]
+    return list_item('', paragraph('', '', *nodes))
 
 def _release_list(*entries):
     entries = list(entries) # lol tuples
@@ -153,7 +146,7 @@ class releases(Spec):
         # Empty nested list stands in for just-a-list-of-nodes,
         # which is what a non-issue/release changelog list item looks like.
         # E.g. list_item(paragraph(more_nodes))
-        entries = _releases('1.0.2', self.f, [[[]]])[1]['entries']
+        entries = _releases('1.0.2', self.f, _entry(raw('wut')))[1]['entries']
         eq_(len(entries), 1)
         assert self.f not in entries
         assert isinstance(entries[0], issue)
@@ -227,7 +220,7 @@ class releases(Spec):
             '1.0.1', '1.1.1', b3, b2, self.b, '1.1.0', self.f
         )
         # Modify 1.0.1 release to be speshul
-        changelog[0][0].append("2, 3")
+        changelog[0][0].append(Text("2, 3"))
         rendered = construct_releases(changelog, _app())
         # 1.0.1 includes just 2 and 3, not bug 1
         one_0_1 = rendered[3]['entries']
@@ -244,7 +237,7 @@ class releases(Spec):
     def explicit_release_list_split_works_with_unicode(self):
         b = _issue('bug', '17')
         changelog = _release_list('1.0.1', b)
-        changelog[0][0].append(six.text_type('17'))
+        changelog[0][0].append(Text(six.text_type('17')))
         # When using naive method calls, this explodes
         construct_releases(changelog, _app())
 
@@ -253,7 +246,7 @@ class releases(Spec):
         f2 = _issue('feature', '2')
         changelog = _release_list('1.1.0', f1, f2)
         # Ensure that 1.1.0 specifies feature 2
-        changelog[0][0].append("2")
+        changelog[0][0].append(Text("2"))
         rendered = _changelog2dict(construct_releases(changelog, _app()))
         # 1.1.0 should have feature 2 only
         assert f2 in rendered['1.1.0']
@@ -268,7 +261,7 @@ class releases(Spec):
         b2 = _issue('bug', '2')
         changelog = _release_list('1.0.1', b1, b2)
         # Ensure that 1.0.1 specifies bug 2
-        changelog[0][0].append("2")
+        changelog[0][0].append(Text('2'))
         rendered = construct_releases(changelog, _app())
         # 1.0.1 should have bug 2 only
         assert b2 in rendered[1]['entries']
@@ -281,7 +274,7 @@ class releases(Spec):
         # Just a release - result will have 1.0.0, 1.0.1, and unreleased
         changelog = _release_list('1.0.1')
         # No issues listed -> this clearly doesn't exist in any buckets
-        changelog[1][0].append("25")
+        changelog[1][0].append(Text("25"))
         # This should asplode
         construct_releases(changelog, _app())
 
@@ -359,18 +352,17 @@ class nodes(Spec):
 
     def descriptions_are_preserved(self):
         # Changelog containing an issue item w/ trailing node
-        issue = [[self.b, raw('', 'x')]]
-        node = self._generate('1.0.2', issue, raw=True)[0][1]
+        issue = self.b.deepcopy()
         # Trailing nodes should appear post-processing after the link/etc
-        rest = node[0][0]
+        rest = self._generate('1.0.2', issue)[0]
         eq_(len(rest), 5)
         _expect_type(rest[4], raw)
         eq_(rest[4].astext(), 'x')
 
     def sub_bullet_lists_are_preserved(self):
         # Complex 'entry' mapping to an outer list_item (list) containing two
-        # paragraphs (raw cuz easier to handle), one w/ the real issue + desc,
-        # another simply a 2nd text paragraph.
+        # paragraphs, one w/ the real issue + desc, another simply a 2nd text
+        # paragraph. Using 'raw' nodes for filler as needed.
         issue = [[self.b, raw('', 'x')], raw('', 'y')]
         node = self._generate('1.0.2', issue, raw=True)[0][1]
         # Expect that the machinery parsing issue nodes/nodelists, is not
