@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* :release:`0.5.2 <2014-03-13>`
 * :bug:`23` Rework implementation to deal with issue descriptions that span
   more than one paragraph - subsequent paragraphs/blocks were not being
   displayed prior.
