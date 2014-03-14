@@ -302,7 +302,7 @@ def construct_releases(entries, app):
                 focus = issue(
                     type_='bug',
                     nodelist=issue_nodelist('bug'),
-                    description=[focus]
+                    description=nodes.list_item('', nodes.paragraph('', '', focus)),
                 )
             else:
                 focus.attributes['description'] = rest
@@ -383,9 +383,11 @@ def construct_nodes(releases):
             # description - sometimes we refer to related issues inline. (They
             # can't be left as issue() objects at render time since that's
             # undefined.)
-            for i, node in enumerate(desc[:]): # Copy to avoid self-mutation
-                if isinstance(node, issue):
-                    desc[i:i+1] = node['nodelist']
+            # Use [:] slicing to avoid mutation during the loops.
+            for index, node in enumerate(desc[:]):
+                for subindex, subnode in enumerate(node[:]):
+                    if isinstance(subnode, issue):
+                        desc[index][subindex:subindex+1] = subnode['nodelist']
             # Rework this entry to insert the now-rendered issue nodes in front
             # of the 1st paragraph of the 'description' nodes (which should be
             # the preserved LI + nested paragraph-or-more from original

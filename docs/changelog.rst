@@ -2,6 +2,8 @@
 Changelog
 =========
 
+* :bug:`25` Empty/no-issue line items broke at some point; fixed.
+* :bug:`24` Broke inline issue parsing; fixed now.
 * :release:`0.5.2 <2014-03-13>`
 * :bug:`23` Rework implementation to deal with issue descriptions that span
   more than one paragraph - subsequent paragraphs/blocks were not being
