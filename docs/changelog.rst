@@ -3,7 +3,8 @@ Changelog
 =========
 
 * :bug:`23` Rework implementation to deal with issue descriptions that span
-  more than one paragraph.
+  more than one paragraph - subsequent paragraphs/blocks were not being
+  displayed prior.
 * :release:`0.5.1 <2014-02-11>`
 * :bug:`-` Fix silly bug in :issue:`20` that cropped up on Python 3.x.
 * :release:`0.5.0 <2014-02-11>`
