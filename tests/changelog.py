@@ -335,7 +335,7 @@ class nodes(Spec):
     def features_marked_as_features(self):
         self._assert_prefix(['1.1.0', self.f], 'Feature')
 
-    def support_marked_as_suppot(self):
+    def support_marked_as_support(self):
         self._assert_prefix(['1.1.0', self.s], 'Support')
 
     def dashed_issues_appear_as_unlinked_issues(self):
