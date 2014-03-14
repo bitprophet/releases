@@ -370,7 +370,7 @@ class nodes(Spec):
         _expect_type(rest[4], raw)
         eq_(rest[4].astext(), 'x')
 
-    def sub_bullet_lists_are_preserved(self):
+    def complex_descriptions_are_preserved(self):
         # Complex 'entry' mapping to an outer list_item (list) containing two
         # paragraphs, one w/ the real issue + desc, another simply a 2nd text
         # paragraph. Using 'raw' nodes for filler as needed.
