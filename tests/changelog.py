@@ -100,7 +100,7 @@ def _setup_issues(self):
 
 class releases(Spec):
     """
-    Organization of issues into releases
+    Organization of issues into releases (parsing)
     """
     def setup(self):
         _setup_issues(self)
@@ -306,7 +306,7 @@ def _expect_type(node, cls):
 
 class nodes(Spec):
     """
-    Expansion/extension of docutils nodes
+    Expansion/extension of docutils nodes (rendering)
     """
     def setup(self):
         _setup_issues(self)
