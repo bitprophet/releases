@@ -220,7 +220,6 @@ class releases(Spec):
         ):
             eq_(set(c[rel]), set(issues))
 
-
     def releases_can_specify_issues_explicitly(self):
         # Build regular list-o-entries
         b2 = _issue('bug', '2')
