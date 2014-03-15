@@ -391,3 +391,20 @@ class nodes(Spec):
         # Only item in 2nd para is our 2nd raw node
         _expect_type(p2[0], raw)
         eq_(p2[0].astext(), 'y')
+
+    def descriptions_are_parsed_for_issue_roles(self):
+        item = list_item('',
+            paragraph('', '', self.b.deepcopy(), _issue('support', '5'))
+        )
+        para = self._generate('1.0.2', item)[0]
+        # Sanity check - in a broken parsing scenarion, the 4th child will be a
+        # raw issue object
+        assert not isinstance(para[4], issue)
+        # First/primary link
+        _expect_type(para[2], reference)
+        eq_(para[2].astext(), '#15')
+        assert 'Bug' in para[0].astext()
+        # Second/inline link
+        _expect_type(para[6], reference)
+        eq_(para[6].astext(), '#5')
+        assert 'Support' in para[4].astext()
