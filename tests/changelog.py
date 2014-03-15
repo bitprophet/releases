@@ -342,6 +342,12 @@ class nodes(Spec):
         node = self._generate('1.0.2', _issue('bug', '0'))
         assert not isinstance(node[0][2], reference)
 
+    def blank_source_lines_appear_as_unlinked_bugs(self):
+        fake = list_item('', paragraph('', '', raw('', 'whatever')))
+        node = self._generate('1.0.2', fake)
+        assert 'Bug' in str(node[0][0])
+        assert 'whatever' in str(node[0][3])
+
     def issues_wrapped_in_unordered_list_nodes(self):
         node = self._generate('1.0.2', self.b, raw=True)[0][1]
         _expect_type(node, bullet_list)
