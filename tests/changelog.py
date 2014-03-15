@@ -150,9 +150,6 @@ class releases(Spec):
         )
 
     def unmarked_bullet_list_items_treated_as_bugs(self):
-        # Empty nested list stands in for just-a-list-of-nodes,
-        # which is what a non-issue/release changelog list item looks like.
-        # E.g. list_item(paragraph(more_nodes))
         fake = list_item('', paragraph('', '', raw('', 'whatever')))
         releases = _releases('1.0.2', self.f, fake)
         entries = releases[1]['entries']
