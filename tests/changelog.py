@@ -348,7 +348,7 @@ class nodes(Spec):
         assert 'Bug' in str(node[0][0])
         assert 'whatever' in str(node[0][3])
 
-    def issues_wrapped_in_unordered_list_nodes(self):
+    def issues_remain_wrapped_in_unordered_list_nodes(self):
         node = self._generate('1.0.2', self.b, raw=True)[0][1]
         _expect_type(node, bullet_list)
         _expect_type(node[0], list_item)
