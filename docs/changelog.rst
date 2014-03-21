@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* :release:`0.5.3 <2014-03-15>`
 * :bug:`25` Empty/no-issue line items broke at some point; fixed.
 * :bug:`24` Broke inline issue parsing; fixed now.
 * :release:`0.5.2 <2014-03-13>`
