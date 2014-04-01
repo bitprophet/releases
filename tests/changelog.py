@@ -336,6 +336,9 @@ class nodes(Spec):
     def issues_with_numbers_appear_as_number_links(self):
         self._test_link({}, 'issue', 'bar_15')
 
+    def releases_appear_as_header_links(self):
+        self._test_link({}, 'release', 'foo_1.0.2')
+
     def links_will_use_github_option_if_defined(self):
         kwargs = {
             'release_uri': None,
