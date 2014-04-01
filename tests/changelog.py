@@ -15,13 +15,16 @@ from docutils.nodes import (
 )
 
 
-def _app():
+def _app(**kwargs):
     # Fake app obj
     app = Mock('app')
     config = Mock('config')
     config.releases_release_uri = 'foo_%s'
     config.releases_issue_uri = 'bar_%s'
     config.releases_debug = False
+    # Allow overrides
+    for name, value in kwargs.iteritems():
+        setattr(config, 'releases_{0}'.format(name), value)
     app.config = config
     return app
 
@@ -86,8 +89,9 @@ def _changelog2dict(changelog):
         d[r['obj'].number] = r['entries']
     return d
 
-def _releases(*entries):
-    return construct_releases(_release_list(*entries), _app())
+def _releases(*entries, **kwargs):
+    app = kwargs.get('app', None) or _app()
+    return construct_releases(_release_list(*entries), app)
 
 def _setup_issues(self):
     self.f = _issue('feature', '12')
@@ -312,7 +316,8 @@ class nodes(Spec):
         _setup_issues(self)
 
     def _generate(self, *entries, **kwargs):
-        nodes = construct_nodes(_releases(*entries))
+        app = kwargs.get('app', None)
+        nodes = construct_nodes(_releases(*entries, app=app))
         # By default, yield the contents of the bullet list.
         return nodes if kwargs.get('raw', False) else nodes[0][1][0]
 
