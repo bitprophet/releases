@@ -343,8 +343,8 @@ class nodes(Spec):
             'github_path': 'foo/bar',
         }
         for type_, expected in (
-            ('issue', 'https://github.com/foo/bar/issue/15'),
-            ('release', 'https://github.com/foo/bar/tree/15'),
+            ('issue', 'https://github.com/foo/bar/issues/15'),
+            ('release', 'https://github.com/foo/bar/tree/1.0.2'),
         ):
             self._test_link(kwargs, type_, expected)
 
@@ -354,7 +354,7 @@ class nodes(Spec):
             'issue_uri': 'explicit_issue_%s',
             'github_path': 'foo/bar',
         }
-        self._test_link(kwargs, 'issue', 'explicit_15')
+        self._test_link(kwargs, 'issue', 'explicit_issue_15')
 
     def release_links_prefer_explicit_setting_over_github_setting(self):
         kwargs = {
