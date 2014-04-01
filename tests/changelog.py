@@ -321,15 +321,20 @@ class nodes(Spec):
         # By default, yield the contents of the bullet list.
         return nodes if kwargs.get('raw', False) else nodes[0][1][0]
 
-    def _test_link(self, kwargs, expected):
+    def _test_link(self, kwargs, type_, expected):
         app = _app(**kwargs)
-        nodes = self._generate('1.0.2', self.b, app=app)
-        link = nodes[0][2]
-        _expect_type(link, reference)
-        assert link['refuri'] == expected
+        nodes = self._generate('1.0.2', self.b, app=app, raw=True)
+        if type_ == 'release':
+            header = nodes[0][0][0].astext()
+            assert expected in header
+        elif type_ == 'issue':
+            link = nodes[0][1][0][0][2]
+            assert link['refuri'] == expected
+        else:
+            raise Exception("Gave unknown type_ kwarg to _test_link()!")
 
     def issues_with_numbers_appear_as_number_links(self):
-        self._test_link({}, 'bar_15')
+        self._test_link({}, 'issue', 'bar_15')
 
     def links_will_use_github_option_if_defined(self):
         kwargs = {
@@ -337,13 +342,27 @@ class nodes(Spec):
             'issue_uri': None,
             'github_path': 'foo/bar',
         }
-        self._test_link(kwargs, 'https://github.com/foo/bar/issue/15')
+        for type_, expected in (
+            ('issue', 'https://github.com/foo/bar/issue/15'),
+            ('release', 'https://github.com/foo/bar/tree/15'),
+        ):
+            self._test_link(kwargs, type_, expected)
 
     def issue_links_prefer_explicit_setting_over_github_setting(self):
-        skip()
+        kwargs = {
+            'release_uri': None,
+            'issue_uri': 'explicit_issue_%s',
+            'github_path': 'foo/bar',
+        }
+        self._test_link(kwargs, 'issue', 'explicit_15')
 
     def release_links_prefer_explicit_setting_over_github_setting(self):
-        skip()
+        kwargs = {
+            'release_uri': 'explicit_release_%s',
+            'issue_uri': None,
+            'github_path': 'foo/bar',
+        }
+        self._test_link(kwargs, 'release', 'explicit_release_15')
 
     def _assert_prefix(self, entries, expectation):
         assert expectation in self._generate(*entries)[0][0][0]
