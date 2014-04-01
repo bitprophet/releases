@@ -322,6 +322,15 @@ class nodes(Spec):
         _expect_type(link, reference)
         assert link['refuri'] == 'bar_15'
 
+    def links_will_use_github_option_if_defined(self):
+        skip()
+
+    def issue_links_prefer_explicit_setting_over_github_setting(self):
+        skip()
+
+    def release_links_prefer_explicit_setting_over_github_setting(self):
+        skip()
+
     def _assert_prefix(self, entries, expectation):
         assert expectation in self._generate(*entries)[0][0][0]
 

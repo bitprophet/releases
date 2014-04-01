@@ -15,6 +15,17 @@ Specifically:
       level options - they determine the targets of the issue & release links
       in the HTML output. Both should have an unevaluated ``%s`` where the
       release/issue number would go.
+
+        * Alternately, if your project is hosted on Github, set the
+          ``releases_github_path`` setting instead, to e.g.
+          ``account/project``. Releases will then use an appropriate Github
+          URL for both releases and issues.
+
+        * If ``releases_release_uri`` or ``releases_issue_uri`` are *also*
+          configured, they will be preferred over ``releases_github_path``.
+          (If only one is configured, the other link type will continue using
+          ``releases_github_path``.)
+
     * See `Fabric's docs/conf.py
       <https://github.com/fabric/fabric/blob/4afd33e971f1c6831cc33fd3228013f7484fbe35/docs/conf.py#L31>`_
       for an example.
