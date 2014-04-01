@@ -328,7 +328,15 @@ class nodes(Spec):
         assert link['refuri'] == 'bar_15'
 
     def links_will_use_github_option_if_defined(self):
-        skip()
+        app = _app(
+            release_uri=None,
+            issue_uri=None,
+            github_path='foo/bar',
+        )
+        nodes = self._generate('1.0.2', self.b, app=app)
+        link = nodes[0][2]
+        _expect_type(link, reference)
+        assert link['refuri'] == 'https://github.com/foo/bar/issue/15'
 
     def issue_links_prefer_explicit_setting_over_github_setting(self):
         skip()
