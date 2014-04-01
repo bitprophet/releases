@@ -321,22 +321,23 @@ class nodes(Spec):
         # By default, yield the contents of the bullet list.
         return nodes if kwargs.get('raw', False) else nodes[0][1][0]
 
-    def issues_with_numbers_appear_as_number_links(self):
-        nodes = self._generate('1.0.2', self.b)
-        link = nodes[0][2]
-        _expect_type(link, reference)
-        assert link['refuri'] == 'bar_15'
-
-    def links_will_use_github_option_if_defined(self):
-        app = _app(
-            release_uri=None,
-            issue_uri=None,
-            github_path='foo/bar',
-        )
+    def _test_link(self, kwargs, expected):
+        app = _app(**kwargs)
         nodes = self._generate('1.0.2', self.b, app=app)
         link = nodes[0][2]
         _expect_type(link, reference)
-        assert link['refuri'] == 'https://github.com/foo/bar/issue/15'
+        assert link['refuri'] == expected
+
+    def issues_with_numbers_appear_as_number_links(self):
+        self._test_link({}, 'bar_15')
+
+    def links_will_use_github_option_if_defined(self):
+        kwargs = {
+            'release_uri': None,
+            'issue_uri': None,
+            'github_path': 'foo/bar',
+        }
+        self._test_link(kwargs, 'https://github.com/foo/bar/issue/15')
 
     def issue_links_prefer_explicit_setting_over_github_setting(self):
         skip()
