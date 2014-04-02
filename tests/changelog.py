@@ -1,9 +1,13 @@
+from tempfile import mkdtemp
+from shutil import rmtree
+
 import six
 from spec import Spec, skip, eq_, raises
 from mock import Mock
 from docutils.nodes import (
     reference, bullet_list, list_item, title, raw, paragraph, Text
 )
+from sphinx.application import Sphinx
 
 from releases import (
     issue,
@@ -13,19 +17,39 @@ from releases import (
     construct_releases,
     construct_nodes
 )
+from releases import setup as releases_setup # avoid unittest crap
 
 
 def _app(**kwargs):
-    # Fake app obj
-    app = Mock()
-    config = Mock()
-    config.releases_release_uri = 'foo_%s'
-    config.releases_issue_uri = 'bar_%s'
-    config.releases_debug = False
+    # Create a real Sphinx app, with stupid temp dirs because it assumes.
+    # Helps catch things like "testing a config option but forgot
+    # app.add_config_value()"
+    src, doctree = mkdtemp(), mkdtemp()
+    try:
+        # STFU Sphinx :(
+        Sphinx._log = lambda self, message, wfile, nonl=False: None
+        app = Sphinx(
+            srcdir=src,
+            confdir=None,
+            outdir=None,
+            doctreedir=doctree,
+            buildername='html',
+        )
+    finally:
+        [rmtree(x) for x in (src, doctree)]
+    releases_setup(app)
+    # Mock out the config within. More horrible assumptions by Sphinx :(
+    config = {
+        'releases_release_uri': 'foo_%s',
+        'releases_issue_uri': 'bar_%s',
+        'releases_debug': False,
+    }
     # Allow overrides
     for name in kwargs:
-        setattr(config, 'releases_{0}'.format(name), kwargs[name])
-    app.config = config
+        config['releases_{0}'.format(name)] = kwargs[name]
+    # Stitch together as the sphinx app init() usually does w/ real conf files
+    app.config._raw_config = config
+    app.config.init_values()
     return app
 
 def _inliner(app=None):
