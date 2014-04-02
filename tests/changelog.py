@@ -17,8 +17,8 @@ from docutils.nodes import (
 
 def _app(**kwargs):
     # Fake app obj
-    app = Mock('app')
-    config = Mock('config')
+    app = Mock()
+    config = Mock()
     config.releases_release_uri = 'foo_%s'
     config.releases_issue_uri = 'bar_%s'
     config.releases_debug = False
