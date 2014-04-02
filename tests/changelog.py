@@ -28,8 +28,9 @@ def _app(**kwargs):
     app.config = config
     return app
 
-def _inliner():
-    return Mock(document=Mock(settings=Mock(env=Mock(app=_app()))))
+def _inliner(app=None):
+    app = app or _app()
+    return Mock(document=Mock(settings=Mock(env=Mock(app=app))))
 
 # Obtain issue() object w/o wrapping all parse steps
 def _issue(type_, number, **kwargs):
@@ -40,12 +41,13 @@ def _issue(type_, number, **kwargs):
         text += " major"
     if kwargs.get('line', None):
         text += " (%s+)" % kwargs['line']
+    app = kwargs.get('app', None)
     return issues_role(
         name=type_,
         rawtext='',
         text=text,
         lineno=None,
-        inliner=_inliner(),
+        inliner=_inliner(app=app),
     )[0][0]
 
 def _entry(i):
@@ -323,13 +325,14 @@ class nodes(Spec):
 
     def _test_link(self, kwargs, type_, expected):
         app = _app(**kwargs)
-        nodes = self._generate('1.0.2', self.b, app=app, raw=True)
+        bug = _issue('bug', 15, app=app)
+        nodes = self._generate('1.0.2', bug, app=app, raw=True)
         if type_ == 'release':
             header = nodes[0][0][0].astext()
             assert expected in header
         elif type_ == 'issue':
             link = nodes[0][1][0][0][2]
-            assert link['refuri'] == expected
+            eq_(link['refuri'], expected)
         else:
             raise Exception("Gave unknown type_ kwarg to _test_link()!")
 
