@@ -23,8 +23,8 @@ def _app(**kwargs):
     config.releases_issue_uri = 'bar_%s'
     config.releases_debug = False
     # Allow overrides
-    for name, value in kwargs.iteritems():
-        setattr(config, 'releases_{0}'.format(name), value)
+    for name in kwargs:
+        setattr(config, 'releases_{0}'.format(name), kwargs[name])
     app.config = config
     return app
 
