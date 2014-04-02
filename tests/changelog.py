@@ -1,6 +1,9 @@
 import six
 from spec import Spec, skip, eq_, raises
 from mock import Mock
+from docutils.nodes import (
+    reference, bullet_list, list_item, title, raw, paragraph, Text
+)
 
 from releases import (
     issue,
@@ -9,9 +12,6 @@ from releases import (
     release_role,
     construct_releases,
     construct_nodes
-)
-from docutils.nodes import (
-    reference, bullet_list, list_item, title, raw, paragraph, Text
 )
 
 
