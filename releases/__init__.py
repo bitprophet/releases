@@ -56,7 +56,12 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     # Lol @ access back to Sphinx
     config = inliner.document.settings.env.app.config
     if issue_no not in ('-', '0'):
-        ref = config.releases_issue_uri % issue_no
+        if config.releases_issue_uri:
+            # TODO: deal with % vs .format()
+            ref = config.releases_issue_uri % issue_no
+        elif config.releases_github_path:
+            ref = "https://github.com/{0}/issues/{1}".format(
+                config.releases_github_path, issue_no)
         link = nodes.reference(rawtext, '#' + issue_no, refuri=ref, **options)
     else:
         link = None
@@ -92,10 +97,13 @@ def release_nodes(text, slug, date, config):
     # title and give it these HTML attributes during render time) so...fuckit.
     # We were already doing fully raw elements elsewhere anyway. And who cares
     # about a PDF of a changelog? :x
-    link = '<a class="reference external" href="{0}">{1}</a>'.format(
-        config.releases_release_uri % slug,
-        text,
-    )
+    if config.releases_release_uri:
+        # TODO: % vs .format()
+        uri = config.releases_release_uri % slug
+    elif config.releases_github_path:
+        uri = "https://github.com/{0}/tree/{1}".format(
+            config.releases_github_path, slug)
+    link = '<a class="reference external" href="{0}">{1}</a>'.format(uri, text)
     datespan = ''
     if date:
         datespan = ' <span style="font-size: 75%%;">{0}</span>'.format(date)
