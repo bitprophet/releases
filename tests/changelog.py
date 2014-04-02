@@ -372,7 +372,7 @@ class nodes(Spec):
             'issue_uri': None,
             'github_path': 'foo/bar',
         }
-        self._test_link(kwargs, 'release', 'explicit_release_15')
+        self._test_link(kwargs, 'release', 'explicit_release_1.0.2')
 
     def _assert_prefix(self, entries, expectation):
         assert expectation in self._generate(*entries)[0][0][0]
