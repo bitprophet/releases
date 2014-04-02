@@ -438,6 +438,9 @@ def setup(app):
     # E.g. 'https://github.com/fabric/fabric/tree/'
     app.add_config_value(name='releases_release_uri', default=None,
         rebuild='html')
+    # Convenience Github version of above
+    app.add_config_value(name='releases_github_path', default=None,
+        rebuild='html')
     # Debug output
     app.add_config_value(name='releases_debug', default=False, rebuild='html')
     # Register intermediate roles
