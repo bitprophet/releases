@@ -2,6 +2,8 @@
 Changelog
 =========
 
+* :feature:`26` Allow specifying Github path shorthand config option instead of
+  explicit release/issue URL strings.
 * :release:`0.5.3 <2014-03-15>`
 * :bug:`25` Empty/no-issue line items broke at some point; fixed.
 * :bug:`24` Broke inline issue parsing; fixed now.
