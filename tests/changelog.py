@@ -64,12 +64,13 @@ def _entry(i):
     return list_item('', paragraph('', '', i))
 
 def _release(number, **kwargs):
+    app = kwargs.get('app', None)
     nodes = release_role(
         name=None,
         rawtext='',
         text='%s <2013-11-20>' % number,
         lineno=None,
-        inliner=_inliner(),
+        inliner=_inliner(app=app),
     )[0]
     return list_item('', paragraph('', '', *nodes))
 
@@ -325,8 +326,11 @@ class nodes(Spec):
 
     def _test_link(self, kwargs, type_, expected):
         app = _app(**kwargs)
-        bug = _issue('bug', 15, app=app)
-        nodes = self._generate('1.0.2', bug, app=app, raw=True)
+        nodes = construct_nodes(construct_releases([
+            _release('1.0.2', app=app),
+            _entry(_issue('bug', 15, app=app)),
+            _release('1.0.0'),
+        ], app=app))
         if type_ == 'release':
             header = nodes[0][0][0].astext()
             assert expected in header
