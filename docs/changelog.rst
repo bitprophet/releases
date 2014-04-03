@@ -2,6 +2,9 @@
 Changelog
 =========
 
+* :feature:`22` Make the document name used as the changelog - previously
+  hardcoded as ``changelog`` (``.rst``) - configurable. Thanks to James Mills
+  for the feature request.
 * :feature:`26` Allow specifying Github path shorthand config option instead of
   explicit release/issue URL strings.
 * :release:`0.5.3 <2014-03-15>`
