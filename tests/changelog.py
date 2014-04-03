@@ -522,5 +522,5 @@ class integration(Spec):
 
     def configurable_document_name(self):
         doc = _doctree('notchangelog')
-        generate_changelog(_app(), doc)
+        generate_changelog(_app(document_name='notchangelog'), doc)
         _assert_changlogged(doc)
