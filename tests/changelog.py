@@ -5,8 +5,9 @@ import six
 from spec import Spec, skip, eq_, raises
 from mock import Mock
 from docutils.nodes import (
-    reference, bullet_list, list_item, title, raw, paragraph, Text
+    reference, bullet_list, list_item, title, raw, paragraph, Text, section,
 )
+from docutils.utils import new_document
 from sphinx.application import Sphinx
 
 from releases import (
@@ -15,7 +16,8 @@ from releases import (
     release,
     release_role,
     construct_releases,
-    construct_nodes
+    construct_nodes,
+    generate_changelog,
 )
 from releases import setup as releases_setup # avoid unittest crap
 
@@ -484,3 +486,33 @@ class nodes(Spec):
         _expect_type(para[6], reference)
         eq_(para[6].astext(), '#5')
         assert 'Support' in para[4].astext()
+
+
+def _doctree(name='changelog'):
+    """
+    Create bare-minimum expected changelog document.
+    """
+    mytitle = title('', 'A Changelog')
+    changelog = bullet_list('', *_release_list('1.0.2', _issue('bug', '27')))
+    source = section('', mytitle, changelog, names=[name])
+    doctree = new_document('whatever')
+    doctree.append(source)
+    return doctree
+
+
+class integration(Spec):
+    """
+    High level integration tests
+    """
+    def full_changelog_build_no_kaboom(self):
+        # Make a changelog 'page'
+        doctree = _doctree()
+        # Parse it
+        generate_changelog(_app(), doctree)
+        # Expect that it has been modified (lol side effects)
+        header, issues = doctree[0][1]
+        assert '<h2' in str(header)
+        assert '1.0.2' in str(header)
+        assert isinstance(issues, bullet_list)
+        assert isinstance(issues[0], list_item)
+        assert '27' in str(issues[0])
