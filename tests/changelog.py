@@ -1,6 +1,14 @@
+from tempfile import mkdtemp
+from shutil import rmtree
+
 import six
 from spec import Spec, skip, eq_, raises
 from mock import Mock
+from docutils.nodes import (
+    reference, bullet_list, list_item, title, raw, paragraph, Text, section,
+)
+from docutils.utils import new_document
+from sphinx.application import Sphinx
 
 from releases import (
     issue,
@@ -8,24 +16,42 @@ from releases import (
     release,
     release_role,
     construct_releases,
-    construct_nodes
+    construct_nodes,
+    generate_changelog,
 )
-from docutils.nodes import (
-    reference, bullet_list, list_item, title, raw, paragraph, Text
-)
+from releases import setup as releases_setup # avoid unittest crap
 
 
 def _app(**kwargs):
-    # Fake app obj
-    app = Mock('app')
-    config = Mock('config')
-    config.releases_release_uri = 'foo_%s'
-    config.releases_issue_uri = 'bar_%s'
-    config.releases_debug = False
+    # Create a real Sphinx app, with stupid temp dirs because it assumes.
+    # Helps catch things like "testing a config option but forgot
+    # app.add_config_value()"
+    src, doctree = mkdtemp(), mkdtemp()
+    try:
+        # STFU Sphinx :(
+        Sphinx._log = lambda self, message, wfile, nonl=False: None
+        app = Sphinx(
+            srcdir=src,
+            confdir=None,
+            outdir=None,
+            doctreedir=doctree,
+            buildername='html',
+        )
+    finally:
+        [rmtree(x) for x in (src, doctree)]
+    releases_setup(app)
+    # Mock out the config within. More horrible assumptions by Sphinx :(
+    config = {
+        'releases_release_uri': 'foo_%s',
+        'releases_issue_uri': 'bar_%s',
+        'releases_debug': False,
+    }
     # Allow overrides
     for name in kwargs:
-        setattr(config, 'releases_{0}'.format(name), kwargs[name])
-    app.config = config
+        config['releases_{0}'.format(name)] = kwargs[name]
+    # Stitch together as the sphinx app init() usually does w/ real conf files
+    app.config._raw_config = config
+    app.config.init_values()
     return app
 
 def _inliner(app=None):
@@ -460,3 +486,41 @@ class nodes(Spec):
         _expect_type(para[6], reference)
         eq_(para[6].astext(), '#5')
         assert 'Support' in para[4].astext()
+
+
+def _doctree(name='changelog'):
+    """
+    Create bare-minimum expected changelog document.
+    """
+    mytitle = title('', 'A Changelog')
+    changelog = bullet_list('', *_release_list('1.0.2', _issue('bug', '27')))
+    source = section('', mytitle, changelog, names=[name])
+    doctree = new_document('whatever')
+    doctree.append(source)
+    return doctree
+
+def _assert_changlogged(doctree):
+    header, issues = doctree[0][1]
+    assert '<h2' in str(header)
+    assert '1.0.2' in str(header)
+    assert isinstance(issues, bullet_list)
+    assert isinstance(issues[0], list_item)
+    assert '27' in str(issues[0])
+
+
+class integration(Spec):
+    """
+    High level integration tests
+    """
+    def full_changelog_build_no_kaboom(self):
+        # Make a changelog 'page'
+        doc = _doctree()
+        # Parse it
+        generate_changelog(_app(), doc)
+        # Expect that it has been modified (lol side effects)
+        _assert_changlogged(doc)
+
+    def configurable_document_name(self):
+        doc = _doctree('notchangelog')
+        generate_changelog(_app(document_name='notchangelog'), doc)
+        _assert_changlogged(doc)

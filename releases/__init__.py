@@ -418,7 +418,7 @@ def generate_changelog(app, doctree):
     # This seems to be the cleanest way to tell what a not-fully-parsed
     # document's 'name' is. Also lol @ not fully implementing dict protocol.
     source = doctree[0]
-    if 'changelog' not in source.get('names', []):
+    if app.config.releases_document_name not in source.get('names', []):
         return
     # Second item inside main document is the 'modern' changelog bullet-list
     # object, whose children are the nodes we care about.
@@ -440,6 +440,9 @@ def setup(app):
         rebuild='html')
     # Convenience Github version of above
     app.add_config_value(name='releases_github_path', default=None,
+        rebuild='html')
+    # Which document to use as the changelog
+    app.add_config_value(name='releases_document_name', default='changelog',
         rebuild='html')
     # Debug output
     app.add_config_value(name='releases_debug', default=False, rebuild='html')

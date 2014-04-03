@@ -34,6 +34,12 @@ Specifically:
 
 * Create a Sphinx document named ``changelog.rst`` with a top-level header
   followed by a bulleted list.
+
+    * If you wish to use a different document name, use another config option
+      (as per previous bullet point), ``releases_document_name``. E.g.
+      ``releases_document_name = "CHANGES"`` would cause Releases to mutate a
+      file called ``CHANGES.rst`` instead of ``changelog.rst``.
+
 * List items are to be ordered chronologically with the newest ones on top.
 
     * As you fix issues, put them on the top of the list.
