@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* :release:`0.6.0 <2014-04-03>`
 * :feature:`22` Make the document name used as the changelog - previously
   hardcoded as ``changelog`` (``.rst``) - configurable. Thanks to James Mills
   for the feature request.
