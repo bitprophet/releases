@@ -499,6 +499,14 @@ def _doctree(name='changelog'):
     doctree.append(source)
     return doctree
 
+def _assert_changlogged(doctree):
+    header, issues = doctree[0][1]
+    assert '<h2' in str(header)
+    assert '1.0.2' in str(header)
+    assert isinstance(issues, bullet_list)
+    assert isinstance(issues[0], list_item)
+    assert '27' in str(issues[0])
+
 
 class integration(Spec):
     """
@@ -506,13 +514,13 @@ class integration(Spec):
     """
     def full_changelog_build_no_kaboom(self):
         # Make a changelog 'page'
-        doctree = _doctree()
+        doc = _doctree()
         # Parse it
-        generate_changelog(_app(), doctree)
+        generate_changelog(_app(), doc)
         # Expect that it has been modified (lol side effects)
-        header, issues = doctree[0][1]
-        assert '<h2' in str(header)
-        assert '1.0.2' in str(header)
-        assert isinstance(issues, bullet_list)
-        assert isinstance(issues[0], list_item)
-        assert '27' in str(issues[0])
+        _assert_changlogged(doc)
+
+    def configurable_document_name(self):
+        doc = _doctree('notchangelog')
+        generate_changelog(_app(), doc)
+        _assert_changlogged(doc)
