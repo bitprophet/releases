@@ -46,7 +46,10 @@ def _app(**kwargs):
         'releases_issue_uri': 'bar_%s',
         'releases_debug': False,
     }
-    # Allow overrides
+    # Allow tinkering with document filename
+    if 'docname' in kwargs:
+        app.env.temp_data['docname'] = kwargs.pop('docname')
+    # Allow config overrides
     for name in kwargs:
         config['releases_{0}'.format(name)] = kwargs[name]
     # Stitch together as the sphinx app init() usually does w/ real conf files
@@ -521,6 +524,15 @@ class integration(Spec):
         _assert_changlogged(doc)
 
     def configurable_document_name(self):
-        doc = _doctree('notchangelog')
-        generate_changelog(_app(document_name='notchangelog'), doc)
+        app = _app(
+            # This goes into app.env.docname, aka filename
+            docname='notjustchangelog',
+            # This goes into config options
+            document_name='notjustchangelog',
+        )
+        # Create doctree with a title-name distinct from the 'real' filename &
+        # configured/desired changelog filename above.
+        doc = _doctree('notthefilename!')
+        # Test.
+        generate_changelog(app, doc)
         _assert_changlogged(doc)
