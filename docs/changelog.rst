@@ -2,6 +2,8 @@
 Changelog
 =========
 
+* :bug:`-` Fix a silly issue with the new feature from :issue:`22` - Sphinx
+  doctree name attributes reflect top level titles, not filenames.
 * :release:`0.6.0 <2014-04-03>`
 * :feature:`22` Make the document name used as the changelog - previously
   hardcoded as ``changelog`` (``.rst``) - configurable. Thanks to James Mills
