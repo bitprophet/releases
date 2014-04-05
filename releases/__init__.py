@@ -415,13 +415,11 @@ def construct_nodes(releases):
 
 
 def generate_changelog(app, doctree):
-    # This seems to be the cleanest way to tell what a not-fully-parsed
-    # document's 'name' is. Also lol @ not fully implementing dict protocol.
-    source = doctree[0]
-    if app.config.releases_document_name not in source.get('names', []):
+    if app.env.docname != app.config.releases_document_name:
         return
     # Second item inside main document is the 'modern' changelog bullet-list
     # object, whose children are the nodes we care about.
+    source = doctree[0]
     changelog = source.children.pop(1)
     # Walk + parse into release mapping
     releases = construct_releases(changelog.children, app)
