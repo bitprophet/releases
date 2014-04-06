@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* :release:`0.6.1 <2014-04-06>`
 * :bug:`-` Fix a silly issue with the new feature from :issue:`22` - Sphinx
   doctree name attributes reflect top level titles, not filenames.
 * :release:`0.6.0 <2014-04-03>`
