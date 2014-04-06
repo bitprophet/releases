@@ -18,7 +18,7 @@ class integration(Spec):
         flags = map(lambda x: '-D {0}'.format(x), pairs)
         flagstr = ' '.join(flags)
         # Setup
-        os.chdir(os.path.join('tests', '_support'))
+        os.chdir(os.path.join('integration', '_support'))
         build = os.path.join(folder, '_build')
         try:
             # Build
