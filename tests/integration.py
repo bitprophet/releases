@@ -34,7 +34,7 @@ class integration(Spec):
 
     def vanilla_with_other_files(self):
         # Same but w/ other files in toctree
-        skip()
+        self._assert_worked('vanilla_plus')
 
     def customized_filename_with_identical_title(self):
         # Changelog named not 'changelog', same title

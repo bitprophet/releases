@@ -1,0 +1,7 @@
+====
+Test
+====
+
+.. toctree::
+    changelog
+    other
