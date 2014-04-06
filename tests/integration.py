@@ -16,7 +16,8 @@ class integration(Spec):
         # Doctree with just-a-changelog-named-changelog
         os.chdir('tests/_support')
         try:
-            result = run('sphinx-build -c . -W vanilla vanilla/_build', warn=True, hide=True)
+            cmd = 'sphinx-build -c . -W vanilla vanilla/_build'
+            result = run(cmd, warn=True, hide=True)
             msg = "Build failed w/ stderr: {0}"
             assert result.ok, msg.format(result.stderr)
             with open('vanilla/_build/changelog.html') as fd:
