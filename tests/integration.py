@@ -55,7 +55,12 @@ class integration(Spec):
 
     def customized_filename_with_different_title(self):
         # Changelog named not 'changelog', title distinct
-        skip()
+        # NOTE: the difference here is in the fixture!
+        self._assert_worked(
+            folder='custom_different',
+            opts={'releases_document_name': 'notachangelog'},
+            target='notachangelog',
+        )
 
     def customized_filename_with_other_files(self):
         # Same as above but w/ other files in toctree
