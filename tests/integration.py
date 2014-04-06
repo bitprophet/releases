@@ -12,20 +12,25 @@ class integration(Spec):
     def teardown(self):
         os.chdir(self.cwd)
 
-    def vanilla_invocation(self):
-        # Doctree with just-a-changelog-named-changelog
-        os.chdir('tests/_support')
+    def _assert_worked(self, folder):
+        os.chdir(os.path.join('tests', '_support'))
+        build = os.path.join(folder, '_build')
         try:
-            cmd = 'sphinx-build -c . -W vanilla vanilla/_build'
+            cmd = 'sphinx-build -c . -W {0} {1}'.format(folder, build)
             result = run(cmd, warn=True, hide=True)
             msg = "Build failed w/ stderr: {0}"
             assert result.ok, msg.format(result.stderr)
-            with open('vanilla/_build/changelog.html') as fd:
+            changelog = os.path.join(build, 'changelog.html')
+            with open(changelog) as fd:
                 text = fd.read()
                 assert "1.0.1" in text
                 assert "#1" in text
         finally:
-            shutil.rmtree('vanilla/_build')
+            shutil.rmtree(build)
+
+    def vanilla_invocation(self):
+        # Doctree with just-a-changelog-named-changelog
+        self._assert_worked('vanilla')
 
     def vanilla_with_other_files(self):
         # Same but w/ other files in toctree
