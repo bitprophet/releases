@@ -2,6 +2,8 @@
 Changelog
 =========
 
+* :feature:`21` Allow duplicate issue numbers; not allowing them was
+  technically an implementation detail. Thanks to Dorian Puła for the patch.
 * :release:`0.6.1 <2014-04-06>`
 * :bug:`-` Fix a silly issue with the new feature from :issue:`22` where it
   accidentally referred to the Sphinx document *title* instead of the document
