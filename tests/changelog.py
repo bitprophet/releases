@@ -319,9 +319,10 @@ class releases(Spec):
         # This should asplode
         construct_releases(changelog, _app())
 
-    @raises(ValueError)
-    def duplicate_issue_numbers_raises_error(self):
-        _releases('1.0.1', self.b, self.b)
+    def duplicate_issue_numbers_adds_two_issue_items(self):
+        test_changelog = _releases('1.0.1', self.b, self.b)
+        test_changelog = _changelog2dict(test_changelog)
+        eq_(len(test_changelog['1.0.1']), 2)
 
     def duplicate_zeroes_dont_error(self):
         cl = _releases('1.0.1', _issue('bug', '0'), _issue('bug', '0'))

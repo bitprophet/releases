@@ -1,3 +1,4 @@
+import itertools
 import re
 import sys
 from functools import partial
@@ -181,10 +182,14 @@ def construct_entry_with_release(focus, issues, lines, log, releases, rest):
         missing = [i for i in explicit if i not in issues]
         if missing:
             raise ValueError(
-                "Couldn't find issue(s) #{} in the changelog!".format(
+                "Couldn't find issue(s) #{0} in the changelog!".format(
                     ', '.join(missing)))
         # Obtain objects from global list
-        entries = [issues[i] for i in explicit]
+        entries = []
+        for i in explicit:
+            for flattened_issue_item in itertools.chain(issues[i]):
+                entries.append(flattened_issue_item)
+
         # Create release
         log("entries in this release: %r" % (entries,))
         releases.append({
@@ -268,11 +273,8 @@ def construct_entry_without_release(focus, issues, lines, log, rest):
     else:
         focus.attributes['description'] = rest
     # Add to global list or die trying
-    if focus.number and focus.number in issues:
-        raise ValueError(
-            "You seem to have defined issue #%s twice! Please double check." % focus.number)
-    else:
-        issues[focus.number] = focus
+    issues[focus.number] = issues.get(focus.number, []) + [focus]
+
     if focus.type == 'bug':
         # Major bugs go into unreleased_feature
         if focus.major:
@@ -286,7 +288,7 @@ def construct_entry_without_release(focus, issues, lines, log, rest):
             if focus.line:
                 bug_lines = [x for x in bug_lines
                              if (x != 'unreleased_bugfix'
-                                 and LooseVersion(x) >= LooseVersion(focus.line))] 
+                                 and LooseVersion(x) >= LooseVersion(focus.line))]
                 bug_lines = bug_lines + ['unreleased_bugfix']
             for line in bug_lines:
                 log("Adding to %r" % line)
