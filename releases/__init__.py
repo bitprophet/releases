@@ -6,6 +6,9 @@ from distutils.version import LooseVersion
 from docutils import nodes, utils
 
 
+from .models import Issue, ISSUE_TYPES, Release
+
+
 def _log(txt, config):
     """
     Log debug output if debug setting is on.
@@ -17,17 +20,9 @@ def _log(txt, config):
         sys.stderr.flush()
 
 
-# Issue type list (keys) + color values
-issue_types = {
-    'bug': 'A04040',
-    'feature': '40A056',
-    'support': '4070A0',
-}
-
-
 def issue_nodelist(name, link=None):
     which = '[<span style="color: #%s;">%s</span>]' % (
-        issue_types[name], name.capitalize()
+        ISSUE_TYPES[name], name.capitalize()
     )
     signifier = [nodes.raw(text=which, format='html')]
     hyperlink = [nodes.inline(text=" "), link] if link else []
@@ -69,7 +64,7 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
         link = None
         issue_no = None # So it doesn't gum up dupe detection later
     # Additional 'new-style changelog' stuff
-    if name in issue_types:
+    if name in ISSUE_TYPES:
         nodelist = issue_nodelist(name, link)
         line = None
         # Sanity check
@@ -137,49 +132,6 @@ def release_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     # Return intermediate node
     node = Release(number=number, date=date, nodelist=nodelist)
     return [node], []
-
-
-class Issue(nodes.Element):
-    @property
-    def type(self):
-        return self['type_']
-
-    @property
-    def backported(self):
-        return self.get('backported', False)
-
-    @property
-    def major(self):
-        return self.get('major', False)
-
-    @property
-    def number(self):
-        return self.get('number', None)
-
-    @property
-    def line(self):
-        return self.get('line', None)
-
-    def __repr__(self):
-        flag = ''
-        if self.backported:
-            flag = 'backported'
-        elif self.major:
-            flag = 'major'
-        elif self.line:
-            flag = self.line + '+'
-        if flag:
-            flag = ' ({})'.format(flag)
-        return '<{issue.type} #{issue.number}{flag}>'.format(issue=self, flag=flag)
-
-
-class Release(nodes.Element):
-    @property
-    def number(self):
-        return self['number']
-
-    def __repr__(self):
-        return '<release {}>'.format(self.number)
 
 
 def get_line(obj):
@@ -449,7 +401,7 @@ def setup(app):
     # Debug output
     app.add_config_value(name='releases_debug', default=False, rebuild='html')
     # Register intermediate roles
-    for x in list(issue_types) + ['issue']:
+    for x in list(ISSUE_TYPES) + ['issue']:
         app.add_role(x, issues_role)
     app.add_role('release', release_role)
     # Hook in our changelog transmutation at appropriate step
