@@ -24,6 +24,7 @@ issue_types = {
     'support': '4070A0',
 }
 
+
 def issue_nodelist(name, link=None):
     which = '[<span style="color: #%s;">%s</span>]' % (
         issue_types[name], name.capitalize()
@@ -35,6 +36,7 @@ def issue_nodelist(name, link=None):
 
 
 release_line_re = re.compile(r'\((\d+\.\d+)\+\)') # e.g. '(1.2+)'
+
 
 def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     """
@@ -78,7 +80,7 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
             else:
                 line = match.groups()[0]
         # Create temporary node w/ data & final nodes to publish
-        node = issue(
+        node = Issue(
             number=issue_no,
             type_=name,
             nodelist=nodelist,
@@ -116,6 +118,7 @@ def release_nodes(text, slug, date, config):
 
 year_arg_re = re.compile(r'^(.+?)\s*(?<!\x00)<(.*?)>$', re.DOTALL)
 
+
 def release_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     """
     Invoked as :release:`N.N.N <YYYY-MM-DD>`.
@@ -132,11 +135,11 @@ def release_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     config = inliner.document.settings.env.app.config
     nodelist = [release_nodes(number, number, date, config)]
     # Return intermediate node
-    node = release(number=number, date=date, nodelist=nodelist)
+    node = Release(number=number, date=date, nodelist=nodelist)
     return [node], []
 
 
-class issue(nodes.Element):
+class Issue(nodes.Element):
     @property
     def type(self):
         return self['type_']
@@ -158,30 +161,31 @@ class issue(nodes.Element):
         return self.get('line', None)
 
     def __repr__(self):
-        flag = ""
+        flag = ''
         if self.backported:
-            flag = "backported"
+            flag = 'backported'
         elif self.major:
-            flag = "major"
+            flag = 'major'
         elif self.line:
-            flag = self.line + "+"
+            flag = self.line + '+'
         if flag:
-            flag = " (%s)" % flag
-        return "<%s #%s%s>" % (self.type, self.number, flag)
+            flag = ' ({})'.format(flag)
+        return '<{issue.type} #{issue.number}{flag}>'.format(issue=self, flag=flag)
 
 
-class release(nodes.Element):
+class Release(nodes.Element):
     @property
     def number(self):
         return self['number']
 
     def __repr__(self):
-        return "<release %s>" % self.number
+        return '<release {}>'.format(self.number)
 
 
 def get_line(obj):
     # 1.2.7 -> 1.2
     return '.'.join(obj.number.split('.')[:-1])
+
 
 def construct_releases(entries, app):
     log = partial(_log, config=app.config)
@@ -203,7 +207,7 @@ def construct_releases(entries, app):
         # final data structure. They also inform new release-line 'buffers'.
         # Release lines, once the release obj is removed, should be empty or a
         # comma-separated list of issue numbers.
-        if isinstance(focus, release):
+        if isinstance(focus, Release):
             line = get_line(focus)
             log("release for line %r" % line)
             # Check for explicitly listed issues first
@@ -216,7 +220,7 @@ def construct_releases(entries, app):
                 # First scan global issue dict, dying if not found
                 missing = [i for i in explicit if i not in issues]
                 if missing:
-                    raise ValueError("Couldn't find issue(s) #%s in the changelog!" % (', '.join(missing)))
+                    raise ValueError("Couldn't find issue(s) #{} in the changelog!".format(', '.join(missing)))
                 # Obtain objects from global list
                 entries = [issues[i] for i in explicit]
                 # Create release
@@ -305,9 +309,9 @@ def construct_releases(entries, app):
         else:
             # Handle rare-but-valid non-issue-attached line items, which are
             # always bugs. (They are their own description.)
-            if not isinstance(focus, issue):
+            if not isinstance(focus, Issue):
                 log("Found line item w/ no real issue object, creating bug")
-                focus = issue(
+                focus = Issue(
                     type_='bug',
                     nodelist=issue_nodelist('bug'),
                     description=nodes.list_item('', nodes.paragraph('', '', focus)),
@@ -365,7 +369,7 @@ def construct_releases(entries, app):
         line = 'unreleased_%s' % which
         log("Creating '%s' faux-release with %r" % (line, lines[line]))
         releases.append({
-            'obj': release(number=line, date=None, nodelist=nodelist),
+            'obj': Release(number=line, date=None, nodelist=nodelist),
             'entries': lines[line]
         })
     return releases
@@ -394,7 +398,7 @@ def construct_nodes(releases):
             # Use [:] slicing to avoid mutation during the loops.
             for index, node in enumerate(desc[:]):
                 for subindex, subnode in enumerate(node[:]):
-                    if isinstance(subnode, issue):
+                    if isinstance(subnode, Issue):
                         desc[index][subindex:subindex+1] = subnode['nodelist']
             # Rework this entry to insert the now-rendered issue nodes in front
             # of the 1st paragraph of the 'description' nodes (which should be

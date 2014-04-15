@@ -11,9 +11,9 @@ from docutils.utils import new_document
 from sphinx.application import Sphinx
 
 from releases import (
-    issue,
+    Issue,
     issues_role,
-    release,
+    Release,
     release_role,
     construct_releases,
     construct_nodes,
@@ -88,7 +88,7 @@ def _entry(i):
     May give your own (non-issue/release) object to skip auto wrapping. (Useful
     since _entry() is often called a few levels deep.)
     """
-    if not isinstance(i, (issue, release)):
+    if not isinstance(i, (Issue, Release)):
         return i
     return list_item('', paragraph('', '', i))
 
@@ -191,7 +191,7 @@ class releases(Spec):
         entries = releases[1]['entries']
         eq_(len(entries), 1)
         assert self.f not in entries
-        assert isinstance(entries[0], issue)
+        assert isinstance(entries[0], Issue)
         eq_(entries[0].number, None)
 
     def unreleased_items_go_in_unreleased_releases(self):
@@ -480,7 +480,7 @@ class nodes(Spec):
         para = self._generate('1.0.2', item)[0]
         # Sanity check - in a broken parsing scenarion, the 4th child will be a
         # raw issue object
-        assert not isinstance(para[4], issue)
+        assert not isinstance(para[4], Issue)
         # First/primary link
         _expect_type(para[2], reference)
         eq_(para[2].astext(), '#15')
