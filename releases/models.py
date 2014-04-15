@@ -39,8 +39,9 @@ class Issue(nodes.Element):
         elif self.line:
             flag = self.line + '+'
         if flag:
-            flag = ' ({})'.format(flag)
-        return '<{issue.type} #{issue.number}{flag}>'.format(issue=self, flag=flag)
+            flag = ' ({0})'.format(flag)
+        return '<{issue.type} #{issue.number}{flag}>'.format(issue=self,
+                                                             flag=flag)
 
 
 class Release(nodes.Element):
@@ -49,4 +50,4 @@ class Release(nodes.Element):
         return self['number']
 
     def __repr__(self):
-        return '<release {}>'.format(self.number)
+        return '<release {0}>'.format(self.number)
