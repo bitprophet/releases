@@ -61,3 +61,8 @@ class integration(Spec):
     def useful_error_if_changelog_is_missed(self):
         # Don't barf with unknown-node errors if changelog not found.
         skip()
+
+    def useful_error_if_buried_issue_nodes(self):
+        # Don't unknown-node error if broken ReST causes 'hidden' issue nodes.
+        # E.g. an accidental definition-list wrapping one.
+        self._assert_worked('hidden_issues')
