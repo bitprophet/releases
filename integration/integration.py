@@ -12,7 +12,7 @@ class integration(Spec):
     def teardown(self):
         os.chdir(self.cwd)
 
-    def _assert_worked(self, folder, opts=None, target='changelog'):
+    def _build(self, folder, opts, target, asserts=None):
         # Dynamic sphinx opt overrides
         pairs = map(lambda x: '='.join(x), (opts or {}).items())
         flags = map(lambda x: '-D {0}'.format(x), pairs)
@@ -25,17 +25,25 @@ class integration(Spec):
             cmd = 'sphinx-build {2} -c . -W {0} {1}'.format(
                 folder, build, flagstr)
             result = run(cmd, warn=True, hide=True)
-            # Check for errors
-            msg = "Build failed w/ stderr: {0}"
-            assert result.ok, msg.format(result.stderr)
-            # Check for vaguely correct output
-            changelog = os.path.join(build, '{0}.html'.format(target))
-            with open(changelog) as fd:
-                text = fd.read()
-                assert "1.0.1" in text
-                assert "#1" in text
+            if callable(asserts):
+                asserts(result, build, target)
+            return result
         finally:
             shutil.rmtree(build)
+
+    def _assert_worked(self, folder, opts=None, target='changelog'):
+        self._build(folder, opts, target, asserts=self._basic_asserts)
+
+    def _basic_asserts(self, result, build, target):
+        # Check for errors
+        msg = "Build failed w/ stderr: {0}"
+        assert result.ok, msg.format(result.stderr)
+        # Check for vaguely correct output
+        changelog = os.path.join(build, '{0}.html'.format(target))
+        with open(changelog) as fd:
+            text = fd.read()
+            assert "1.0.1" in text
+            assert "#1" in text
 
     def vanilla_invocation(self):
         # Doctree with just-a-changelog-named-changelog
@@ -65,4 +73,11 @@ class integration(Spec):
     def useful_error_if_buried_issue_nodes(self):
         # Don't unknown-node error if broken ReST causes 'hidden' issue nodes.
         # E.g. an accidental definition-list wrapping one.
-        self._assert_worked('hidden_issues')
+        result = self._build(
+            folder='hidden_issues',
+            opts=None,
+            target='changelog',
+        )
+        assert result.failed
+        assert "ValueError" in result.stderr
+        assert "double-check" in result.stderr

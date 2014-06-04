@@ -264,6 +264,16 @@ def construct_entry_without_release(focus, issues, lines, log, rest):
     # Handle rare-but-valid non-issue-attached line items, which are
     # always bugs. (They are their own description.)
     if not isinstance(focus, Issue):
+        # First, sanity check for potential mistakes resulting in an issue node
+        # being buried within something else.
+        buried = focus.traverse(Issue)
+        if buried:
+            msg = """
+Found issue node(s) ({0!r}) buried inside other nodes. Please double-check your ReST syntax!
+For example, indentation problems can accidentally generate nested definition lists.
+"""
+            raise ValueError(msg.format(buried))
+        # OK, it looks legit - make it a bug.
         log("Found line item w/ no real issue object, creating bug")
         focus = Issue(
             type_='bug',
