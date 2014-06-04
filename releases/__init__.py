@@ -269,10 +269,17 @@ def construct_entry_without_release(focus, issues, lines, log, rest):
         buried = focus.traverse(Issue)
         if buried:
             msg = """
-Found issue node(s) ({0!r}) buried inside other nodes. Please double-check your ReST syntax!
-For example, indentation problems can accidentally generate nested definition lists.
+Found issue node ({0!r}) buried inside another node:
+
+{1}
+
+Please double-check your ReST syntax! There is probably text in the above
+output that will show you which part of your changelog to look at.
+
+For example, indentation problems can accidentally generate nested definition
+lists.
 """
-            raise ValueError(msg.format(buried))
+            raise ValueError(msg.format(buried[0], str(buried[0].parent)))
         # OK, it looks legit - make it a bug.
         log("Found line item w/ no real issue object, creating bug")
         focus = Issue(

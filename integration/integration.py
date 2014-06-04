@@ -81,3 +81,4 @@ class integration(Spec):
         assert result.failed
         assert "ValueError" in result.stderr
         assert "double-check" in result.stderr
+        assert "innocuous" in result.stderr
