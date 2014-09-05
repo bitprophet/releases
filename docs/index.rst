@@ -14,4 +14,3 @@ Table of Contents
     concepts
     usage
     changelog
-    todo
