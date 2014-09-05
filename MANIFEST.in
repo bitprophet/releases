@@ -1,0 +1,7 @@
+include LICENSE
+include dev-requirements.txt
+include tasks.py
+recursive-include docs *
+recursive-exclude docs/_build *
+recursive-include tests *
+recursive-exclude tests *.pyc *.pyo
