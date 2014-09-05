@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* :release:`0.7.0 <2014-09-04>`
 * :bug:`30 major` Add LICENSE (plus a handful of other administrative files) to
   a ``MANIFEST.in`` so sdists pick it up. Thanks to Zygmunt Krynicki for catch
   & original patch (:issue:`33`).
