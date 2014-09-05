@@ -2,6 +2,9 @@
 Changelog
 =========
 
+* :bug:`30 major` Add LICENSE (plus a handful of other administrative files) to
+  a ``MANIFEST.in`` so sdists pick it up. Thanks to Zygmunt Krynicki for catch
+  & original patch (:issue:`33`).
 * :feature:`21` Allow duplicate issue numbers; not allowing them was
   technically an implementation detail. Thanks to Dorian Puła for the patch.
 * :release:`0.6.1 <2014-04-06>`
