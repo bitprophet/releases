@@ -2,7 +2,7 @@
 invoke>=0.6.0
 invocations>=0.4.1
 # Tests (N.B. integration suite also uses Invoke as above)
-spec>=0.11.1
+spec>=0.11.3
 mock==1.0.1
 # Just for tests...heh
 six>=1.4.1
