@@ -26,14 +26,14 @@ def _app(**kwargs):
     # Create a real Sphinx app, with stupid temp dirs because it assumes.
     # Helps catch things like "testing a config option but forgot
     # app.add_config_value()"
-    src, doctree = mkdtemp(), mkdtemp()
+    src, dst, doctree = mkdtemp(), mkdtemp(), mkdtemp()
     try:
         # STFU Sphinx :(
         Sphinx._log = lambda self, message, wfile, nonl=False: None
         app = Sphinx(
             srcdir=src,
             confdir=None,
-            outdir=None,
+            outdir=dst,
             doctreedir=doctree,
             buildername='html',
         )
