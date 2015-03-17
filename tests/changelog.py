@@ -9,6 +9,7 @@ from docutils.nodes import (
 )
 from docutils.utils import new_document
 from sphinx.application import Sphinx
+import sphinx
 
 from releases import (
     Issue,
@@ -54,7 +55,11 @@ def _app(**kwargs):
         config['releases_{0}'.format(name)] = kwargs[name]
     # Stitch together as the sphinx app init() usually does w/ real conf files
     app.config._raw_config = config
-    app.config.init_values()
+    # init_values() requires a 'warn' runner on Sphinx 1.3+, give it no-op.
+    init_args = []
+    if sphinx.version_info[:2] > (1, 2):
+        init_args = [lambda x: x]
+    app.config.init_values(*init_args)
     return app
 
 def _inliner(app=None):
