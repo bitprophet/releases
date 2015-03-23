@@ -5,7 +5,7 @@ Usage
 To use Releases, mimic the format seen in `its own changelog
 <https://raw.github.com/bitprophet/releases/master/docs/changelog.rst>`_ or in
 `Fabric's changelog
-<https://raw.github.com/fabric/fabric/master/docs/changelog.rst>`_.
+<https://raw.github.com/fabric/fabric/master/sites/www/changelog.rst>`_.
 Specifically:
 
 * Install ``releases`` and update your Sphinx ``conf.py`` to include it in the
