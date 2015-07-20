@@ -414,13 +414,33 @@ def construct_nodes(releases):
     return result
 
 
+class BulletListVisitor(nodes.NodeVisitor):
+
+    def __init__(self, document):
+        docutils.nodes.NodeVisitor.__init__(self, document)
+        self.changelog = None
+
+    def visit_bullet_list(self, node):
+        # find the first one
+        if not self.changelog:
+            self.changelog = node
+
+    def unknown_visit(self, node):
+        pass
+
+
 def generate_changelog(app, doctree):
     if app.env.docname != app.config.releases_document_name:
         return
     # Second item inside main document is the 'modern' changelog bullet-list
     # object, whose children are the nodes we care about.
     source = doctree[0]
-    changelog = source.children.pop(1)
+
+    # Find the first bullet-list node
+    changelog_visitor = BulletListVisitor(doctree)
+    source.walk(changelog_visitor)
+    changelog = changelog_visitor.changelog
+
     # Walk + parse into release mapping
     releases = construct_releases(changelog.children, app)
     # Construct new set of nodes to replace the old, and we're done

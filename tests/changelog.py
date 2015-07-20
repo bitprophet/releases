@@ -2,12 +2,11 @@ from tempfile import mkdtemp
 from shutil import rmtree
 
 import six
-from spec import Spec, skip, eq_, raises
+from spec import Spec, eq_, raises
 from mock import Mock
 from docutils.nodes import (
-    reference, bullet_list, list_item, title, raw, paragraph, Text, section,
+    reference, bullet_list, list_item, raw, paragraph, Text,
 )
-from docutils.utils import new_document
 from sphinx.application import Sphinx
 import sphinx
 
@@ -18,7 +17,6 @@ from releases import (
     release_role,
     construct_releases,
     construct_nodes,
-    generate_changelog,
 )
 from releases import setup as releases_setup # avoid unittest crap
 

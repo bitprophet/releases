@@ -7,10 +7,13 @@ from invoke import run
 from invoke import task
 
 
-@task()
-def integration_tests():
+@task(help={
+    'pty': "Whether to run tests under a pseudo-tty",
+})
+def integration_tests(pty=True):
     """Runs integration tests."""
-    run('inv test -o --tests=integration')
+    cmd = 'inv test -o --tests=integration'
+    run(cmd + ('' if pty else ' --no-pty'), pty=pty)
 
 
 ns = Collection(test, integration_tests, release, docs)
