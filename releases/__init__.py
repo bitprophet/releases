@@ -417,7 +417,7 @@ def construct_nodes(releases):
 class BulletListVisitor(nodes.NodeVisitor):
 
     def __init__(self, document):
-        docutils.nodes.NodeVisitor.__init__(self, document)
+        nodes.NodeVisitor.__init__(self, document)
         self.changelog = None
 
     def visit_bullet_list(self, node):
