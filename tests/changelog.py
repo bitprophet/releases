@@ -334,6 +334,14 @@ class releases(Spec):
         cl = _changelog2dict(cl)
         assert len(cl['1.0.1']) == 2
 
+    def comments_are_not_parsed(self):
+        cl = _releases(('.. This is a comment ',))
+        cl = _changelog2dict(cl)
+        assert len(cl['1.0.0']) == 0
+
+
+
+
 
 def _obj2name(obj):
     cls = obj if isinstance(obj, type) else obj.__class__
@@ -495,3 +503,5 @@ class nodes(Spec):
         _expect_type(para[6], reference)
         eq_(para[6].astext(), '#5')
         assert 'Support' in para[4].astext()
+
+

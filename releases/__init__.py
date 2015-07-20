@@ -335,6 +335,11 @@ def construct_releases(entries, app):
     issues = {}
 
     for obj in reversed(entries):
+
+        # Skip comments
+        if isinstance(obj[0], (unicode, str)):
+            continue
+
         # Issue object is always found in obj (LI) index 0 (first, often only
         # P) and is the 1st item within that (index 0 again).
         # Preserve all other contents of 'obj'.
