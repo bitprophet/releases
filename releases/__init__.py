@@ -72,7 +72,8 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
         if ported not in ('backported', 'major', ''):
             match = release_line_re.match(ported)
             if not match:
-                raise ValueError("Gave unknown issue metadata '%s' for issue no. %s" % (ported, issue_no))
+                err = "Gave unknown issue metadata '{0} for issue no. {1}"
+                raise ValueError(err.format(ported, issue_no))
             else:
                 line = match.groups()[0]
         # Create temporary node w/ data & final nodes to publish
@@ -105,7 +106,8 @@ def release_nodes(text, slug, date, config):
     datespan = ''
     if date:
         datespan = ' <span style="font-size: 75%%;">{0}</span>'.format(date)
-    header = '<h2 style="margin-bottom: 0.3em;">{0}{1}</h2>'.format(link, datespan)
+    header = '<h2 style="margin-bottom: 0.3em;">{0}{1}</h2>'.format(
+        link, datespan)
     return nodes.section('',
         nodes.raw(rawtext='', text=header, format='html'),
         ids=[text]
@@ -346,7 +348,9 @@ def construct_releases(entries, app):
         # Release lines, once the release obj is removed, should be empty or a
         # comma-separated list of issue numbers.
         if isinstance(focus, Release):
-            construct_entry_with_release(focus, issues, lines, log, releases, rest)
+            construct_entry_with_release(
+                focus, issues, lines, log, releases, rest
+            )
 
         # Entries get copied into release line buckets as follows:
         # * Features and support go into 'unreleased_feature' for use in new
