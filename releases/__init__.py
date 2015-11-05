@@ -415,15 +415,18 @@ def construct_nodes(releases):
 
 
 class BulletListVisitor(nodes.NodeVisitor):
-
     def __init__(self, document):
         nodes.NodeVisitor.__init__(self, document)
         self.changelog = None
 
     def visit_bullet_list(self, node):
-        # find the first one
+        # The first found bullet list (which should be the first one at the top
+        # level of the document) is the changelog.
         if not self.changelog:
             self.changelog = node
+            # Remove it from the document so it's not hanging around at the end
+            # after we build the changelogs back out.
+            node.replace_self([])
 
     def unknown_visit(self, node):
         pass
