@@ -2,6 +2,11 @@
 Changelog
 =========
 
+* :feature:`41` Update changelog discovery to use a docutils ``NodeVisitor``
+  instead of naively assuming the 2nd child node of the document is always the
+  bulleted list we expect it to be. This allows one to have comments,
+  paragraphs or other non-bullet-list elements above or below the changelog.
+  Thanks to Rodrigue Cloutier for the original patch.
 * :release:`0.7.0 <2014-09-04>`
 * :bug:`30 major` Add LICENSE (plus a handful of other administrative files) to
   a ``MANIFEST.in`` so sdists pick it up. Thanks to Zygmunt Krynicki for catch

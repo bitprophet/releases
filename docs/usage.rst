@@ -32,13 +32,16 @@ Specifically:
     * You may optionally set ``releases_debug = True`` to see debug output
       while building your docs.
 
-* Create a Sphinx document named ``changelog.rst`` with a top-level header
-  followed by a bulleted list.
+* Create a Sphinx document named ``changelog.rst`` containing a bulleted list
+  somewhere at its topmost level.
 
     * If you wish to use a different document name, use another config option
       (as per previous bullet point), ``releases_document_name``. E.g.
       ``releases_document_name = "CHANGES"`` would cause Releases to mutate a
       file called ``CHANGES.rst`` instead of ``changelog.rst``.
+    * Elements before or after this bulleted list will be untouched by
+      Releases, allowing you to place e.g. paragraphs, comments etc at the top
+      (or bottom) of the document.
 
 * List items are to be ordered chronologically with the newest ones on top.
 
