@@ -163,6 +163,16 @@ def append_unreleased_entries(app, lines, releases):
         })
 
 
+def reorder_release_entries(releases):
+    """
+    Mutate ``releases`` so the entrylist in each is ordered by feature/bug/etc.
+    """
+    order = {'feature': 0, 'bug': 1, 'support': 2}
+    for release in releases:
+        entries = release['entries'][:]
+        release['entries'] = sorted(entries, key=lambda x: order[x.type])
+
+
 def construct_entry_with_release(focus, issues, lines, log, releases, rest):
     """
     Releases 'eat' the entries in their line's list and get added to the
@@ -371,6 +381,8 @@ def construct_releases(entries, app):
             construct_entry_without_release(focus, issues, lines, log, rest)
 
     append_unreleased_entries(app, lines, releases)
+
+    reorder_release_entries(releases)
 
     return releases
 

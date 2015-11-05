@@ -332,6 +332,22 @@ class releases(Spec):
         cl = _changelog2dict(cl)
         assert len(cl['1.0.1']) == 2
 
+    def issues_are_sorted_by_type_within_releases(self):
+        b1 = _issue('bug', '123', major=True)
+        b2 = _issue('bug', '124', major=True)
+        s1 = _issue('support', '25')
+        s2 = _issue('support', '26')
+        f1 = _issue('feature', '3455')
+        f2 = _issue('feature', '3456')
+
+        # Semi random definitely-not-in-desired-order order
+        changelog = _changelog2dict(_releases('1.1', b1, s1, s2, f1, b2, f2))
+
+        # Order should be feature, bug, support. While it doesn't REALLY
+        # matter, assert that within each category the order matches the old
+        # 'reverse chronological' order.
+        eq_(changelog['1.1'], [f2, f1, b2, b1, s2, s1])
+
 
 def _obj2name(obj):
     cls = obj if isinstance(obj, type) else obj.__class__
