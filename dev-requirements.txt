@@ -10,3 +10,6 @@ six>=1.4.1
 -e .
 sphinx>=1.1
 sphinx_rtd_theme>=0.1.5
+# Builds
+wheel==0.24
+twine==1.5
