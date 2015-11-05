@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* :release:`1.0.0 <2015-11-05>`
 * :feature:`42` For readability, issues within each release so they are
   displayed in feature->bug->support order.
 * :feature:`41` Clean up changelog discovery so one can have comments,
