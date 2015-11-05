@@ -2,6 +2,8 @@
 Changelog
 =========
 
+* :feature:`42` For readability, issues within each release so they are
+  displayed in feature->bug->support order.
 * :feature:`41` Update changelog discovery to use a docutils ``NodeVisitor``
   instead of naively assuming the 2nd child node of the document is always the
   bulleted list we expect it to be. This allows one to have comments,
