@@ -10,6 +10,23 @@ class Version(StrictVersion):
         super(Version, self).__init__(version_string, partial)
 
 
+def default_spec(lines):
+    """
+    Given iterable of line identifiers, return the default Spec for issues.
+
+    Specifically:
+
+    * By default, only the latest major version family is used in default
+      Specs, so if something calling this has "seen" a 2.0.x release pass by,
+      it will return a Spec like ``>=2.0``.
+    * When ``releases_always_forwardport`` is ``True``, that behavior is
+      nullified, and this function always returns the empty ``Spec`` (which
+      matches any and all versions/lines).
+    """
+    # TODO: actually support always_forwardport or w/e we end up calling it
+    return Spec()
+
+
 # Issue type list (keys) + color values
 ISSUE_TYPES = {
     'bug': 'A04040',
@@ -48,9 +65,17 @@ class Issue(nodes.Element):
         'unreleased_bugfix', features into 'unreleased_feature', etc.)
         """
         # NOTE: 'Blank' Spec objects match all versions/lines.
-        spec = Spec(">={0}".format(self.line)) if self.line else Spec()
+        # TODO: update this to implement 'default to latest major' behavior, by
+        # testing what the latest major version is within 'lines', then
+        # treating blank 'line' issues as if they were Spec('>=<that line>')
+        # instead of Spec(). (Keeping Spec() if that setting is false.)
+
         # Strip out unreleased_* as they're not real versions
         candidates = [x for x in lines if not x.startswith('unreleased')]
+        if self.line:
+            spec = Spec(">={0}".format(self.line))
+        else:
+            spec = default_spec(candidates)
         # Select matching release lines (& stringify)
         bug_lines = map(str, spec.filter(Version(x) for x in candidates))
         # Add back in unreleased_bugfix
