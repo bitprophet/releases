@@ -118,7 +118,7 @@ class organization(Spec):
         b34 = b(34)
         f22 = f(22)
         b20 = b(20)
-        c = changelog2dict( releases(
+        c = changelog2dict(releases(
             '1.2.1', '1.1.2', '1.0.3',
             b50, b42,
             '1.2.0', '1.1.1', '1.0.2',

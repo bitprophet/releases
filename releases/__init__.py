@@ -317,7 +317,8 @@ lists.
             if focus.line:
                 bug_lines = [x for x in bug_lines
                              if (x != 'unreleased_bugfix'
-                                 and LooseVersion(x) >= LooseVersion(focus.line))]
+                                 and LooseVersion(x)
+                                 >= LooseVersion(focus.line))]
                 bug_lines = bug_lines + ['unreleased_bugfix']
             for line in bug_lines:
                 log("Adding to %r" % line)
@@ -411,7 +412,8 @@ def construct_nodes(releases):
             for index, node in enumerate(desc[:]):
                 for subindex, subnode in enumerate(node[:]):
                     if isinstance(subnode, Issue):
-                        desc[index][subindex:subindex+1] = subnode['nodelist']
+                        lst = subnode['nodelist']
+                        desc[index][subindex:subindex + 1] = lst
             # Rework this entry to insert the now-rendered issue nodes in front
             # of the 1st paragraph of the 'description' nodes (which should be
             # the preserved LI + nested paragraph-or-more from original
