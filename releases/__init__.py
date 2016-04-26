@@ -4,9 +4,8 @@ import sys
 from functools import partial
 
 from docutils import nodes, utils
-from semantic_version import Version as StrictVersion, Spec
 
-from .models import Issue, ISSUE_TYPES, Release
+from .models import Issue, ISSUE_TYPES, Release, Version, Spec
 
 
 def _log(txt, config):
@@ -18,14 +17,6 @@ def _log(txt, config):
     if config.releases_debug:
         sys.stderr.write(str(txt) + "\n")
         sys.stderr.flush()
-
-
-class Version(StrictVersion):
-    """
-    Version subclass toggling ``partial=True`` by default.
-    """
-    def __init__(self, version_string, partial=True):
-        super(Version, self).__init__(version_string, partial)
 
 
 def issue_nodelist(name, link=None):
@@ -320,16 +311,7 @@ lists.
         # not) as well as unreleased_bugfix. Adjust for bugs with a
         # 'line' (minimum line no.) attribute.
         else:
-            # NOTE: 'Blank' Spec objects match all versions/lines.
-            spec = Spec(">={0}".format(focus.line)) if focus.line else Spec()
-            # Strip out unreleased_feature, unreleased_bugfix
-            possible_lines = [x for x in lines if not x.startswith('unreleased')]
-            # Select matching release lines
-            bug_lines = [str(y) for y in spec.filter(Version(x) for x in possible_lines)]
-            # Add back in unreleased_bugfix
-            bug_lines.append('unreleased_bugfix')
-            # Actually put into buckets
-            for line in bug_lines:
+            for line in focus.filter_lines(lines):
                 log("Adding to %r" % line)
                 lines[line].append(focus)
     else:
