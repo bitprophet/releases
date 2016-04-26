@@ -30,7 +30,7 @@ def _expect_type(node, cls):
     assert isinstance(node, cls), msg
 
 
-class nodes(Spec):
+class presentation(Spec):
     """
     Expansion/extension of docutils nodes (rendering)
     """
