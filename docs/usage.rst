@@ -79,10 +79,15 @@ Specifically:
           releases '1.1.1' and '1.2.0' will cause it to appear in '1.2.0'
           **only**.
         * ``(N.N+)`` where ``N.N`` is a valid release line, e.g. ``1.1`` or
-          ``2.10``: Given on *bug* issues to denote minimum release line. E.g.
-          when actively backporting most bugs to release lines 1.2, 1.3 and
-          1.4, you might specify ``:bug:`55 (1.3+)``` to note that bug 55 only
-          applies to releases in 1.3 and above - not 1.2.
+          ``2.10``: Given on issues (usually *bugs*) to denote minimum release
+          line. E.g. when actively backporting most bugs to release lines 1.2,
+          1.3 and 1.4, you might specify ``:bug:`55 (1.3+)``` to note that bug
+          55 only applies to releases in 1.3 and above - not 1.2.
+        * A `semantic version range spec covering minor+major version numbers
+          <https://python-semanticversion.readthedocs.org/en/latest/reference.html#version-specifications-the-spec-class>`_
+          such as ``(<2.0)`` or ``(>=1.0,<3.1)``. A more powerful version of
+          ``(N.N+)`` allowing annotation of issues belonging to specific major
+          versions.
 
 * Regular Sphinx content may be given after issue roles and will be preserved
   as-is when rendering. For example, in ``:bug:`123` Fixed a bug, thanks
