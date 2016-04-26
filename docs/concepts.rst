@@ -90,7 +90,8 @@ for details on formatting/etc.
         * ``1.1.0``: feature #2
         * ``1.0.1``: bug #1
 
-* **Bugfixes marked 'major' go into feature releases instead.**
+* **Bugfixes marked 'major' go into feature releases instead.** In other words,
+  they're displayed as bugs, but organized as features.
 
     * Input::
     
@@ -107,7 +108,8 @@ for details on formatting/etc.
         * ``1.0.1``: bug #1
 
 * **Features or support items marked 'backported' appear in both bugfix and
-  feature releases.**
+  feature releases.** In other words, they're displayed as feature/support
+  items, but organized as a combination feature/support *and* bug item.
 
     * Input::
     
