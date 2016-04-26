@@ -211,3 +211,156 @@ for details on formatting/etc.
         * ``1.5.3``: bug #50 only
         * ``1.6.2``: bugs #50 and #42
         * ``1.7.1``: bugs #50 and #42
+
+
+Major releases
+==============
+
+Major releases introduce additional concerns to changelog organization on top
+of those above. Users whose software tends to just "roll forwards" without
+keeping older stable branches alive for bugfix releases, will likely not need
+to do much.
+
+However, when your support window stretches across major version
+boundaries, telling Releases which issues belong to which major version (or
+versions plural) becomes a bit more work.
+
+There are two main rules to keep in mind when dealing with "mixed" major
+versions:
+
+* **All issues encountered after a major release are considered
+  associated with that major release by default.**
+* **To force association with a different major release (or set of major
+  releases), issues may specify a 'version spec'.**
+
+Here's some examples to clarify.
+
+"Rolling" releases
+------------------
+
+No actual mixing of release lines, just moving from 1.x to 2.x. 1.x is
+effectively abandoned. (Hope 2.x is an easy upgrade...)
+
+Input::
+    
+    * :release:`2.1.0 <date>`
+    * :release:`2.0.1 <date>`
+    * :feature:`7` Yet another new feature
+    * :bug:`6` A bug :(
+    * :release:`2.0.0 <date>`
+    * :feature:`5` Another (backwards incompatible) feature!
+    * :feature:`4` A (backwards incompatible) feature!
+    * :release:`1.1.0 <date>`
+    * :release:`1.0.1 <date>`
+    * :feature:`3` New feature
+    * :bug:`2` Another bug
+    * :bug:`1` An bug
+    * :release:`1.0.0 <date>`
+
+Result:
+
+* ``1.0.1``: bug #1, bug #2
+* ``1.1.0``: feature #3
+* ``2.0.0``: feature #4, feature #5
+* ``2.0.1``: bug #6
+* ``2.1.0``: feature #7
+
+Pretty simple, nothing actually new here.
+
+Mostly-compatible 2.0 with continued maint for 1.x
+--------------------------------------------------
+
+This maintainer is a bit more conscientious/masochistic and wants to keep users
+of 1.x happy for a while after 2.0 launches.
+
+The timeline is very similar to the previous example, but in this scenario, all
+issues are developed on the 1.x branch and forward-ported to 2.x, because 2.x
+wasn't a huge departure from 1.x.
+
+To signify this, post-2.0 issues are annotated with ``(1.0+)``, telling
+Releases to add them to any releases above 1.0 (i.e., all of them). Then, the
+continuing 1.x releases are listed alongside the 2.x ones::
+
+    * :release:`2.1.0 <date>`
+    * :release:`2.0.1 <date>`
+    * :release:`1.2.0 <date>`
+    * :release:`1.1.1 <date>`
+    * :release:`1.0.2 <date>`
+    * :feature:`7 (1.0+)` Yet another new feature
+    * :bug:`6 (1.0+)` A bug :(
+    * :release:`2.0.0 <date>`
+    * :feature:`5` Another (backwards incompatible) feature!
+    * :feature:`4` A (backwards incompatible) feature!
+    * :release:`1.1.0 <date>`
+    * :release:`1.0.1 <date>`
+    * :feature:`3` New feature
+    * :bug:`2` Another bug
+    * :bug:`1` An bug
+    * :release:`1.0.0 <date>`
+
+Result:
+
+* ``1.0.1``: bug #1, bug #2
+* ``1.1.0``: feature #3
+* ``2.0.0``: feature #4, feature #5
+* ``1.0.2``: bug #6
+* ``1.1.1``: bug #6
+* ``1.2.0``: feature #7
+* ``2.0.1``: bug #6
+* ``2.1.0``: feature #7
+
+Some issues forward-ported, others not
+--------------------------------------
+
+This time, some issues must remain 1.x-specific due to them not applying to the
+clearly superior 2.0 codebase. Since the simple format of "X.Y+" doesn't let us
+declare this, we need a more specific format - one you may be familiar with
+from packaging systems such as ``setuptools``/``pip``:
+
+* ``(<2.0)`` signifies "only included in releases lower than 2.0"
+* ``(>=2.0)`` says "only include in the release lines 2.0 and higher" (thus
+  applying to 2.1, 2.2, 3.0, 4.0 and on to infinity).
+
+    * This is actually the same as saying ``(2.0+)``; the ``+`` version is just
+      a convenient shorthand.
+
+* ``(>=2.0,<3.0)`` allows one to limit an issue to *just* the 2.x line,
+  preventing its inclusion in 1.x, 3.x or anything else.
+* And so on and so forth; see the documentation for the ``Spec`` class at
+  https://python-semanticversion.readthedocs.org for details.
+* To be clear, **you may put any combination of major+minor version number in
+  these annotations**, just as with the simpler ``(1.5+)`` style format.
+
+Armed with this more powerful syntax, we can limit some issues just to the 1.x
+line::
+
+    * :release:`2.1.0 <date>`
+    * :release:`2.0.1 <date>`
+    * :release:`1.2.0 <date>`
+    * :release:`1.1.1 <date>`
+    * :release:`1.0.2 <date>`
+    * :feature:`9 (>=1.0)` A new feature that works with both versions (using
+      the more explicit version of "1.0+")
+    * :feature:`8` A new feature that only works on 2.x (no annotation needed)
+    * :bug:`7 (<2.0) A bug only affecting 1.x
+    * :bug:`6 (1.0+)` A bug affecting all versions
+    * :release:`2.0.0 <date>`
+    * :feature:`5` Another (backwards incompatible) feature!
+    * :feature:`4` A (backwards incompatible) feature!
+    * :release:`1.1.0 <date>`
+    * :release:`1.0.1 <date>`
+    * :feature:`3` New feature
+    * :bug:`2` Another bug
+    * :bug:`1` An bug
+    * :release:`1.0.0 <date>`
+
+Result:
+
+* ``1.0.1``: bug #1, bug #2
+* ``1.1.0``: feature #3
+* ``2.0.0``: feature #4, feature #5
+* ``1.0.2``: bug #6, bug #7
+* ``1.1.1``: bug #6, bug #7
+* ``1.2.0``: feature #9 (but not #8)
+* ``2.0.1``: bug #6 (but not #7)
+* ``2.1.0``: feature #8, feature #9
