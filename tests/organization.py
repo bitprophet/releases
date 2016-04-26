@@ -9,7 +9,14 @@ from releases import (
     construct_releases,
 )
 
-from _util import *
+from _util import (
+    b, f, s,
+    changelog2dict,
+    make_app,
+    release_list,
+    releases,
+    setup_issues,
+)
 
 
 class organization(Spec):

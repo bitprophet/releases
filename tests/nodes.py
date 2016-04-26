@@ -9,7 +9,14 @@ from releases import (
     construct_nodes,
 )
 
-from _util import *
+from _util import (
+    b, s,
+    entry,
+    make_app,
+    release,
+    releases,
+    setup_issues,
+)
 
 
 def _obj2name(obj):
