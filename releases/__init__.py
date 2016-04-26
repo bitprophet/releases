@@ -320,12 +320,15 @@ lists.
         # not) as well as unreleased_bugfix. Adjust for bugs with a
         # 'line' (minimum line no.) attribute.
         else:
-            bug_lines = [x for x in lines if x != 'unreleased_feature']
-            if focus.line:
-                bug_lines = [x for x in bug_lines
-                             if (x != 'unreleased_bugfix'
-                                 and Version(x) >= Version(focus.line))]
-                bug_lines = bug_lines + ['unreleased_bugfix']
+            # NOTE: 'Blank' Spec objects match all versions/lines.
+            spec = Spec(">={0}".format(focus.line)) if focus.line else Spec()
+            # Strip out unreleased_feature, unreleased_bugfix
+            possible_lines = [x for x in lines if not x.startswith('unreleased')]
+            # Select matching release lines
+            bug_lines = [str(y) for y in spec.filter(Version(x) for x in possible_lines)]
+            # Add back in unreleased_bugfix
+            bug_lines.append('unreleased_bugfix')
+            # Actually put into buckets
             for line in bug_lines:
                 log("Adding to %r" % line)
                 lines[line].append(focus)
