@@ -274,18 +274,20 @@ This maintainer is a bit more conscientious/masochistic and wants to keep users
 of 1.x happy for a while after 2.0 launches.
 
 The timeline is very similar to the previous example, but in this scenario, all
-issues are developed on the 1.x branch and forward-ported to 2.x, because 2.x
+issues developed on the 1.x branch are forward-ported to 2.x, because 2.x
 wasn't a huge departure from 1.x.
 
-To signify this, post-2.0 issues are annotated with ``(1.0+)``, telling
-Releases to add them to any releases above 1.0 (i.e., all of them). Then, the
-continuing 1.x releases are listed alongside the 2.x ones::
+To signify this, post-2.0 issues that were developed initially for 1.x, are
+annotated with ``(1.0+)``, telling Releases to add them to all releases above
+1.0, instead of just the most recent major release (2.0)::
 
     * :release:`2.1.0 <date>`
     * :release:`2.0.1 <date>`
     * :release:`1.2.0 <date>`
     * :release:`1.1.1 <date>`
     * :release:`1.0.2 <date>`
+    * :bug:`9` A 2.0-only bugfix.
+    * :feature:`8` A 2.0-only feature.
     * :feature:`7 (1.0+)` Yet another new feature
     * :bug:`6 (1.0+)` A bug :(
     * :release:`2.0.0 <date>`
@@ -300,11 +302,11 @@ continuing 1.x releases are listed alongside the 2.x ones::
 
 Result:
 
-* ``2.1.0``: feature #7
-* ``2.0.1``: bug #6
-* ``1.2.0``: feature #7
-* ``1.1.1``: bug #6
-* ``1.0.2``: bug #6
+* ``2.1.0``: feature #7, feature #8
+* ``2.0.1``: bug #6, bug #9
+* ``1.2.0``: feature #7, but not feature #8
+* ``1.1.1``: bug #6, but not bug #9
+* ``1.0.2``: bug #6, but not bug #9
 * ``2.0.0``: feature #4, feature #5
 * ``1.1.0``: feature #3
 * ``1.0.1``: bug #1, bug #2
@@ -312,21 +314,21 @@ Result:
 Some issues forward-ported, others not
 --------------------------------------
 
-This time, some issues must remain 1.x-specific due to them not applying to the
-clearly superior 2.0 codebase. Since the simple format of "X.Y+" doesn't let us
-declare this, we need a more specific format - one you may be familiar with
-from packaging systems such as ``setuptools``/``pip``:
+This time, some issues remain 1.x-specific as they don't apply to 2.x for
+whatever reason. The simple "X.Y+" format doesn't let us declare this, so we
+use one you're familiar with from packaging systems like
+``setuptools``/``pip``:
 
 * ``(<2.0)`` signifies "only included in releases lower than 2.0"
-* ``(>=2.0)`` says "only include in the release lines 2.0 and higher" (thus
-  applying to 2.1, 2.2, 3.0, 4.0 and on to infinity).
+* ``(>=2.0)`` says "only include in release lines 2.0 and higher" (thus
+  applying to 2.1, 2.2, 3.0, 4.0 etc).
 
-    * This is actually the same as saying ``(2.0+)``; the ``+`` version is just
-      a convenient shorthand.
+    * This is identical to saying ``(2.0+)``; the ``+`` version is just a
+      convenient / backwards compatible shorthand.
 
-* ``(>=2.0,<3.0)`` allows one to limit an issue to *just* the 2.x line,
-  preventing its inclusion in 1.x, 3.x or anything else.
-* And so on and so forth; see the documentation for the ``Spec`` class at
+* ``(>=2.0,<3.0)`` limits an issue to *just* the 2.x line, preventing its
+  inclusion in 1.x, 3.x or anything else.
+* And so on; see the documentation for the ``Spec`` class at
   https://python-semanticversion.readthedocs.org for details.
 * To be clear, **you may put any combination of major+minor version number in
   these annotations**, just as with the simpler ``(1.5+)`` style format.
