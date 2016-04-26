@@ -2,7 +2,7 @@ from tempfile import mkdtemp
 from shutil import rmtree
 
 import six
-from spec import Spec, eq_, raises
+from spec import Spec, eq_, raises, skip
 from mock import Mock
 from docutils.nodes import (
     reference, bullet_list, list_item, raw, paragraph, Text,
@@ -347,6 +347,36 @@ class releases(Spec):
         # matter, assert that within each category the order matches the old
         # 'reverse chronological' order.
         eq_(changelog['1.1'], [f2, f1, b2, b1, s2, s1])
+
+    def rolling_release_works_without_annotation(self):
+        b1 = _issue('bug', '1')
+        b2 = _issue('bug', '2')
+        f3 = _issue('feature', '3')
+        f4 = _issue('feature', '4')
+        f5 = _issue('feature', '5')
+        b6 = _issue('bug', '6')
+        f7 = _issue('feature', '7')
+        changelog = _changelog2dict(_releases(
+            '2.1.0', '2.0.1', f7, b6, '2.0.0', f5, f4, '1.1.0', '1.0.1',
+            f3, b2, b1,
+        ))
+        for rel, issues in six.iteritems({
+            '1.0.1': [b1, b2],
+            '1.1.0': [f3],
+            '2.0.0': [f4, f5],
+            '2.0.1': [b6],
+            '2.1.0': [f7],
+        }):
+            eq_(changelog[rel], issues)
+
+    def plus_annotations_let_old_lines_continue_getting_released(self):
+        skip()
+
+    def semver_spec_annotations_allow_preventing_forward_porting(self):
+        skip()
+
+    def semver_double_ended_specs_work_when_more_than_two_major_versions(self):
+        skip()
 
 
 def _obj2name(obj):
