@@ -2,10 +2,9 @@ import itertools
 import re
 import sys
 from functools import partial
-from distutils.version import LooseVersion
 
 from docutils import nodes, utils
-
+from semantic_version import Version as StrictVersion, Spec
 
 from .models import Issue, ISSUE_TYPES, Release
 
@@ -19,6 +18,14 @@ def _log(txt, config):
     if config.releases_debug:
         sys.stderr.write(str(txt) + "\n")
         sys.stderr.flush()
+
+
+class Version(StrictVersion):
+    """
+    Version subclass toggling ``partial=True`` by default.
+    """
+    def __init__(self, version_string, partial=True):
+        super(Version, self).__init__(version_string, partial)
 
 
 def issue_nodelist(name, link=None):
@@ -317,8 +324,7 @@ lists.
             if focus.line:
                 bug_lines = [x for x in bug_lines
                              if (x != 'unreleased_bugfix'
-                                 and LooseVersion(x)
-                                 >= LooseVersion(focus.line))]
+                                 and Version(x) >= Version(focus.line))]
                 bug_lines = bug_lines + ['unreleased_bugfix']
             for line in bug_lines:
                 log("Adding to %r" % line)
