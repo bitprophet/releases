@@ -12,7 +12,7 @@ class Version(StrictVersion):
 
 def default_spec(lines):
     """
-    Given iterable of line identifiers, return the default Spec for issues.
+    Given iterable of line Versions, return the default Spec for issues.
 
     Specifically:
 
@@ -24,7 +24,13 @@ def default_spec(lines):
       matches any and all versions/lines).
     """
     # TODO: actually support always_forwardport or w/e we end up calling it
-    return Spec()
+    if True:
+        # Empty Spec -> likes all versions -> select() grabs newest -> yay
+        latest_major = Spec().select(lines).major
+        default = Spec(">={0}".format(latest_major))
+    else:
+        default = Spec()
+    return default
 
 
 # Issue type list (keys) + color values
@@ -71,13 +77,15 @@ class Issue(nodes.Element):
         # instead of Spec(). (Keeping Spec() if that setting is false.)
 
         # Strip out unreleased_* as they're not real versions
-        candidates = [x for x in lines if not x.startswith('unreleased')]
+        candidates = [
+            Version(x) for x in lines if not x.startswith('unreleased')
+        ]
         if self.line:
             spec = Spec(">={0}".format(self.line))
         else:
             spec = default_spec(candidates)
         # Select matching release lines (& stringify)
-        bug_lines = map(str, spec.filter(Version(x) for x in candidates))
+        bug_lines = [str(x) for x in spec.filter(candidates)]
         # Add back in unreleased_bugfix
         # TODO: make this work for features too...
         bug_lines.append('unreleased_bugfix')
