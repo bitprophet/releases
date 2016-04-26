@@ -88,8 +88,8 @@ class organization(Spec):
         eq_(len(bugfix['entries']), 1)
         assert self.f in feature['entries']
         assert self.b in bugfix['entries']
-        eq_(feature['obj'].number, 'unreleased_feature')
-        eq_(bugfix['obj'].number, 'unreleased_bugfix')
+        eq_(feature['obj'].number, 'unreleased_1.x_feature')
+        eq_(bugfix['obj'].number, 'unreleased_1.x_bugfix')
 
     def issues_consumed_by_releases_are_not_in_unreleased(self):
         changelog = releases('1.0.2', self.f, self.b, self.s, self.bs)
@@ -241,6 +241,7 @@ class organization(Spec):
             '2.1.0', '2.0.1', f7, b6, '2.0.0', f5, f4, '1.1.0', '1.0.1',
             f3, b2, b1,
         ))
+        err = "Got unexpected contents for {0}: wanted {1}, got {2}"
         for rel, issues in six.iteritems({
             '1.0.1': [b1, b2],
             '1.1.0': [f3],
@@ -248,7 +249,10 @@ class organization(Spec):
             '2.0.1': [b6],
             '2.1.0': [f7],
         }):
-            eq_(changelog[rel], issues)
+            eq_(
+                changelog[rel], issues,
+                err.format(rel, issues, changelog[rel])
+            )
 
     def plus_annotations_let_old_lines_continue_getting_released(self):
         b9 = b(9)
@@ -264,6 +268,7 @@ class organization(Spec):
             '2.1.0', '2.0.1', '1.2.0', '1.1.1', '1.0.2', b9, f8, f7, b6,
             '2.0.0', f5, f4, '1.1.0', '1.0.1', f3, b2, b1,
         ))
+        err = "Got unexpected contents for {0}: wanted {1}, got {2}"
         for rel, issues in six.iteritems({
             '2.1.0': [f7, f8],
             '2.0.1': [b6, b9],
@@ -274,7 +279,10 @@ class organization(Spec):
             '1.1.0': [f3],
             '1.0.1': [b1, b2],
         }):
-            eq_(changelog[rel], issues)
+            eq_(
+                changelog[rel], issues,
+                err.format(rel, issues, changelog[rel])
+            )
 
     def semver_spec_annotations_allow_preventing_forward_porting(self):
         skip()

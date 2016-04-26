@@ -4,6 +4,7 @@ import sys
 from functools import partial
 
 from docutils import nodes, utils
+import six
 
 from .models import Issue, ISSUE_TYPES, Release, Version, Spec
 
@@ -135,30 +136,34 @@ def release_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     return [node], []
 
 
-def get_line(obj):
-    # 1.2.7 -> 1.2
-    return '.'.join(obj.number.split('.')[:-1])
-
-
 def append_unreleased_entries(app, lines, releases):
     """
-    Entries not yet released get special 'release' entries (that lack an
-    actual release object).
+    Generate new abstract 'releases' for unreleased issues.
+
+    There's one for each combination of bug-vs-feature & major release line.
+
+    When only one major release line exists, that dimension is ignored.
     """
+    # TODO: actually ignore major lines as stated above
     log = partial(_log, config=app.config)
-    for which in ('bugfix', 'feature'):
-        nodelist = [release_nodes(
-            "Next %s release" % which,
-            'master',
-            None,
-            app.config
-        )]
-        line = 'unreleased_%s' % which
-        log("Creating '%s' faux-release with %r" % (line, lines[line]))
-        releases.append({
-            'obj': Release(number=line, date=None, nodelist=nodelist),
-            'entries': lines[line]
-        })
+    for family, _lines in six.iteritems(lines):
+        for type_ in ('bugfix', 'feature'):
+            issues =  _lines['unreleased_{0}'.format(type_)]
+            nodelist = [release_nodes(
+                "Next {0} {1} release".format(family, type_),
+                # TODO: should link to master for newest family and...what
+                # exactly, for the others? Expectation isn't necessarily to
+                # have a branch per family? Or is there? Maybe there must be..
+                'master', 
+                None,
+                app.config
+            )]
+            line = "unreleased_{0}.x_{1}".format(family, type_)
+            log("Creating {0!r} faux-release with {1!r}".format(line, issues))
+            releases.append({
+                'obj': Release(number=line, date=None, nodelist=nodelist),
+                'entries': issues,
+            })
 
 
 def reorder_release_entries(releases):
@@ -178,9 +183,7 @@ def construct_entry_with_release(focus, issues, lines, log, releases, rest):
     Release lines, once the release obj is removed, should be empty or a
     comma-separated list of issue numbers.
     """
-
-    line = get_line(focus)
-    log("release for line %r" % line)
+    log("release for line %r" % focus.line)
     # Check for explicitly listed issues first
     explicit = None
     if rest[0].children:
@@ -194,80 +197,89 @@ def construct_entry_with_release(focus, issues, lines, log, releases, rest):
             raise ValueError(
                 "Couldn't find issue(s) #{0} in the changelog!".format(
                     ', '.join(missing)))
-        # Obtain objects from global list
+        # Obtain the explicitly named issues from global list
         entries = []
         for i in explicit:
             for flattened_issue_item in itertools.chain(issues[i]):
                 entries.append(flattened_issue_item)
-
         # Create release
         log("entries in this release: %r" % (entries,))
         releases.append({
             'obj': focus,
             'entries': entries,
         })
-        # Introspect entries to determine which buckets they should get
-        # removed from
+        # Introspect these entries to determine which buckets they should get
+        # removed from (it's not "all of them"!)
         for obj in entries:
             if obj.type == 'bug':
                 # Major bugfix: remove from unreleased_feature
                 if obj.major:
                     log("Removing #%s from unreleased" % obj.number)
-                    lines['unreleased_feature'].remove(obj)
+                    # TODO: consider making 'lines' a richer object so this
+                    # sort of thing is easier vs repeated in a few places
+                    lines[focus.family]['unreleased_feature'].remove(obj)
                 # Regular bugfix: remove from bucket for this release's
                 # line + unreleased_bugfix
                 else:
-                    if obj in lines['unreleased_bugfix']:
-                        log("Removing #%s from unreleased" % obj.number)
-                        lines['unreleased_bugfix'].remove(obj)
-                    if obj in lines[line]:
-                        log("Removing #%s from %s" % (obj.number, line))
-                        lines[line].remove(obj)
+                    log("Removing #%s from unreleased" % obj.number)
+                    lines[focus.family]['unreleased_bugfix'].remove(obj)
+                    # TODO: why wouldn't it be in the bucket??
+                    if obj in lines[focus.family][focus.line]:
+                        log("Removing #%s from %s" % (obj.number, focus.line))
+                        lines[focus.family][focus.line].remove(obj)
             # Regular feature/support: remove from unreleased_feature
             # Backported feature/support: remove from bucket for this
             # release's line (if applicable) + unreleased_feature
             else:
                 log("Removing #%s from unreleased" % obj.number)
-                lines['unreleased_feature'].remove(obj)
-                if obj in lines.get(line, []):
-                    lines[line].remove(obj)
+                lines[focus.family]['unreleased_feature'].remove(obj)
+                if obj in lines[focus.family].get(focus.line, []):
+                    lines[focus.family][focus.line].remove(obj)
 
     # Implicit behavior otherwise
     else:
+        # Ensure focus' major version family even exists, we might be the 1st
+        if focus.family not in lines:
+            lines[focus.family] = {
+                'unreleased_bugfix': [],
+                'unreleased_feature': [],
+            }
         # New release line/branch detected. Create it & dump unreleased
         # features.
-        if line not in lines:
-            log("not seen prior, making feature release")
-            lines[line] = []
-            entries = [
-                x
-                for x in lines['unreleased_feature']
-                if x.type in ('feature', 'support') or x.major
-            ]
+        if focus.line not in lines[focus.family]:
+            log("not seen prior, making feature release & bugfix bucket")
+            lines[focus.family][focus.line] = []
+            # TODO: this used to explicitly say "go over everything in
+            # unreleased_feature and dump if it's feature, support or major
+            # bug". But what the hell else would BE in unreleased_feature? Why
+            # not just dump the whole thing??
+            #
+            # Dump only the items in the bucket whose family this release
+            # object belongs to, i.e. 1.5.0 should only nab the 1.0 family's
+            # unreleased feature items.
             releases.append({
                 'obj': focus,
-                'entries': entries
+                'entries': lines[focus.family]['unreleased_feature'][:],
             })
-            lines['unreleased_feature'] = []
+            lines[focus.family]['unreleased_feature'] = []
         # Existing line -> empty out its bucket into new release.
         # Skip 'major' bugs as those "belong" to the next release (and will
         # also be in 'unreleased_feature' - so safe to nuke the entire
         # line)
         else:
             log("pre-existing, making bugfix release")
-            entries = [x for x in lines[line] if not x.major]
-            log("entries in this release: %r" % (entries,))
-            releases.append({
-                'obj': focus,
-                'entries': entries,
-            })
-            lines[line] = []
+            # TODO: as in other branch, I don't get why this wasn't just
+            # dumping the whole thing - why would major bugs be in the regular
+            # bugfix buckets?
+            entries = lines[focus.family][focus.line][:]
+            releases.append({'obj': focus, 'entries': entries})
+            lines[focus.family][focus.line] = []
             # Clean out the items we just released from
             # 'unreleased_bugfix'.  (Can't nuke it because there might
             # be some unreleased bugs for other release lines.)
             for x in entries:
-                if x in lines['unreleased_bugfix']:
-                    lines['unreleased_bugfix'].remove(x)
+                if x in lines[focus.family]['unreleased_bugfix']:
+                    lines[focus.family]['unreleased_bugfix'].remove(x)
 
 
 def construct_entry_without_release(focus, issues, lines, log, rest):
@@ -299,33 +311,13 @@ lists.
         )
     else:
         focus.attributes['description'] = rest
-    # Add to global list or die trying
+
+    # Add to global list (for use by explicit releases) or die trying
     issues[focus.number] = issues.get(focus.number, []) + [focus]
 
-    if focus.type == 'bug':
-        # Major bugs go into unreleased_feature
-        if focus.major:
-            lines['unreleased_feature'].append(focus)
-            log("Adding to unreleased_feature")
-        # Regular bugs go into per-line buckets ('major' bugs do
-        # not) as well as unreleased_bugfix. Adjust for bugs with a
-        # 'line' (minimum line no.) attribute.
-        else:
-            for line in focus.filter_lines(lines):
-                log("Adding to %r" % line)
-                lines[line].append(focus)
-    else:
-        # Backported feature/support items go into all lines, including
-        # both 'unreleased' lists
-        if focus.backported:
-            for line in lines:
-                log("Adding to release line %r" % line)
-                lines[line].append(focus)
-        # Non-backported feature/support items go into feature releases
-        # only.
-        else:
-            log("Adding to unreleased_feature")
-            lines['unreleased_feature'].append(focus)
+    # Add to per-release bugfix lines and/or unreleased bug/feature buckets, as
+    # necessary.
+    focus.add_self_to_lines(lines)
 
 
 def construct_releases(entries, app):
@@ -333,7 +325,9 @@ def construct_releases(entries, app):
     # Walk from back to front, consuming entries & copying them into
     # per-release buckets as releases are encountered. Store releases in order.
     releases = []
-    lines = {'unreleased_bugfix': [], 'unreleased_feature': []}
+    # Release lines, to be organized by major releases, then by major+minor,
+    # alongside per-major-release 'unreleased' bugfix/feature buckets.
+    lines = {}
     # Also keep a master hash of issues by number to detect duplicates & assist
     # in explicitly defined release lists.
     issues = {}

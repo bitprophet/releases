@@ -10,26 +10,21 @@ class Version(StrictVersion):
         super(Version, self).__init__(version_string, partial)
 
 
-def default_spec(lines):
+def default_spec(families):
     """
-    Given iterable of line Versions, return the default Spec for issues.
+    Given iterable of major release numbers, return a default Spec for issues.
 
     Specifically:
 
-    * By default, only the latest major version family is used in default
-      Specs, so if something calling this has "seen" a 2.0.x release pass by,
-      it will return a Spec like ``>=2.0``.
+    * Normally, only the highest major release is used, so given ``[1, 2]``
+      this will simply return something like ``Spec(">=2")``.
     * When ``releases_always_forwardport`` is ``True``, that behavior is
       nullified, and this function always returns the empty ``Spec`` (which
       matches any and all versions/lines).
     """
-    # TODO: actually support always_forwardport or w/e we end up calling it
-    if True:
-        # Empty Spec -> likes all versions -> select() grabs newest -> yay
-        latest_major = Spec().select(lines).major
-        default = Spec(">={0}".format(latest_major))
-    else:
-        default = Spec()
+    default = Spec()
+    if True: # TODO: if app->config-><releases_always_forwardport or w/e
+        default = Spec(">={0}".format(max(families)))
     return default
 
 
@@ -62,34 +57,43 @@ class Issue(nodes.Element):
     def line(self):
         return self.get('line', None)
 
-    def filter_lines(self, lines):
+    def add_self_to_lines(self, lines):
         """
-        Given iterable of lines like "1.2", return those this issue belongs in.
-
-        The lines may include 'unreleased' labels like 'unreleased_bugfix' and
-        these will be considered correctly (e.g. regular bugs will filter into
-        'unreleased_bugfix', features into 'unreleased_feature', etc.)
+        Given a 'lines' structure, add self to one or more of its 'buckets'.
         """
-        # NOTE: 'Blank' Spec objects match all versions/lines.
-        # TODO: update this to implement 'default to latest major' behavior, by
-        # testing what the latest major version is within 'lines', then
-        # treating blank 'line' issues as if they were Spec('>=<that line>')
-        # instead of Spec(). (Keeping Spec() if that setting is false.)
-
-        # Strip out unreleased_* as they're not real versions
-        candidates = [
-            Version(x) for x in lines if not x.startswith('unreleased')
-        ]
+        # Derive version spec allowing us to filter against major/minor buckets
         if self.line:
             spec = Spec(">={0}".format(self.line))
         else:
-            spec = default_spec(candidates)
-        # Select matching release lines (& stringify)
-        bug_lines = [str(x) for x in spec.filter(candidates)]
-        # Add back in unreleased_bugfix
-        # TODO: make this work for features too...
-        bug_lines.append('unreleased_bugfix')
-        return bug_lines
+            spec = default_spec(lines.keys())
+            print("default spec for {0} (given {2}): {1}".format(self.number, spec, lines))
+        # Only look in appropriate major version/family; if self is an issue
+        # declared as living in e.g. >=2, this means we don't even bother
+        # looking in the 1.x family.
+        families = [Version(str(x)) for x in lines]
+        for version in spec.filter(families):
+            family = version.major
+            # Within each family, we further limit which bugfix lines match up
+            # to what self cares about (ignoring 'unreleased' until later)
+            candidates = [
+                Version(x)
+                for x in lines[family]
+                if not x.startswith('unreleased')
+            ]
+            # TODO: handle actual spec-like bits, self.line currently is only
+            # looking for the '+' format...
+            # Select matching release lines (& stringify)
+            buckets = [str(x) for x in spec.filter(candidates)]
+            # Add back in unreleased_* as appropriate
+            # TODO: probably leverage Issue subclasses for this eventually?
+            if self.type == 'bug' or self.backported:
+                buckets.append('unreleased_bugfix')
+            if self.type != 'bug' or self.major:
+                buckets.append('unreleased_feature')
+            # Now that we know which buckets are appropriate, add ourself to
+            # all of them. TODO: or just...do it above...instead...
+            for bucket in buckets:
+                lines[family][bucket].append(self)
 
     def __repr__(self):
         flag = ''
@@ -109,6 +113,17 @@ class Release(nodes.Element):
     @property
     def number(self):
         return self['number']
+
+    @property
+    def line(self):
+        # TODO: use Version
+        return '.'.join(self.number.split('.')[:-1])
+
+    @property
+    def family(self):
+        # TODO: use Version.major
+        # TODO: and probs just rename to .major, 'family' is dumb tbh
+        return int(self.number.split('.')[0])
 
     def __repr__(self):
         return '<release {0}>'.format(self.number)
