@@ -251,7 +251,30 @@ class organization(Spec):
             eq_(changelog[rel], issues)
 
     def plus_annotations_let_old_lines_continue_getting_released(self):
-        skip()
+        b9 = b(9)
+        f8 = f(8)
+        f7 = f(7, line='1.0')
+        b6 = b(6, line='1.0')
+        f5 = f(5)
+        f4 = f(4)
+        f3 = f(3)
+        b2 = b(2)
+        b1 = b(1)
+        changelog = changelog2dict(releases(
+            '2.1.0', '2.0.1', '1.2.0', '1.1.1', '1.0.2', b9, f8, f7, b6,
+            '2.0.0', f5, f4, '1.1.0', '1.0.1', f3, b2, b1,
+        ))
+        for rel, issues in six.iteritems({
+            '2.1.0': [f7, f8],
+            '2.0.1': [b6, b9],
+            '1.2.0': [f7], # but not f8
+            '1.1.1': [b6], # but not b9
+            '1.0.2': [b6], # but not b9
+            '2.0.0': [f4, f5],
+            '1.1.0': [f3],
+            '1.0.1': [b1, b2],
+        }):
+            eq_(changelog[rel], issues)
 
     def semver_spec_annotations_allow_preventing_forward_porting(self):
         skip()
