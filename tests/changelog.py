@@ -82,6 +82,16 @@ def _issue(type_, number, **kwargs):
         inliner=_inliner(app=app),
     )[0][0]
 
+# Even shorter shorthand!
+def _b(number, **kwargs):
+    return _issue('bug', str(number), **kwargs)
+
+def _f(number, **kwargs):
+    return _issue('feature', str(number), **kwargs)
+
+def _s(number, **kwargs):
+    return _issue('support', str(number), **kwargs)
+
 def _entry(i):
     """
     Easy wrapper for issue/release objects.
@@ -129,12 +139,12 @@ def _releases(*entries, **kwargs):
     return construct_releases(_release_list(*entries), app)
 
 def _setup_issues(self):
-    self.f = _issue('feature', '12')
-    self.s = _issue('support', '5')
-    self.b = _issue('bug', '15')
-    self.mb = _issue('bug', '200', major=True)
-    self.bf = _issue('feature', '27', backported=True)
-    self.bs = _issue('support', '29', backported=True)
+    self.f = _f(12)
+    self.s = _s(5)
+    self.b = _b(15)
+    self.mb = _b(200, major=True)
+    self.bf = _f(27, backported=True)
+    self.bs = _s(29, backported=True)
 
 
 class releases(Spec):
@@ -219,8 +229,8 @@ class releases(Spec):
     def oddly_ordered_bugfix_releases_and_unreleased_list(self):
         # Release set up w/ non-contiguous feature+bugfix releases; catches
         # funky problems with 'unreleased' buckets
-        b2 = _issue('bug', '2')
-        f3 = _issue('feature', '3')
+        b2 = _b(2)
+        f3 = _f(3)
         changelog = _releases(
             '1.1.1', '1.0.2', self.f, b2, '1.1.0', f3, self.b
         )
@@ -229,13 +239,13 @@ class releases(Spec):
         assert b2 in changelog[3]['entries']
 
     def release_line_bugfix_specifier(self):
-        b50 = _issue('bug', '50')
-        b42 = _issue('bug', '42', line='1.1')
-        f25 = _issue('feature', '25')
-        b35 = _issue('bug', '35')
-        b34 = _issue('bug', '34')
-        f22 = _issue('feature', '22')
-        b20 = _issue('bug', '20')
+        b50 = _b(50)
+        b42 = _b(42, line='1.1')
+        f25 = _f(25)
+        b35 = _b(35)
+        b34 = _b(34)
+        f22 = _f(22)
+        b20 = _b(20)
         c = _changelog2dict(_releases(
             '1.2.1', '1.1.2', '1.0.3',
             b50, b42,
@@ -258,8 +268,8 @@ class releases(Spec):
 
     def releases_can_specify_issues_explicitly(self):
         # Build regular list-o-entries
-        b2 = _issue('bug', '2')
-        b3 = _issue('bug', '3')
+        b2 = _b(2)
+        b3 = _b(3)
         changelog = _release_list(
             '1.0.1', '1.1.1', b3, b2, self.b, '1.1.0', self.f
         )
@@ -279,15 +289,15 @@ class releases(Spec):
         assert b3 in one_1_1
 
     def explicit_release_list_split_works_with_unicode(self):
-        b = _issue('bug', '17')
+        b = _b(17)
         changelog = _release_list('1.0.1', b)
         changelog[0][0].append(Text(six.text_type('17')))
         # When using naive method calls, this explodes
         construct_releases(changelog, _app())
 
     def explicit_feature_release_features_are_removed_from_unreleased(self):
-        f1 = _issue('feature', '1')
-        f2 = _issue('feature', '2')
+        f1 = _f(1)
+        f2 = _f(2)
         changelog = _release_list('1.1.0', f1, f2)
         # Ensure that 1.1.0 specifies feature 2
         changelog[0][0].append(Text("2"))
@@ -301,8 +311,8 @@ class releases(Spec):
         assert f2 not in rendered['unreleased_feature']
 
     def explicit_bugfix_releases_get_removed_from_unreleased(self):
-        b1 = _issue('bug', '1')
-        b2 = _issue('bug', '2')
+        b1 = _b(1)
+        b2 = _b(2)
         changelog = _release_list('1.0.1', b1, b2)
         # Ensure that 1.0.1 specifies bug 2
         changelog[0][0].append(Text('2'))
@@ -328,17 +338,17 @@ class releases(Spec):
         eq_(len(test_changelog['1.0.1']), 2)
 
     def duplicate_zeroes_dont_error(self):
-        cl = _releases('1.0.1', _issue('bug', '0'), _issue('bug', '0'))
+        cl = _releases('1.0.1', _b(0), _b(0))
         cl = _changelog2dict(cl)
         assert len(cl['1.0.1']) == 2
 
     def issues_are_sorted_by_type_within_releases(self):
-        b1 = _issue('bug', '123', major=True)
-        b2 = _issue('bug', '124', major=True)
-        s1 = _issue('support', '25')
-        s2 = _issue('support', '26')
-        f1 = _issue('feature', '3455')
-        f2 = _issue('feature', '3456')
+        b1 = _b(123, major=True)
+        b2 = _b(124, major=True)
+        s1 = _s(25)
+        s2 = _s(26)
+        f1 = _f(3455)
+        f2 = _f(3456)
 
         # Semi random definitely-not-in-desired-order order
         changelog = _changelog2dict(_releases('1.1', b1, s1, s2, f1, b2, f2))
@@ -349,13 +359,13 @@ class releases(Spec):
         eq_(changelog['1.1'], [f2, f1, b2, b1, s2, s1])
 
     def rolling_release_works_without_annotation(self):
-        b1 = _issue('bug', '1')
-        b2 = _issue('bug', '2')
-        f3 = _issue('feature', '3')
-        f4 = _issue('feature', '4')
-        f5 = _issue('feature', '5')
-        b6 = _issue('bug', '6')
-        f7 = _issue('feature', '7')
+        b1 = _b(1)
+        b2 = _b(2)
+        f3 = _f(3)
+        f4 = _f(4)
+        f5 = _f(5)
+        b6 = _b(6)
+        f7 = _f(7)
         changelog = _changelog2dict(_releases(
             '2.1.0', '2.0.1', f7, b6, '2.0.0', f5, f4, '1.1.0', '1.0.1',
             f3, b2, b1,
@@ -407,7 +417,7 @@ class nodes(Spec):
         app = _app(**kwargs)
         nodes = construct_nodes(construct_releases([
             _release('1.0.2', app=app),
-            _entry(_issue('bug', 15, app=app)),
+            _entry(_b(15, app=app)),
             _release('1.0.0'),
         ], app=app))
         if type_ == 'release':
@@ -466,11 +476,11 @@ class nodes(Spec):
         self._assert_prefix(['1.1.0', self.s], 'Support')
 
     def dashed_issues_appear_as_unlinked_issues(self):
-        node = self._generate('1.0.2', _issue('bug', '-'))
+        node = self._generate('1.0.2', _b('-'))
         assert not isinstance(node[0][2], reference)
 
     def zeroed_issues_appear_as_unlinked_issues(self):
-        node = self._generate('1.0.2', _issue('bug', '0'))
+        node = self._generate('1.0.2', _b(0))
         assert not isinstance(node[0][2], reference)
 
     def un_prefixed_list_items_appear_as_unlinked_bugs(self):
@@ -525,7 +535,7 @@ class nodes(Spec):
 
     def descriptions_are_parsed_for_issue_roles(self):
         item = list_item('',
-            paragraph('', '', self.b.deepcopy(), _issue('support', '5'))
+            paragraph('', '', self.b.deepcopy(), _s(5))
         )
         para = self._generate('1.0.2', item)[0]
         # Sanity check - in a broken parsing scenarion, the 4th child will be a
