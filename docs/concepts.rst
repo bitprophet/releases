@@ -65,8 +65,8 @@ for details on formatting/etc.
 
     * Result:
 
-        * ``1.0.1``: bug #1, bug #3
         * ``1.1.0``: feature #2, support #4
+        * ``1.0.1``: bug #1, bug #3
 
 * **Bugfixes are assumed to backport to all stable release lines by default,
   and are displayed as such.** However, this can be overridden on a per-release
@@ -85,10 +85,10 @@ for details on formatting/etc.
 
     * Result:
 
-        * ``1.0.1``: bug #1
-        * ``1.1.0``: feature #2
-        * ``1.0.2``: bug #3
         * ``1.1.1``: bug #3
+        * ``1.0.2``: bug #3
+        * ``1.1.0``: feature #2
+        * ``1.0.1``: bug #1
 
 * **Bugfixes marked 'major' go into feature releases instead.**
 
@@ -103,8 +103,8 @@ for details on formatting/etc.
 
     * Result:
 
-        * ``1.0.1``: bug #1
         * ``1.1.0``: feature #2, bug #3
+        * ``1.0.1``: bug #1
 
 * **Features or support items marked 'backported' appear in both bugfix and
   feature releases.**
@@ -121,8 +121,8 @@ for details on formatting/etc.
 
     * Result:
 
-        * ``1.0.1``: bug #1, feature #2, bug #4
         * ``1.1.0``: feature #2, feature #3
+        * ``1.0.1``: bug #1, feature #2, bug #4
 
 * **Releases implicitly include all issues from their own, and prior, release
   lines.** (Again, unless the release explicitly states otherwise - see below.)
@@ -141,8 +141,8 @@ for details on formatting/etc.
 
     * Again, to be explicit, the rendered changelog displays this breakdown:
 
-        * ``1.0.1``: bug #1, bug #3
         * ``1.1.0``: feature #2
+        * ``1.0.1``: bug #1, bug #3
 
       But it's *implied* that ``1.1.0`` includes the contents of ``1.0.1``
       because it released afterwards/simultaneously and is a higher release
@@ -203,14 +203,14 @@ for details on formatting/etc.
 
     * Result:
 
-        * ``1.5.1``: bug #20
-        * ``1.6.0``: feature #22
-        * ``1.5.2``: bugs #34, #35
-        * ``1.6.1``: bugs #34, #35
-        * ``1.7.0``: feature #25
-        * ``1.5.3``: bug #50 only
-        * ``1.6.2``: bugs #50 and #42
         * ``1.7.1``: bugs #50 and #42
+        * ``1.6.2``: bugs #50 and #42
+        * ``1.5.3``: bug #50 only
+        * ``1.7.0``: feature #25
+        * ``1.6.1``: bugs #34, #35
+        * ``1.5.2``: bugs #34, #35
+        * ``1.6.0``: feature #22
+        * ``1.5.1``: bug #20
 
 
 Major releases
@@ -228,10 +228,10 @@ versions plural) becomes a bit more work.
 There are two main rules to keep in mind when dealing with "mixed" major
 versions:
 
-* **All issues encountered after a major release are considered
-  associated with that major release by default.**
-* **To force association with a different major release (or set of major
-  releases), issues may specify a 'version spec'.**
+* **All issues encountered after a major release** are considered
+  associated with that major release **by default**.
+* To force association with a **different major release** (or set of major
+  releases), issues may **specify a 'version spec'** annotation.
 
 Here's some examples to clarify.
 
@@ -259,11 +259,11 @@ Input::
 
 Result:
 
-* ``1.0.1``: bug #1, bug #2
-* ``1.1.0``: feature #3
-* ``2.0.0``: feature #4, feature #5
-* ``2.0.1``: bug #6
 * ``2.1.0``: feature #7
+* ``2.0.1``: bug #6
+* ``2.0.0``: feature #4, feature #5
+* ``1.1.0``: feature #3
+* ``1.0.1``: bug #1, bug #2
 
 Pretty simple, nothing actually new here.
 
@@ -300,14 +300,14 @@ continuing 1.x releases are listed alongside the 2.x ones::
 
 Result:
 
-* ``1.0.1``: bug #1, bug #2
-* ``1.1.0``: feature #3
-* ``2.0.0``: feature #4, feature #5
-* ``1.0.2``: bug #6
-* ``1.1.1``: bug #6
-* ``1.2.0``: feature #7
-* ``2.0.1``: bug #6
 * ``2.1.0``: feature #7
+* ``2.0.1``: bug #6
+* ``1.2.0``: feature #7
+* ``1.1.1``: bug #6
+* ``1.0.2``: bug #6
+* ``2.0.0``: feature #4, feature #5
+* ``1.1.0``: feature #3
+* ``1.0.1``: bug #1, bug #2
 
 Some issues forward-ported, others not
 --------------------------------------
@@ -356,11 +356,11 @@ line::
 
 Result:
 
-* ``1.0.1``: bug #1, bug #2
-* ``1.1.0``: feature #3
-* ``2.0.0``: feature #4, feature #5
-* ``1.0.2``: bug #6, bug #7
-* ``1.1.1``: bug #6, bug #7
-* ``1.2.0``: feature #9 (but not #8)
-* ``2.0.1``: bug #6 (but not #7)
 * ``2.1.0``: feature #8, feature #9
+* ``2.0.1``: bug #6 (but not #7)
+* ``1.2.0``: feature #9 (but not #8)
+* ``1.1.1``: bug #6, bug #7
+* ``1.0.2``: bug #6, bug #7
+* ``2.0.0``: feature #4, feature #5
+* ``1.1.0``: feature #3
+* ``1.0.1``: bug #1, bug #2
