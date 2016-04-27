@@ -230,8 +230,8 @@ versions plural) becomes a bit more work.
 There are two main rules to keep in mind when dealing with "mixed" major
 versions:
 
-* **All issues encountered after a major release** are considered
-  associated with that major release **by default**.
+* **All issues encountered after, or immediately prior to, a major release**
+  are considered associated with that major release **by default**.
 * To force association with a **different major release** (or set of major
   releases), issues may **specify a 'version spec'** annotation.
 
@@ -240,8 +240,10 @@ Here's some examples to clarify.
 "Rolling" releases
 ------------------
 
-No actual mixing of release lines, just moving from 1.x to 2.x. 1.x is
-effectively abandoned. (Hope 2.x is an easy upgrade...)
+This example has no mixing of release lines, just moving from 1.x to 2.x. 1.x
+is effectively abandoned. (Hope 2.x is an easy upgrade...) Note how features 4
+and 5, because they are encountered prior to 2.0.0, are attached to it
+automatically.
 
 Input::
     
@@ -368,3 +370,28 @@ Result:
 * ``2.0.0``: feature #4, feature #5
 * ``1.1.0``: feature #3
 * ``1.0.1``: bug #1, bug #2
+
+
+Mixed-but-exclusive features prior to a new major release
+---------------------------------------------------------
+
+This example illustrates a corner case where one is actively maintaining a
+"current" 1.x line at the same time as releasing the new 2.x line. Unlike the
+earlier examples, this one has both "2.0-only" *and* "1.0-only" features in the
+run-up to 2.0.0.
+
+In this scenario, the non-annotated releases are automatically assigned to the
+2.0 major version, even though the 1.2.0 minor version technically comes out
+"before" 2.0.0.
+
+As long as no non-release line items appear between 1.2.0 and 2.0.0, the
+system will behave as if 2.0.0 was the "primary" next release, with 1.2.0
+only capturing features explicitly annotated as being "<2.0" or ">=1.0" (or
+similar).
+
+.. note::
+    This behavior holds true even if the adjacent release line-items have
+    different dates; the heuristic is solely about their placement in the
+    changelog list.
+
+TK
