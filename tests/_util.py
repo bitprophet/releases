@@ -1,12 +1,12 @@
 from tempfile import mkdtemp
 from shutil import rmtree
 
-import six
-from mock import Mock
 from docutils.nodes import (
     list_item, paragraph,
 )
+from mock import Mock
 from sphinx.application import Sphinx
+import six
 import sphinx
 
 from releases import (
