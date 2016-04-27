@@ -317,7 +317,36 @@ lists.
 
     # Add to per-release bugfix lines and/or unreleased bug/feature buckets, as
     # necessary.
-    focus.add_self_to_lines(lines)
+    focus.add_to_lines(lines)
+
+
+def handle_upcoming_major_release(entries, lines):
+    # Short-circuit if the future holds nothing for us
+    if not entries:
+        return
+    # Short-circuit if we're in the middle of a block of releases, only the
+    # last release before a bunch of issues, should be taking any action.
+    if isinstance(entries[0], Release):
+        return
+    # Iterate through entries til we find the next Release or set of Releases
+    next_releases = []
+    for index, obj in enumerate(entries):
+        if isinstance(obj, Release):
+            next_releases.append(obj)
+        # Non-empty next_releases + encountered a non-release = done w/ release
+        # block.
+        elif next_releases:
+            break
+    # Examine result: is a major release present? If so, add its major number
+    # to the lines structure!
+    for obj in next_releases:
+        # TODO: update when Release gets tied closer w/ Version
+        version = Version(obj.number)
+        if version.minor == 0 and version.patch == 0:
+            lines[obj.family] = {
+                'unreleased_bugfix': [],
+                'unreleased_feature': [],
+            }
 
 
 def construct_releases(entries, app):
@@ -332,7 +361,12 @@ def construct_releases(entries, app):
     # in explicitly defined release lists.
     issues = {}
 
-    for obj in reversed(entries):
+    reversed_entries = list(reversed(entries))
+    # For the lookahead, so we're not doing this stripping O(n) times.
+    # TODO: probs just merge the two into e.g. a list of 2-tuples of "actual
+    # entry obj + rest"?
+    stripped_entries = [x[0][0] for x in reversed_entries]
+    for index, obj in enumerate(reversed_entries):
         # Issue object is always found in obj (LI) index 0 (first, often only
         # P) and is the 1st item within that (index 0 again).
         # Preserve all other contents of 'obj'.
@@ -347,6 +381,12 @@ def construct_releases(entries, app):
             construct_entry_with_release(
                 focus, issues, lines, log, releases, rest
             )
+            # After each release is handled, look ahead to see if we're
+            # entering "last stretch before a major release". If so,
+            # pre-emptively update the lines structure so upcoming features are
+            # correctly sorted into that major release by default (re: logic in
+            # Release.add_to_lines)
+            handle_upcoming_major_release(stripped_entries[index + 1:], lines)
 
         # Entries get copied into release line buckets as follows:
         # * Features and support go into 'unreleased_feature' for use in new

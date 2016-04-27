@@ -57,7 +57,7 @@ class Issue(nodes.Element):
     def line(self):
         return self.get('line', None)
 
-    def add_self_to_lines(self, lines):
+    def add_to_lines(self, lines):
         """
         Given a 'lines' structure, add self to one or more of its 'buckets'.
         """
@@ -66,7 +66,6 @@ class Issue(nodes.Element):
             spec = Spec(">={0}".format(self.line))
         else:
             spec = default_spec(lines.keys())
-            print("default spec for {0} (given {2}): {1}".format(self.number, spec, lines))
         # Only look in appropriate major version/family; if self is an issue
         # declared as living in e.g. >=2, this means we don't even bother
         # looking in the 1.x family.
@@ -83,10 +82,12 @@ class Issue(nodes.Element):
             # TODO: handle actual spec-like bits, self.line currently is only
             # looking for the '+' format...
             # Select matching release lines (& stringify)
-            buckets = [str(x) for x in spec.filter(candidates)]
+            buckets = []
+            bugfix_buckets = [str(x) for x in spec.filter(candidates)]
             # Add back in unreleased_* as appropriate
             # TODO: probably leverage Issue subclasses for this eventually?
             if self.type == 'bug' or self.backported:
+                buckets.extend(bugfix_buckets)
                 buckets.append('unreleased_bugfix')
             if self.type != 'bug' or self.major:
                 buckets.append('unreleased_feature')
