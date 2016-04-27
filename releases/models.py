@@ -53,6 +53,10 @@ class Issue(nodes.Element):
     def number(self):
         return self.get('number', None)
 
+    # TODO: rename both of the below, apparently 'line' is a semi-reserved
+    # method/attribute upstream now so bug #44 is probably due in part due to
+    # us shadowing it unintentionally.
+    # TODO: kinda wanted to do that anyways though since it's now 'spec' or w/e
     @property
     def line(self):
         return self.get('line', None)
