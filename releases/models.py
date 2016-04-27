@@ -30,6 +30,10 @@ class Issue(nodes.Element):
     def line(self):
         return self.get('line', None)
 
+    @line.setter
+    def line(self, value):
+        self['line'] = value
+        
     def __repr__(self):
         flag = ''
         if self.backported:
