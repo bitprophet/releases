@@ -16,6 +16,7 @@ setup(
     author_email='jeff@bitprophet.org',
     url='https://github.com/bitprophet/releases',
     packages=['releases'],
+    install_requires=['semantic_version<3.0'],
     classifiers=[
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',

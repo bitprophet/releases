@@ -2,6 +2,13 @@
 Changelog
 =========
 
+* :feature:`45` Add support for major version transitions (e.g. 1.0 to 2.0).
+
+  .. note::
+    This adds a new install-time dependency: the `semantic_version library
+    <https://python-semanticversion.readthedocs.org/en/latest/>`_. It's pure
+    Python, so installation should be trivial.
+
 * :release:`1.0.0 <2015-11-05>`
 * :feature:`42` For readability, issues within each release so they are
   displayed in feature->bug->support order.
