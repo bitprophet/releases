@@ -84,7 +84,7 @@ Specifically:
           1.3 and 1.4, you might specify ``:bug:`55 (1.3+)``` to note that bug
           55 only applies to releases in 1.3 and above - not 1.2.
         * A `semantic version range spec covering minor+major version numbers
-          <https://python-semanticversion.readthedocs.org/en/latest/reference.html#version-specifications-the-spec-class>`_
+          <https://python-semanticversion.readthedocs.io/en/latest/reference.html#version-specifications-the-spec-class>`_
           such as ``(<2.0)`` or ``(>=1.0,<3.1)``. A more powerful version of
           ``(N.N+)`` allowing annotation of issues belonging to specific major
           versions.
@@ -104,7 +104,7 @@ Specifically:
 Then build your docs; in the rendered output, ``changelog.html`` should show
 issues grouped by release, as per the above rules. Examples: `Releases' own
 rendered changelog
-<http://releases.readthedocs.org/en/latest/changelog.html>`_, `Fabric's
+<http://releases.readthedocs.io/en/latest/changelog.html>`_, `Fabric's
 rendered changelog <http://www.fabfile.org/changelog.html>`_.
 
 

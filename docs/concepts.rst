@@ -333,7 +333,7 @@ use one you're familiar with from packaging systems like
 * ``(>=2.0,<3.0)`` limits an issue to *just* the 2.x line, preventing its
   inclusion in 1.x, 3.x or anything else.
 * And so on; see the documentation for the ``Spec`` class at
-  https://python-semanticversion.readthedocs.org for details.
+  https://python-semanticversion.readthedocs.io for details.
 * To be clear, **you may put any combination of major+minor version number in
   these annotations**, just as with the simpler ``(1.5+)`` style format.
 

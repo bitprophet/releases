@@ -6,8 +6,8 @@ Changelog
 
   .. note::
     This adds a new install-time dependency: the `semantic_version library
-    <https://python-semanticversion.readthedocs.org/en/latest/>`_. It's pure
-    Python, so installation should be trivial.
+    <https://python-semanticversion.readthedocs.io>`_. It's pure Python, so
+    installation should be trivial.
 
 * :bug:`44` Update one of our internal docutils-related classes for
   compatibility with Sphinx 1.4.x. Thanks to Gabi Davar for catch & patch.

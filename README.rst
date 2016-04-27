@@ -23,7 +23,7 @@ Specifically:
 Some background on why this tool was created can be found in `this blog post
 <http://bitprophet.org/blog/2013/09/14/a-better-changelog/>`_.
 
-For more documentation, please see http://releases.readthedocs.org.
+For more documentation, please see http://releases.readthedocs.io.
 
 .. note::
     You can install the `development version
