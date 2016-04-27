@@ -57,6 +57,10 @@ class Issue(nodes.Element):
     def line(self):
         return self.get('line', None)
 
+    @line.setter
+    def line(self, value):
+        self['line'] = value
+
     def add_to_lines(self, lines):
         """
         Given a 'lines' structure, add self to one or more of its 'buckets'.

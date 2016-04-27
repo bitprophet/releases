@@ -9,6 +9,8 @@ Changelog
     <https://python-semanticversion.readthedocs.org/en/latest/>`_. It's pure
     Python, so installation should be trivial.
 
+* :bug:`44` Update one of our internal docutils-related classes for
+  compatibility with Sphinx 1.4.x. Thanks to Gabi Davar for catch & patch.
 * :release:`1.0.0 <2015-11-05>`
 * :feature:`42` For readability, issues within each release so they are
   displayed in feature->bug->support order.
