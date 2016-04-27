@@ -12,6 +12,7 @@ from releases import (
 from _util import (
     b, f, s,
     changelog2dict,
+    expect_releases,
     make_app,
     release_list,
     releases,
@@ -237,22 +238,18 @@ class organization(Spec):
         f5 = f(5)
         b6 = b(6)
         f7 = f(7)
-        changelog = changelog2dict(releases(
-            '2.1.0', '2.0.1', f7, b6, '2.0.0', f5, f4, '1.1.0', '1.0.1',
-            f3, b2, b1,
-        ))
-        err = "Got unexpected contents for {0}: wanted {1}, got {2}"
-        for rel, issues in six.iteritems({
+        entries = (
+            '2.1.0', '2.0.1', f7, b6, '2.0.0', f5, f4, '1.1.0', '1.0.1', f3,
+            b2, b1
+        )
+        expected = {
             '1.0.1': [b1, b2],
             '1.1.0': [f3],
             '2.0.0': [f4, f5],
             '2.0.1': [b6],
             '2.1.0': [f7],
-        }):
-            eq_(
-                changelog[rel], issues,
-                err.format(rel, issues, changelog[rel])
-            )
+        }
+        expect_releases(entries, expected)
 
     def plus_annotations_let_old_lines_continue_getting_released(self):
         b9 = b(9)
@@ -264,12 +261,11 @@ class organization(Spec):
         f3 = f(3)
         b2 = b(2)
         b1 = b(1)
-        changelog = changelog2dict(releases(
+        entries = (
             '2.1.0', '2.0.1', '1.2.0', '1.1.1', '1.0.2', b9, f8, f7, b6,
             '2.0.0', f5, f4, '1.1.0', '1.0.1', f3, b2, b1,
-        ))
-        err = "Got unexpected contents for {0}: wanted {1}, got {2}"
-        for rel, issues in six.iteritems({
+        )
+        expected = {
             '2.1.0': [f7, f8],
             '2.0.1': [b6, b9],
             '1.2.0': [f7], # but not f8
@@ -278,11 +274,8 @@ class organization(Spec):
             '2.0.0': [f4, f5],
             '1.1.0': [f3],
             '1.0.1': [b1, b2],
-        }):
-            eq_(
-                changelog[rel], issues,
-                err.format(rel, issues, changelog[rel])
-            )
+        }
+        expect_releases(entries, expected)
 
     def semver_spec_annotations_allow_preventing_forward_porting(self):
         skip()
