@@ -86,7 +86,7 @@ class Issue(nodes.Element):
             bugfix_buckets = [str(x) for x in spec.filter(candidates)]
             # Add back in unreleased_* as appropriate
             # TODO: probably leverage Issue subclasses for this eventually?
-            if self.type == 'bug' or self.backported:
+            if (self.type == 'bug' and not self.major) or self.backported:
                 buckets.extend(bugfix_buckets)
                 buckets.append('unreleased_bugfix')
             if self.type != 'bug' or self.major:

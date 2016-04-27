@@ -177,9 +177,9 @@ class organization(Spec):
         assert f2 in rendered['1.1.0']
         assert f1 not in rendered['1.1.0']
         # unreleased feature list should still get/see feature 1
-        assert f1 in rendered['unreleased_feature']
+        assert f1 in rendered['unreleased_1.x_feature']
         # now-released feature 2 should not be in unreleased_feature
-        assert f2 not in rendered['unreleased_feature']
+        assert f2 not in rendered['unreleased_1.x_feature']
 
     def explicit_bugfix_releases_get_removed_from_unreleased(self):
         b1 = b(1)

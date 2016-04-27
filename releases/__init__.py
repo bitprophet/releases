@@ -221,9 +221,9 @@ def construct_entry_with_release(focus, issues, lines, log, releases, rest):
                 # Regular bugfix: remove from bucket for this release's
                 # line + unreleased_bugfix
                 else:
-                    log("Removing #%s from unreleased" % obj.number)
-                    lines[focus.family]['unreleased_bugfix'].remove(obj)
-                    # TODO: why wouldn't it be in the bucket??
+                    if obj in lines[focus.family]['unreleased_bugfix']:
+                        log("Removing #%s from unreleased" % obj.number)
+                        lines[focus.family]['unreleased_bugfix'].remove(obj)
                     if obj in lines[focus.family][focus.line]:
                         log("Removing #%s from %s" % (obj.number, focus.line))
                         lines[focus.family][focus.line].remove(obj)
