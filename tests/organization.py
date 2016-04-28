@@ -320,6 +320,37 @@ class organization(Spec):
         }
         expect_releases(entries, expected)
 
+    def bugs_before_major_releases_associate_with_previous_release(self):
+        b1 = b(1)
+        b2 = b(2)
+        f3 = f(3)
+        f4 = f(4)
+        f5 = f(5, spec="<2.0")
+        b6 = b(6)
+
+        entries = (
+            '2.0.0',
+            '1.2.0',
+            '1.1.1',
+            b6,
+            f5,
+            f4,
+            '1.1.0',
+            '1.0.1',
+            f3,
+            b2,
+            b1,
+        )
+
+        expected = {
+            '2.0.0': [f4], # but not f5
+            '1.2.0': [f5], # but not f4
+            '1.1.1': [b6],
+            '1.1.0': [f3],
+            '1.0.1': [b1, b2]
+        }
+        expect_releases(entries, expected)
+
     def semver_double_ended_specs_work_when_more_than_two_major_versions(self):
         skip()
 
