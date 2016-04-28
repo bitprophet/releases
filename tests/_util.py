@@ -5,7 +5,7 @@ from docutils.nodes import (
     list_item, paragraph,
 )
 from mock import Mock
-from spec import eq_
+from spec import eq_, ok_
 from sphinx.application import Sphinx
 import six
 import sphinx
@@ -153,4 +153,10 @@ def expect_releases(entries, release_map, skip_initial=False):
     changelog = changelog2dict(releases(*entries, **kwargs))
     err = "Got unexpected contents for {0}: wanted {1}, got {2}"
     for rel, issues in six.iteritems(release_map):
-        eq_(changelog[rel], issues, err.format(rel, issues, changelog[rel]))
+        found = changelog.pop(rel)
+        eq_(found, issues, err.format(rel, issues, found))
+    # Sanity: ensure no leftover issue lists exist (empty ones are OK)
+    for key in changelog.keys():
+        if not changelog[key]:
+            del changelog[key]
+    ok_(not changelog, "Found leftovers: {0}".format(changelog))
