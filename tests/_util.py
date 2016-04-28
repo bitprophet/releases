@@ -156,7 +156,7 @@ def expect_releases(entries, release_map, skip_initial=False):
         found = changelog.pop(rel)
         eq_(found, issues, err.format(rel, issues, found))
     # Sanity: ensure no leftover issue lists exist (empty ones are OK)
-    for key in changelog.keys():
+    for key in list(changelog.keys()):
         if not changelog[key]:
             del changelog[key]
     ok_(not changelog, "Found leftovers: {0}".format(changelog))
