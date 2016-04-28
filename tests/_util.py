@@ -116,7 +116,8 @@ def release(number, **kwargs):
     )[0]
     return list_item('', paragraph('', '', *nodes))
 
-def release_list(*entries):
+def release_list(*entries, **kwargs):
+    skip_initial = kwargs.pop('skip_initial', False)
     entries = list(entries) # lol tuples
     # Translate simple objs into changelog-friendly ones
     for index, item in enumerate(entries):
@@ -125,7 +126,8 @@ def release_list(*entries):
         else:
             entries[index] = entry(item)
     # Insert initial/empty 1st release to start timeline
-    entries.append(release('1.0.0'))
+    if not skip_initial:
+        entries.append(release('1.0.0'))
     return entries
 
 def changelog2dict(changelog):
@@ -146,8 +148,9 @@ def setup_issues(self):
     self.bf = f(27, backported=True)
     self.bs = s(29, backported=True)
 
-def expect_releases(entries, release_map):
-    changelog = changelog2dict(releases(*entries))
+def expect_releases(entries, release_map, skip_initial=False):
+    kwargs = {'skip_initial': skip_initial}
+    changelog = changelog2dict(releases(*entries, **kwargs))
     err = "Got unexpected contents for {0}: wanted {1}, got {2}"
     for rel, issues in six.iteritems(release_map):
         eq_(changelog[rel], issues, err.format(rel, issues, changelog[rel]))

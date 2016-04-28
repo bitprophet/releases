@@ -282,3 +282,19 @@ class organization(Spec):
 
     def semver_double_ended_specs_work_when_more_than_two_major_versions(self):
         skip()
+
+    def issues_before_first_release_function_correctly(self):
+        f0 = f(0)
+        b1 = b(1)
+        f2 = f(2)
+        entries = (
+            '0.2.0', f2, '0.1.1', b1, '0.1.0', f0
+        )
+        expected = {
+            '0.1.0': [f0],
+            '0.1.1': [b1],
+            '0.2.0': [f2],
+        }
+        # Make sure to skip typically-implicit 1.0.0 release.
+        # TODO: consider removing that entirely; arguably needing it is a bug?
+        expect_releases(entries, expected, skip_initial=True)
