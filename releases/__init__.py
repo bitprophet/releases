@@ -165,7 +165,7 @@ def append_unreleased_entries(app, lines, releases):
     for family, _lines in six.iteritems(lines):
         for type_ in ('bugfix', 'feature'):
             issues =  _lines['unreleased_{0}'.format(type_)]
-            fam_prefix = "{0} ".format(family) if len(lines) > 1 else ""
+            fam_prefix = "{0}.x ".format(family) if len(lines) > 1 else ""
             header = "Next {0}{1} release".format(fam_prefix, type_)
             nodelist = [release_nodes(
                 header,

@@ -181,16 +181,26 @@ class presentation(Spec):
         assert 'Support' in para[4].astext()
 
     def unreleased_buckets_omit_major_version_when_only_one_exists(self):
-        # I.e. "Next bugfix release" as before
         result = self._generate(b(1), raw=True)[0][0][0]
         html = str(result) # since repr() from test-fail hides actual text
         assert "Next bugfix release" in html
 
     def unreleased_buckets_display_major_version_when_multiple(self):
-        # I.e. "Next 1.x bugfix release"
-        skip()
+        entries = (
+            b(3), # should appear in unreleased bugs for 2.x
+            '2.0.0',
+            b(2), # should appear in unreleased bugs for 1.x
+            '1.0.1',
+            b(1),
+        )
+        # Expectation: [2.x unreleased, 1.x unreleased, 1.0.1]
+        two_x, one_x, _ = self._generate(*entries, raw=True)
+        html = str(two_x[0][0])
+        assert "Next 2.x bugfix release" in html
+        html = str(one_x[0][0])
+        assert "Next 1.x bugfix release" in html
 
-    def unreleased_displays_version_even_when_only_one_present(self):
+    def unreleased_displays_version_when_multiple_potential_lines_active(self):
         # I.e. if there's unreleased 1.x stuff but no unreleased 2.x, still
         # display the "1.x".
         skip()
