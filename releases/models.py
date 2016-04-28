@@ -1,5 +1,6 @@
 from docutils import nodes
 from semantic_version import Version as StrictVersion, Spec
+import six
 
 
 class Version(StrictVersion):
@@ -8,24 +9,6 @@ class Version(StrictVersion):
     """
     def __init__(self, version_string, partial=True):
         super(Version, self).__init__(version_string, partial)
-
-
-def default_spec(families):
-    """
-    Given iterable of major release numbers, return a default Spec for issues.
-
-    Specifically:
-
-    * Normally, only the highest major release is used, so given ``[1, 2]``
-      this will simply return something like ``Spec(">=2")``.
-    * When ``releases_always_forwardport`` is ``True``, that behavior is
-      nullified, and this function always returns the empty ``Spec`` (which
-      matches any and all versions/lines).
-    """
-    default = Spec()
-    if True: # TODO: if app->config-><releases_always_forwardport or w/e
-        default = Spec(">={0}".format(max(families)))
-    return default
 
 
 # Issue type list (keys) + color values
@@ -68,12 +51,47 @@ class Issue(nodes.Element):
     def spec(self):
         return self.get('spec', None)
 
+    def default_spec(self, lines):
+        """
+        Given the current release-lines structure, return a default Spec.
+
+        Specifics:
+
+        * For feature-like issues, only the highest major release is used, so
+          given a ``lines`` with top level keys of ``[1, 2]``, this would
+          return ``Spec(">=2")``.
+
+            * When ``releases_always_forwardport_features`` is ``True``, that
+              behavior is nullified, and this function always returns the empty
+              ``Spec`` (which matches any and all versions/lines).
+
+        * For bugfix-like issues, we only consider major release families which
+          have actual releases already.
+
+            * Thus the core difference here is that features are 'consumed' by
+              upcoming major releases, and bugfixes are not.
+        """
+        # TODO: I feel like this + the surrounding bits in add_to_lines() could
+        # be consolidated & simplified...
+        default = Spec()
+        if self.is_featurelike:
+            # TODO: if app->config-><releases_always_forwardport_features or w/e
+            if True:
+                default = Spec(">={0}".format(max(lines.keys())))
+        else:
+            # TODO: yea deffo need a real object for 'lines', heh
+            default = Spec(">={0}".format(max(
+                key for key, value in six.iteritems(lines)
+                if any(x for x in value if not x.startswith('unreleased'))
+            )))
+        return default
+
     def add_to_lines(self, lines):
         """
         Given a 'lines' structure, add self to one or more of its 'buckets'.
         """
         # Derive version spec allowing us to filter against major/minor buckets
-        spec = self.spec or default_spec(lines.keys())
+        spec = self.spec or self.default_spec(lines)
         # Only look in appropriate major version/family; if self is an issue
         # declared as living in e.g. >=2, this means we don't even bother
         # looking in the 1.x family.
