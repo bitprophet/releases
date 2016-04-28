@@ -182,7 +182,9 @@ class presentation(Spec):
 
     def unreleased_buckets_omit_major_version_when_only_one_exists(self):
         # I.e. "Next bugfix release" as before
-        skip()
+        result = self._generate(b(1), raw=True)[0][0][0]
+        html = str(result) # since repr() from test-fail hides actual text
+        assert "Next bugfix release" in html
 
     def unreleased_buckets_display_major_version_when_multiple(self):
         # I.e. "Next 1.x bugfix release"
