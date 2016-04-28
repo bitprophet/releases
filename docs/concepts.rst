@@ -348,7 +348,7 @@ line::
     * :feature:`9 (>=1.0)` A new feature that works with both versions (using
       the more explicit version of "1.0+")
     * :feature:`8` A new feature that only works on 2.x (no annotation needed)
-    * :bug:`7 (<2.0) A bug only affecting 1.x
+    * :bug:`7 (<2.0)` A bug only affecting 1.x
     * :bug:`6 (1.0+)` A bug affecting all versions
     * :release:`2.0.0 <date>`
     * :feature:`5` Another (backwards incompatible) feature!
