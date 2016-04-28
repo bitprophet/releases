@@ -6,7 +6,7 @@ python:
   - "3.4"
   - "3.5"
   - "pypy"
-  - "pypy3"
+  #- "pypy3" # Looks like Sphinx (as of 1.4.1) is not pypy3 compat
 install:
   - pip install -r dev-requirements.txt
 script:
