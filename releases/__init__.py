@@ -48,7 +48,7 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     was a major bug released in a feature release. May give a 'ticket number'
     of ``-`` or ``0`` to generate no hyperlink.
     """
-    issue_no, _, ported = utils.unescape(text).partition(' ')
+    issue_no, _, keyword = utils.unescape(text).partition(' ')
     # Lol @ access back to Sphinx
     config = inliner.document.settings.env.app.config
     if issue_no not in ('-', '0'):
@@ -66,8 +66,8 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     if name in ISSUE_TYPES:
         nodelist = issue_nodelist(name, link)
         spec = None
-        # Sanity check
-        if ported not in ('backported', 'major', ''):
+        # Handle non-simple keyword values
+        if keyword not in ('backported', 'major', ''):
             match = release_line_re.match(ported)
             if not match:
                 err = "Gave unknown issue metadata '{0} for issue no. {1}"
@@ -79,8 +79,8 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
             number=issue_no,
             type_=name,
             nodelist=nodelist,
-            backported=(ported == 'backported'),
-            major=(ported == 'major'),
+            backported=(keyword == 'backported'),
+            major=(keyword == 'major'),
             spec=spec,
         )
         return [node], []
