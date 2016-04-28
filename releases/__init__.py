@@ -48,7 +48,6 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     was a major bug released in a feature release. May give a 'ticket number'
     of ``-`` or ``0`` to generate no hyperlink.
     """
-    # Old-style 'just the issue link' behavior
     issue_no, _, ported = utils.unescape(text).partition(' ')
     # Lol @ access back to Sphinx
     config = inliner.document.settings.env.app.config
