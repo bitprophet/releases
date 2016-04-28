@@ -79,7 +79,10 @@ class Issue(nodes.Element):
             if True:
                 default = Spec(">={0}".format(max(lines.keys())))
         else:
-            # TODO: yea deffo need a real object for 'lines', heh
+            # TODO: yea deffo need a real object for 'lines', heh. E.g. we do a
+            # very similar test for "do you have any actual releases yet?"
+            # elsewhere. (This may be fodder for changing how we roll up
+            # pre-major-release features though...?)
             default = Spec(">={0}".format(max(
                 key for key, value in six.iteritems(lines)
                 if any(x for x in value if not x.startswith('unreleased'))
