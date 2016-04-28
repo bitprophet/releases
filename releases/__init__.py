@@ -30,7 +30,26 @@ def issue_nodelist(name, link=None):
     return signifier + hyperlink + [nodes.inline(text=":")] + trail
 
 
-release_line_re = re.compile(r'\((\d+\.\d+)\+\)') # e.g. '(1.2+)'
+release_line_re = re.compile(r'(\d+\.\d+)\+') # e.g. '1.2+'
+
+def scan_for_spec(keyword):
+    """
+    Attempt to return some sort of Spec from given keyword value.
+
+    Returns None if one could not be derived.
+    """
+    # Both 'spec' formats are wrapped in parens, discard
+    keyword = keyword.lstrip('(').rstrip(')')
+    # First, test for intermediate '1.2+' style
+    matches = release_line_re.findall(keyword)
+    if matches:
+        return Spec(">={0}".format(matches[0]))
+    # Failing that, see if Spec can make sense of it
+    try:
+        return Spec(keyword)
+    # I've only ever seen Spec fail with ValueError.
+    except ValueError:
+        return None
 
 
 def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
@@ -68,12 +87,10 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
         spec = None
         # Handle non-simple keyword values
         if keyword not in ('backported', 'major', ''):
-            match = release_line_re.match(ported)
-            if not match:
-                err = "Gave unknown issue metadata '{0} for issue no. {1}"
-                raise ValueError(err.format(ported, issue_no))
-            else:
-                spec = match.groups()[0]
+            spec = scan_for_spec(keyword)
+            if spec is None: # not backported, major, or valid spec: onoz!
+                err = "Gave unknown keyword {0!r} for issue no. {1}"
+                raise ValueError(err.format(keyword, issue_no))
         # Create temporary node w/ data & final nodes to publish
         node = Issue(
             number=issue_no,

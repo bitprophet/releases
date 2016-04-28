@@ -62,16 +62,13 @@ class Issue(nodes.Element):
         Given a 'lines' structure, add self to one or more of its 'buckets'.
         """
         # Derive version spec allowing us to filter against major/minor buckets
-        if self.spec:
-            # TODO: distinguish between 1.1+ and, well, a real spec
-            spec = Spec(">={0}".format(self.spec))
-        else:
-            spec = default_spec(lines.keys())
+        spec = self.spec or default_spec(lines.keys())
         # Only look in appropriate major version/family; if self is an issue
         # declared as living in e.g. >=2, this means we don't even bother
         # looking in the 1.x family.
         families = [Version(str(x)) for x in lines]
-        for version in spec.filter(families):
+        versions = list(spec.filter(families))
+        for version in versions:
             family = version.major
             # Within each family, we further limit which bugfix lines match up
             # to what self cares about (ignoring 'unreleased' until later)
@@ -102,9 +99,7 @@ class Issue(nodes.Element):
         elif self.major:
             flag = 'major'
         elif self.spec:
-            # TODO: represent +-style specs correctly, or just normalize on
-            # creation & display as >=X.X?
-            flag = self.spec + '+'
+            flag = self.spec
         if flag:
             flag = ' ({0})'.format(flag)
         return '<{issue.type} #{issue.number}{flag}>'.format(issue=self,

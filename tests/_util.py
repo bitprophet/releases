@@ -71,8 +71,8 @@ def issue(type_, number, **kwargs):
         text += " backported"
     if kwargs.get('major', False):
         text += " major"
-    if kwargs.get('line', None):
-        text += " (%s+)" % kwargs['line']
+    if kwargs.get('spec', None):
+        text += " (%s)" % kwargs['spec']
     app = kwargs.get('app', None)
     return issues_role(
         name=type_,

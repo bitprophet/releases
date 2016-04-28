@@ -113,7 +113,7 @@ class organization(Spec):
 
     def release_line_bugfix_specifier(self):
         b50 = b(50)
-        b42 = b(42, line='1.1')
+        b42 = b(42, spec='1.1+')
         f25 = f(25)
         b35 = b(35)
         b34 = b(34)
@@ -254,8 +254,8 @@ class organization(Spec):
     def plus_annotations_let_old_lines_continue_getting_released(self):
         b9 = b(9)
         f8 = f(8)
-        f7 = f(7, line='1.0')
-        b6 = b(6, line='1.0')
+        f7 = f(7, spec="1.0+")
+        b6 = b(6, spec="1.0+")
         f5 = f(5)
         f4 = f(4)
         f3 = f(3)
@@ -294,18 +294,18 @@ class organization(Spec):
             '1.2.0',
             '1.1.1',
             '1.0.2',
-            f(9, spec=">=1.0"),
-            f(8),
-            b(7, spec="<2.0"),
-            b(6, spec="1.0+"),
+            f9,
+            f8,
+            b7,
+            b6,
             '2.0.0',
-            f(5),
-            f(4),
+            f5,
+            f4,
             '1.1.0',
             '1.0.1',
-            f(3),
-            b(2),
-            b(1),
+            f3,
+            b2,
+            b1,
         )
 
         expected = {
