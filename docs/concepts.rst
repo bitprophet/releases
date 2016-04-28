@@ -230,8 +230,10 @@ versions plural) becomes a bit more work.
 There are two main rules to keep in mind when dealing with "mixed" major
 versions:
 
-* **All issues encountered after, or immediately prior to, a major release**
-  are considered associated with that major release **by default**.
+* **All issues encountered after a major release** are considered associated
+  with that major release line **by default**.
+* **All feature-like items (features, support, major bugs) encountered just
+  prior to a major release** are considered part of the major release itself.
 * To force association with a **different major release** (or set of major
   releases), issues may **specify a 'version spec'** annotation.
 
@@ -378,20 +380,44 @@ Mixed-but-exclusive features prior to a new major release
 This example illustrates a corner case where one is actively maintaining a
 "current" 1.x line at the same time as releasing the new 2.x line. Unlike the
 earlier examples, this one has both "2.0-only" *and* "1.0-only" features in the
-run-up to 2.0.0.
+run-up to 2.0.0 (plus bugs).
 
-In this scenario, the non-annotated releases are automatically assigned to the
-2.0 major version, even though the 1.2.0 minor version technically comes out
-"before" 2.0.0.
+In this scenario, the non-annotated features are automatically assigned to the
+2.0 major version, even though the 1.2.0 release technically came out "before"
+2.0.0. 
 
-As long as no non-release line items appear between 1.2.0 and 2.0.0, the
-system will behave as if 2.0.0 was the "primary" next release, with 1.2.0
-only capturing features explicitly annotated as being "<2.0" or ">=1.0" (or
-similar).
+As long as no non-release line items appear between 1.2.0 and 2.0.0, the system
+will behave as if 2.0.0 was the "primary" next release, with 1.2.0 only
+capturing features explicitly annotated as being "<2.0" (or similar).
 
 .. note::
     This behavior holds true even if the adjacent release line-items have
     different dates; the heuristic is solely about their placement in the
     changelog list.
 
-TK
+Note also how bugs found in this window just prior to 2.0.0, remain associated
+with the 1.x line that they are fixing; it wouldn't make sense to publish a
+bugfix for unreleased functionality.
+
+Changelog::
+
+    * :release:`2.0.0 <date>`
+    * :release:`1.2.0 <date>`
+    * :release:`1.1.1 <date>`
+    * :bug:`6` A bug found after 1.1.0 came out
+    * :feature:`5 (<2.0)` A 1.0-only feature!
+    * :feature:`4` A (backwards incompatible) feature!
+    * :release:`1.1.0 <date>`
+    * :release:`1.0.1 <date>`
+    * :feature:`3` New feature
+    * :bug:`2` Another bug
+    * :bug:`1` An bug
+    * :release:`1.0.0 <date>`
+
+Result:
+
+* ``2.0.0``: feature #4 (but not feature #5)
+* ``1.2.0``: feature #5 (but not feature #4)
+* ``1.1.1``: bug 6
+* ``1.1.0``: feature #3
+* ``1.0.1``: bug #1, bug #2
