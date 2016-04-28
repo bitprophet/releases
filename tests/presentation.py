@@ -1,4 +1,4 @@
-from spec import Spec, eq_
+from spec import Spec, eq_, skip
 from docutils.nodes import (
     reference, bullet_list, list_item, raw, paragraph,
 )
@@ -179,3 +179,16 @@ class presentation(Spec):
         _expect_type(para[6], reference)
         eq_(para[6].astext(), '#5')
         assert 'Support' in para[4].astext()
+
+    def unreleased_buckets_omit_major_version_when_only_one_exists(self):
+        # I.e. "Next bugfix release" as before
+        skip()
+
+    def unreleased_buckets_display_major_version_when_multiple(self):
+        # I.e. "Next 1.x bugfix release"
+        skip()
+
+    def unreleased_displays_version_even_when_only_one_present(self):
+        # I.e. if there's unreleased 1.x stuff but no unreleased 2.x, still
+        # display the "1.x".
+        skip()
