@@ -278,7 +278,47 @@ class organization(Spec):
         expect_releases(entries, expected)
 
     def semver_spec_annotations_allow_preventing_forward_porting(self):
-        skip()
+        f9 = f(9, spec=">=1.0")
+        f8 = f(8)
+        b7 = b(7, spec="<2.0")
+        b6 = b(6, spec="1.0+")
+        f5 = f(5)
+        f4 = f(4)
+        f3 = f(3)
+        b2 = b(2)
+        b1 = b(1)
+
+        entries = (
+            '2.1.0',
+            '2.0.1',
+            '1.2.0',
+            '1.1.1',
+            '1.0.2',
+            f(9, spec=">=1.0"),
+            f(8),
+            b(7, spec="<2.0"),
+            b(6, spec="1.0+"),
+            '2.0.0',
+            f(5),
+            f(4),
+            '1.1.0',
+            '1.0.1',
+            f(3),
+            b(2),
+            b(1),
+        )
+
+        expected = {
+            '2.1.0': [f8, f9],
+            '2.0.1': [b6], # (but not #7)
+            '1.2.0': [f9], # (but not #8)
+            '1.1.1': [b6, b7],
+            '1.0.2': [b6, b7],
+            '2.0.0': [f4, f5],
+            '1.1.0': [f3],
+            '1.0.1': [b1, b2],
+        }
+        expect_releases(entries, expected)
 
     def semver_double_ended_specs_work_when_more_than_two_major_versions(self):
         skip()
