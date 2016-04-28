@@ -113,7 +113,11 @@ class Issue(nodes.Element):
             # TODO: probably leverage Issue subclasses for this eventually?
             if self.is_buglike:
                 buckets.extend(bugfix_buckets)
-                buckets.append('unreleased_bugfix')
+                # Don't put into JUST unreleased_bugfix; it implies that this
+                # major release/family hasn't actually seen any releases yet
+                # and only exists for features to go into.
+                if bugfix_buckets:
+                    buckets.append('unreleased_bugfix')
             else:
                 buckets.append('unreleased_feature')
             # Now that we know which buckets are appropriate, add ourself to
