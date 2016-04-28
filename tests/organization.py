@@ -283,6 +283,9 @@ class organization(Spec):
     def semver_double_ended_specs_work_when_more_than_two_major_versions(self):
         skip()
 
+    def can_disable_default_pin_to_latest_major_version(self):
+        skip()
+
     def issues_before_first_release_function_correctly(self):
         f0 = f(0)
         b1 = b(1)
