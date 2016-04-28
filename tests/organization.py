@@ -320,7 +320,7 @@ class organization(Spec):
         }
         expect_releases(entries, expected)
 
-    def bugs_before_major_releases_associate_with_previous_release(self):
+    def bugs_before_major_releases_associate_with_previous_release_only(self):
         b1 = b(1)
         b2 = b(2)
         f3 = f(3)
