@@ -53,25 +53,18 @@ class Issue(nodes.Element):
     def number(self):
         return self.get('number', None)
 
-    # TODO: rename both of the below, apparently 'line' is a semi-reserved
-    # method/attribute upstream now so bug #44 is probably due in part due to
-    # us shadowing it unintentionally.
-    # TODO: kinda wanted to do that anyways though since it's now 'spec' or w/e
     @property
-    def line(self):
-        return self.get('line', None)
-
-    @line.setter
-    def line(self, value):
-        self['line'] = value
+    def spec(self):
+        return self.get('spec', None)
 
     def add_to_lines(self, lines):
         """
         Given a 'lines' structure, add self to one or more of its 'buckets'.
         """
         # Derive version spec allowing us to filter against major/minor buckets
-        if self.line:
-            spec = Spec(">={0}".format(self.line))
+        if self.spec:
+            # TODO: distinguish between 1.1+ and, well, a real spec
+            spec = Spec(">={0}".format(self.spec))
         else:
             spec = default_spec(lines.keys())
         # Only look in appropriate major version/family; if self is an issue
@@ -87,8 +80,6 @@ class Issue(nodes.Element):
                 for x in lines[family]
                 if not x.startswith('unreleased')
             ]
-            # TODO: handle actual spec-like bits, self.line currently is only
-            # looking for the '+' format...
             # Select matching release lines (& stringify)
             buckets = []
             bugfix_buckets = [str(x) for x in spec.filter(candidates)]
@@ -110,8 +101,10 @@ class Issue(nodes.Element):
             flag = 'backported'
         elif self.major:
             flag = 'major'
-        elif self.line:
-            flag = self.line + '+'
+        elif self.spec:
+            # TODO: represent +-style specs correctly, or just normalize on
+            # creation & display as >=X.X?
+            flag = self.spec + '+'
         if flag:
             flag = ' ({0})'.format(flag)
         return '<{issue.type} #{issue.number}{flag}>'.format(issue=self,
@@ -124,7 +117,7 @@ class Release(nodes.Element):
         return self['number']
 
     @property
-    def line(self):
+    def minor(self):
         # TODO: use Version
         return '.'.join(self.number.split('.')[:-1])
 

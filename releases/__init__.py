@@ -66,7 +66,7 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     # Additional 'new-style changelog' stuff
     if name in ISSUE_TYPES:
         nodelist = issue_nodelist(name, link)
-        line = None
+        spec = None
         # Sanity check
         if ported not in ('backported', 'major', ''):
             match = release_line_re.match(ported)
@@ -74,7 +74,7 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
                 err = "Gave unknown issue metadata '{0} for issue no. {1}"
                 raise ValueError(err.format(ported, issue_no))
             else:
-                line = match.groups()[0]
+                spec = match.groups()[0]
         # Create temporary node w/ data & final nodes to publish
         node = Issue(
             number=issue_no,
@@ -82,7 +82,7 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
             nodelist=nodelist,
             backported=(ported == 'backported'),
             major=(ported == 'major'),
-            line=line,
+            spec=spec,
         )
         return [node], []
     # Return old style info for 'issue' for older changelog entries
@@ -183,7 +183,7 @@ def construct_entry_with_release(focus, issues, lines, log, releases, rest):
     Release lines, once the release obj is removed, should be empty or a
     comma-separated list of issue numbers.
     """
-    log("release for line %r" % focus.line)
+    log("release for line %r" % focus.minor)
     # Check for explicitly listed issues first
     explicit = None
     if rest[0].children:
@@ -224,25 +224,25 @@ def construct_entry_with_release(focus, issues, lines, log, releases, rest):
                     if obj in lines[focus.family]['unreleased_bugfix']:
                         log("Removing #%s from unreleased" % obj.number)
                         lines[focus.family]['unreleased_bugfix'].remove(obj)
-                    if obj in lines[focus.family][focus.line]:
-                        log("Removing #%s from %s" % (obj.number, focus.line))
-                        lines[focus.family][focus.line].remove(obj)
+                    if obj in lines[focus.family][focus.minor]:
+                        log("Removing #%s from %s" % (obj.number, focus.minor))
+                        lines[focus.family][focus.minor].remove(obj)
             # Regular feature/support: remove from unreleased_feature
             # Backported feature/support: remove from bucket for this
             # release's line (if applicable) + unreleased_feature
             else:
                 log("Removing #%s from unreleased" % obj.number)
                 lines[focus.family]['unreleased_feature'].remove(obj)
-                if obj in lines[focus.family].get(focus.line, []):
-                    lines[focus.family][focus.line].remove(obj)
+                if obj in lines[focus.family].get(focus.minor, []):
+                    lines[focus.family][focus.minor].remove(obj)
 
     # Implicit behavior otherwise
     else:
         # New release line/branch detected. Create it & dump unreleased
         # features.
-        if focus.line not in lines[focus.family]:
+        if focus.minor not in lines[focus.family]:
             log("not seen prior, making feature release & bugfix bucket")
-            lines[focus.family][focus.line] = []
+            lines[focus.family][focus.minor] = []
             # TODO: this used to explicitly say "go over everything in
             # unreleased_feature and dump if it's feature, support or major
             # bug". But what the hell else would BE in unreleased_feature? Why
@@ -265,9 +265,9 @@ def construct_entry_with_release(focus, issues, lines, log, releases, rest):
             # TODO: as in other branch, I don't get why this wasn't just
             # dumping the whole thing - why would major bugs be in the regular
             # bugfix buckets?
-            entries = lines[focus.family][focus.line][:]
+            entries = lines[focus.family][focus.minor][:]
             releases.append({'obj': focus, 'entries': entries})
-            lines[focus.family][focus.line] = []
+            lines[focus.family][focus.minor] = []
             # Clean out the items we just released from
             # 'unreleased_bugfix'.  (Can't nuke it because there might
             # be some unreleased bugs for other release lines.)
