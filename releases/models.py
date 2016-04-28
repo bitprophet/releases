@@ -42,6 +42,17 @@ class Issue(nodes.Element):
         return self['type_']
 
     @property
+    def is_featurelike(self):
+        if self.type == 'bug':
+            return self.major
+        else:
+            return not self.backported
+
+    @property
+    def is_buglike(self):
+        return not self.is_featurelike
+
+    @property
     def backported(self):
         return self.get('backported', False)
 
@@ -82,10 +93,10 @@ class Issue(nodes.Element):
             bugfix_buckets = [str(x) for x in spec.filter(candidates)]
             # Add back in unreleased_* as appropriate
             # TODO: probably leverage Issue subclasses for this eventually?
-            if (self.type == 'bug' and not self.major) or self.backported:
+            if self.is_buglike:
                 buckets.extend(bugfix_buckets)
                 buckets.append('unreleased_bugfix')
-            if self.type != 'bug' or self.major:
+            else:
                 buckets.append('unreleased_feature')
             # Now that we know which buckets are appropriate, add ourself to
             # all of them. TODO: or just...do it above...instead...
