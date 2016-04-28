@@ -200,7 +200,18 @@ class presentation(Spec):
         html = str(one_x[0][0])
         assert "Next 1.x bugfix release" in html
 
-    def unreleased_displays_version_when_multiple_potential_lines_active(self):
+    def unreleased_displays_version_when_only_some_lines_displayed(self):
         # I.e. if there's unreleased 1.x stuff but no unreleased 2.x, still
         # display the "1.x".
-        skip()
+        entries = (
+            # Note lack of any bugfixes post 2.0.0
+            '2.0.0',
+            b(2),
+            '1.0.1',
+            b(1),
+        )
+        # Expectation: [1.x unreleased, 1.0.1] - no 2.x.
+        result = self._generate(*entries, raw=True)
+        eq_(len(result), 2)
+        html = str(result[0][0][0])
+        assert "Next 1.x bugfix release" in html
