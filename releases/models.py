@@ -121,7 +121,7 @@ class Issue(nodes.Element):
                 # and only exists for features to go into.
                 if bugfix_buckets:
                     buckets.append('unreleased_bugfix')
-            else:
+            if self.is_featurelike or self.backported:
                 buckets.append('unreleased_feature')
             # Now that we know which buckets are appropriate, add ourself to
             # all of them. TODO: or just...do it above...instead...
