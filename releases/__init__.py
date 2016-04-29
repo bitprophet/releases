@@ -61,13 +61,14 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
 
     When invoked otherwise, turns into "[Type] <#NN hyperlink>: ".
 
-    May give a 'ticket number' of '<number> backported' to indicate a
-    backported feature or support ticket. This extra info will be stripped out
-    prior to parsing. May also give 'major' in the same vein, implying the bug
-    was a major bug released in a feature release. May give a 'ticket number'
-    of ``-`` or ``0`` to generate no hyperlink.
+    Spaces present in the "ticket number" are used as fields for keywords
+    (major, backported) and/or specs (e.g. '>=1.0'). This data is removed &
+    used when constructing the object.
+
+    May give a 'ticket number' of ``-`` or ``0`` to generate no hyperlink.
     """
-    issue_no, _, keyword = utils.unescape(text).partition(' ')
+    parts = utils.unescape(text).split()
+    issue_no = parts.pop(0)
     # Lol @ access back to Sphinx
     config = inliner.document.settings.env.app.config
     if issue_no not in ('-', '0'):
@@ -85,12 +86,19 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     if name in ISSUE_TYPES:
         nodelist = issue_nodelist(name, link)
         spec = None
-        # Handle non-simple keyword values
-        if keyword not in ('backported', 'major', ''):
-            spec = scan_for_spec(keyword)
-            if spec is None: # not backported, major, or valid spec: onoz!
-                err = "Gave unknown keyword {0!r} for issue no. {1}"
-                raise ValueError(err.format(keyword, issue_no))
+        keyword = None
+        # TODO: sanity checks re: e.g. >2 parts, >1 instance of keywords, >1
+        # instance of specs, etc.
+        for part in parts:
+            maybe_spec = scan_for_spec(part)
+            if maybe_spec:
+                spec = maybe_spec
+            else:
+                if part in ('backported', 'major'):
+                    keyword = part
+                else:
+                    err = "Gave unknown keyword {0!r} for issue no. {1}"
+                    raise ValueError(err.format(keyword, issue_no))
         # Create temporary node w/ data & final nodes to publish
         node = Issue(
             number=issue_no,
