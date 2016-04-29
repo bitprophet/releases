@@ -339,6 +339,10 @@ use one you're familiar with from packaging systems like
 * To be clear, **you may put any combination of major+minor version number in
   these annotations**, just as with the simpler ``(1.5+)`` style format.
 
+    * This is mostly applicable to bugs or backported issues. Features, support
+      items and major bugs only need to inform Releases about major release
+      lines.
+
 Armed with this more powerful syntax, we can limit some issues just to the 1.x
 line::
 

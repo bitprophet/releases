@@ -89,6 +89,12 @@ Specifically:
           ``(N.N+)`` allowing annotation of issues belonging to specific major
           versions.
 
+      .. note::
+        It is possible to give *both* a regular keyword
+        (``backported``/``major``) *and* a spec (``(N.N+)``/``(>=1.0)``) in
+        the same issue. However, giving two keywords or two specs at the same
+        time makes no sense & is not allowed.
+
 * Regular Sphinx content may be given after issue roles and will be preserved
   as-is when rendering. For example, in ``:bug:`123` Fixed a bug, thanks
   `@somebody`!``, the rendered changelog will preserve/render "Fixed a bug,
