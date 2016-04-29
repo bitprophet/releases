@@ -30,7 +30,7 @@ def issue_nodelist(name, link=None):
     return signifier + hyperlink + [nodes.inline(text=":")] + trail
 
 
-release_line_re = re.compile(r'(\d+\.\d+)\+') # e.g. '1.2+'
+release_line_re = re.compile(r'^(\d+\.\d+)\+$') # e.g. '1.2+'
 
 def scan_for_spec(keyword):
     """
