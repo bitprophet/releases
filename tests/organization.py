@@ -383,3 +383,29 @@ class organization(Spec):
         # Make sure to skip typically-implicit 1.0.0 release.
         # TODO: consider removing that entirely; arguably needing it is a bug?
         expect_releases(entries, expected, skip_initial=True)
+
+    def specs_and_keywords_play_together_nicely(self):
+        b1 = b(1)
+        b2 = b(2, major=True, spec='1.0+')
+        f3 = f(3)
+        # Feature copied to both 1.x and 2.x branches
+        f4 = f(4, spec='1.0+')
+        # Support item backported to bugfix line + 1.17 + 2.0.0
+        s5 = s(5, spec='1.0+', backported=True)
+        entries = (
+            '2.0.0',
+            '1.17.0',
+            '1.16.1',
+            s5,
+            f4,
+            f3,
+            b2,
+            b1,
+            '1.16.0',
+        )
+        expected = {
+            '1.16.1': [b1, s5], # s5 backported ok
+            '1.17.0': [b2, f4, s5], # s5 here too, plus major bug b2
+            '2.0.0': [b2, f3, f4, s5], # all featurelike items here
+        }
+        expect_releases(entries, expected)
