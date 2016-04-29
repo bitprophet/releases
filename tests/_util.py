@@ -154,7 +154,7 @@ def expect_releases(entries, release_map, skip_initial=False):
     err = "Got unexpected contents for {0}: wanted {1}, got {2}"
     for rel, issues in six.iteritems(release_map):
         found = changelog.pop(rel)
-        eq_(found, issues, err.format(rel, issues, found))
+        eq_(set(found), set(issues), err.format(rel, issues, found))
     # Sanity: ensure no leftover issue lists exist (empty ones are OK)
     for key in list(changelog.keys()):
         if not changelog[key]:
