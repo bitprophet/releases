@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* :release:`1.1.0 <2016-04-28>`
 * :feature:`45` Add support for major version transitions (e.g. 1.0 to 2.0).
 
   .. note::
@@ -9,7 +10,7 @@ Changelog
     <https://python-semanticversion.readthedocs.io>`_. It's pure Python, so
     installation should be trivial.
 
-* :bug:`44` Update one of our internal docutils-related classes for
+* :bug:`44 major` Update one of our internal docutils-related classes for
   compatibility with Sphinx 1.4.x. Thanks to Gabi Davar for catch & patch.
 * :release:`1.0.0 <2015-11-05>`
 * :feature:`42` For readability, issues within each release so they are
