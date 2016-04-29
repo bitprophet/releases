@@ -71,6 +71,17 @@ class organization(Spec):
             [self.s, self.f]
         )
 
+    def backported_features_also_appear_in_feature_releases(self):
+        entries = (
+            '1.1.0', '1.0.2', self.bf, self.b, self.s,
+        )
+        # Ensure bf (backported feature) is in BOTH 1.0.2 AND 1.1.0
+        expected = {
+            '1.0.2': [self.bf, self.b],
+            '1.1.0': [self.bf, self.s],
+        }
+        expect_releases(entries, expected)
+
     def unmarked_bullet_list_items_treated_as_bugs(self):
         fake = list_item('', paragraph('', '', raw('', 'whatever')))
         changelog = releases('1.0.2', self.f, fake)
