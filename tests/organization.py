@@ -368,7 +368,7 @@ class organization(Spec):
     def can_disable_default_pin_to_latest_major_version(self):
         skip()
 
-    def issues_before_first_release_function_correctly(self):
+    def features_before_first_release_function_correctly(self):
         f0 = f(0)
         b1 = b(1)
         f2 = f(2)
