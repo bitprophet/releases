@@ -384,6 +384,22 @@ class organization(Spec):
         # TODO: consider removing that entirely; arguably needing it is a bug?
         expect_releases(entries, expected, skip_initial=True)
 
+    def all_bugs_before_first_release_act_featurelike(self):
+        b1 = b(1)
+        f2 = f(2)
+        b3 = b(3)
+        implicit = list_item('', paragraph('', '', raw('', 'whatever')))
+        changelog = changelog2dict(releases(
+            '0.1.1', b3, '0.1.0', f2, b1, implicit,
+            skip_initial=True
+        ))
+        first = changelog['0.1.0']
+        second = changelog['0.1.1']
+        assert b1 in first
+        assert f2 in first
+        eq_(len(first), 3) # Meh, hard to assert about the implicit one
+        eq_(second, [b3])
+
     def specs_and_keywords_play_together_nicely(self):
         b1 = b(1)
         b2 = b(2, major=True, spec='1.0+')

@@ -214,6 +214,28 @@ for details on formatting/etc.
         * ``1.6.0``: feature #22
         * ``1.5.1``: bug #20
 
+* **Bugs listed before the first release are treated as though they have the
+  'major' keyword.** This is chiefly because it makes no sense to have a
+  "bugfix release" as one's first-ever release - you can't fix something that's
+  not public! Then once the changelog parser passes that initial release,
+  normal rules start to apply again.
+
+    * Input::
+
+        * :release:`0.1.1`
+        * :bug:`3` The feature had bugs :(
+        * :release:`0.1.0 <date>`
+        * :feature:`2` Our first ever feature
+        * :bug:`1` Explicitly marked bug, even though that is silly
+        * Implicit issue/entry here (becomes a bug by default)
+
+    * Result:
+
+        * ``0.1.1``: bug #3 only, since it's the only bug after the first
+          release.
+        * ``0.1.0``: everything else - the implicit bug, the explicit bug #1,
+          and the feature #2.
+
 
 Major releases
 ==============

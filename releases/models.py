@@ -51,6 +51,19 @@ class Issue(nodes.Element):
     def spec(self):
         return self.get('spec', None)
 
+    def minor_releases(self, lines):
+        """
+        Return all minor release line labels found in ``lines``.
+        """
+        # TODO: yea deffo need a real object for 'lines', heh. E.g. we do a
+        # very similar test for "do you have any actual releases yet?"
+        # elsewhere. (This may be fodder for changing how we roll up
+        # pre-major-release features though...?)
+        return [
+            key for key, value in six.iteritems(lines)
+            if any(x for x in value if not x.startswith('unreleased'))
+        ]
+
     def default_spec(self, lines):
         """
         Given the current release-lines structure, return a default Spec.
@@ -79,14 +92,11 @@ class Issue(nodes.Element):
             if True:
                 default = Spec(">={0}".format(max(lines.keys())))
         else:
-            # TODO: yea deffo need a real object for 'lines', heh. E.g. we do a
-            # very similar test for "do you have any actual releases yet?"
-            # elsewhere. (This may be fodder for changing how we roll up
-            # pre-major-release features though...?)
-            default = Spec(">={0}".format(max(
-                key for key, value in six.iteritems(lines)
-                if any(x for x in value if not x.startswith('unreleased'))
-            )))
+            # Can only meaningfully limit to minor release buckets if they
+            # actually exist yet.
+            buckets = self.minor_releases(lines)
+            if buckets:
+                default = Spec(">={0}".format(max(buckets)))
         return default
 
     def add_to_lines(self, lines):
@@ -121,7 +131,13 @@ class Issue(nodes.Element):
                 # and only exists for features to go into.
                 if bugfix_buckets:
                     buckets.append('unreleased_bugfix')
-            if self.is_featurelike or self.backported:
+            # Obtain list of minor releases to check for "haven't had ANY
+            # releases yet" corner case, in which case ALL issues get thrown in
+            # unreleased_feature for the first release to consume.
+            # NOTE: assumes first release is a minor or major one,
+            # but...really? why would your first release be a bugfix one??
+            no_releases = not self.minor_releases(lines)
+            if self.is_featurelike or self.backported or no_releases:
                 buckets.append('unreleased_feature')
             # Now that we know which buckets are appropriate, add ourself to
             # all of them. TODO: or just...do it above...instead...
