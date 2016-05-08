@@ -1,15 +1,15 @@
 # Task runner
-invoke>=0.6.0
-invocations>=0.4.1
+invoke>=0.6.0,<2.0
+invocations>=0.4.1,<2.0
 # Tests (N.B. integration suite also uses Invoke as above)
-spec>=0.11.3
+spec>=0.11.3,<2.0
 mock==1.0.1
 # Just for tests...heh
-six>=1.4.1
+six>=1.4.1,<2.0
 # Docs
 -e .
-sphinx>=1.1
-sphinx_rtd_theme>=0.1.5
+sphinx>=1.1,<2.0
+sphinx_rtd_theme>=0.1.5,<2.0
 # Builds
 wheel==0.24
 twine==1.5
