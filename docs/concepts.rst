@@ -2,9 +2,9 @@
 Concepts
 ========
 
-Basic conceptual info about how Releases organizes and thinks about issues and
-releases. For details on formatting/etc (e.g. so you can interpret the examples
-below), see :doc:`/usage`.
+This page contains conceptual info about how Releases organizes and thinks
+about issues and releases. For details on formatting/config options/etc (e.g.
+so you can interpret the examples below), see :doc:`/usage`.
 
 
 Issue and release types
