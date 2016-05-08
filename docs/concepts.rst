@@ -447,3 +447,92 @@ Result:
 * ``1.1.1``: bug 6
 * ``1.1.0``: feature #3
 * ``1.0.1``: bug #1, bug #2
+
+
+.. _unstable-prehistory:
+
+"Unstable prehistory" mode
+==========================
+
+All of the above assumes a mature, semantic-versioning-enabled project, where
+you have stable release lines as well as a feature development 'trunk' branch.
+This doesn't always describe young projects, however - before one's 1.0.0,
+semantic versioning may not apply strongly or at all.
+
+When the ``releases_unstable_prehistory`` option is enabled (it's off by
+default for backwards compatibility reasons), changelog parsing/organizing
+behaves differently, until releases other than ``0.x.x`` are encountered:
+
+* All issues, regardless of type, are assigned to the very next release;
+  there's no organizing along minor release lines, no 'major' bugs are
+  necessary, nor are 'backported' features.
+* Unmarked line-items - which are normally considered to be bugs - are
+  displayed without any classification (i.e. they don't get a 'Bug' prefix).
+
+    * This is mostly to enable the types of "pre-Releases" changelogs wherein
+      *all* line items lack issue-type role prefixes.
+    * If your changelog *does* include explicit role prefixes (``:bug:``,
+      ``:feature:`` etc) they are left untouched & will still visually appear
+      as the indicated type.
+
+Example
+-------
+
+Here's an example of what this option means. Take the following changelog::
+
+    * :release:`0.2.1 <date>`
+    * Bugfix #7
+    * Feature #6, but meh, we arbitrarily are gonna call the next release a
+      tertiary one anyways
+    * Bugfix #5
+    * :release:`0.2.0 <date>`
+    * Medium bugfix #4
+    * Tiny bugfix #3
+    * Feature #2
+    * :release:`0.1.0 <date>`
+    * It works! First public release.
+
+Under normal Releases behavior this wouldn't match what the author clearly
+intends - all of these line items lack roles, so they'd all be "bugs", and then
+none of them would get inserted into 0.1.0 or 0.2.0 which are feature releases.
+
+With ``releases_unstable_prehistory`` enabled, we instead get:
+
+* ``0.2.1``: bugfix 5, feature 6, bugfix 7
+* ``0.2.0``: feature 2, bugfix 3, bugfix 4
+* ``0.1.0``: the beginning-of-time "it works!" note
+
+Crossing the 1.0 boundary
+-------------------------
+
+As mentioned, even when this option is enabled, the 1.0.0 release (or
+whichever release is the first not beginning with ``0.``) implicitly
+deactivates this behavior. All subsequent issues then follow the behavior
+outlined in the rest of the document: bugfixes only go in tertiary releases,
+features only go in minor releases, etc.
+
+Another explicit example - this changelog (which is even more arbitrary with
+its versioning prior to 1.0)::
+
+    * :release:`1.1.0 <date>`
+    * :release:`1.0.1 <date>`
+    * :feature:`8` A new, backwards compatible feature, hooray
+    * :bug:`7` First post-1.0 bugfix!
+    * :release:`1.0.0 <date>`
+    * Bug #6
+    * Feature #5
+    * `0.5.0`
+    * Feature #4
+    * Bug #3
+    * Bug #2
+    * `0.1.0`
+    * Feature #1
+
+The resulting changelog is organized like so:
+
+* ``1.1.0``: Feature #8
+* ``1.0.1``: Bug #7 - no features, this is the first "real" bugfix release
+* ``1.0.0``: Bug #6, feature #5 - this is the last "unstable" release rolling
+  up all prior issues.
+* ``0.5.0``: Bug #2, bug #3, feature #4
+* ``0.1.0``: Feature #1

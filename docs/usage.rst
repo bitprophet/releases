@@ -31,6 +31,15 @@ Specifically:
       for an example.
     * You may optionally set ``releases_debug = True`` to see debug output
       while building your docs.
+    * If your changelog includes "simple" pre-1.0 releases derived from a
+      single branch (i.e. without stable release lines & semantic versioning)
+      you may want to set ``releases_unstable_prehistory = True``.
+
+        * This is also useful if you've just imported a non-Releases changelog,
+          where your issues are all basic list-items and you don't want to go
+          through and add bug/feature/support/etc roles.
+        * See :ref:`the appropriate conceptual docs <unstable-prehistory>` for
+          details on this behavior.
 
 * Create a Sphinx document named ``changelog.rst`` containing a bulleted list
   somewhere at its topmost level.
