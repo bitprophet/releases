@@ -425,3 +425,20 @@ class organization(Spec):
             '2.0.0': [b2, f3, f4, s5], # all featurelike items here
         }
         expect_releases(entries, expected)
+
+    class unstable_prehistory:
+        def all_issue_types_rolled_up_together(self):
+            # Pre-1.0-only base case
+            skip()
+
+        def does_not_affect_releases_after_1_0(self):
+            # Mixed changelog crossing 1.0 boundary
+            skip()
+
+        def doesnt_care_if_you_skipped_literal_1_0_0(self):
+            # Mixed changelog where 1.0.0 doesn't exist, only 1.0.1
+            skip()
+
+        def doesnt_care_if_you_skipped_1_0_entirely(self):
+            # Mixed changelog where 1.0 is totally skipped and one goes to 2.0
+            skip()
