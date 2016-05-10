@@ -26,6 +26,13 @@ Specifically:
           (If only one is configured, the other link type will continue using
           ``releases_github_path``.)
 
+        * If your unreleased changes live in a different location than your existing
+          releases, set ``releases_future_release_uri`` separately from ``releases_release_uri``.
+          This option *does not* accept a ``%s`` substitution.
+          This setting can also be used to change the branch linked to by unreleased changes.
+          (E.g. ``releases_release_uri = "https://github.com/fabric/fabric/releases/tag/%s"`` and
+          ``releases_future_release_uri = "https://github.com/fabric/fabric/tree/develop"``)
+
     * See `Fabric's docs/conf.py
       <https://github.com/fabric/fabric/blob/4afd33e971f1c6831cc33fd3228013f7484fbe35/docs/conf.py#L31>`_
       for an example.
@@ -73,7 +80,7 @@ Specifically:
       will not be given a hyperlink.
 
 * Issue roles are of the form ``:type:`number[ keyword]```. Specifically:
-  
+
     * ``number`` is used to generate the link to the actual issue in your issue
       tracker (going by the ``releases_issue_uri`` option). It's used for both
       the link target & (part of) the link text.
