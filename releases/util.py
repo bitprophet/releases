@@ -288,6 +288,7 @@ def make_app(**kwargs):
     # maybe just literally slap this over the return value of load_conf()...
     config = {
         'releases_release_uri': 'foo_%s',
+        'releases_future_release_uri': 'baz_%s',
         'releases_issue_uri': 'bar_%s',
         'releases_debug': False,
         'master_doc': 'index',

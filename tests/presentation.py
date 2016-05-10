@@ -71,6 +71,7 @@ class presentation(Spec):
     def links_will_use_github_option_if_defined(self):
         kwargs = {
             'release_uri': None,
+            'future_release_uri': None,
             'issue_uri': None,
             'github_path': 'foo/bar',
         }
@@ -83,6 +84,7 @@ class presentation(Spec):
     def issue_links_prefer_explicit_setting_over_github_setting(self):
         kwargs = {
             'release_uri': None,
+            'future_release_uri': None,
             'issue_uri': 'explicit_issue_%s',
             'github_path': 'foo/bar',
         }
@@ -91,6 +93,7 @@ class presentation(Spec):
     def release_links_prefer_explicit_setting_over_github_setting(self):
         kwargs = {
             'release_uri': 'explicit_release_%s',
+            'future_release_uri': None,
             'issue_uri': None,
             'github_path': 'foo/bar',
         }
@@ -99,6 +102,7 @@ class presentation(Spec):
     def completely_blank_uri_settings_does_not_asplode(self):
         kwargs = {
             'release_uri': None,
+            'future_release_uri': None,
             'issue_uri': None,
             'github_path': None,
         }
