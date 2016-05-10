@@ -43,6 +43,7 @@ def make_app(**kwargs):
     config = {
         'releases_release_uri': 'foo_%s',
         'releases_issue_uri': 'bar_%s',
+        'releases_future_release_uri': 'baz',
         'releases_debug': False,
     }
     # Allow tinkering with document filename
