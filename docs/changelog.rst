@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* :feature:`-` Add a configuration to change the link for unreleased changes
 * :bug:`53` Tweak newly-updated models so bugfix items prior to an initial
   release are considered 'major bugs' so they get rolled into that initial
   release (instead of causing a ``ValueError``).
