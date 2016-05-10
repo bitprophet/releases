@@ -134,7 +134,9 @@ def release_nodes(text, slug, date, config):
     # We were already doing fully raw elements elsewhere anyway. And who cares
     # about a PDF of a changelog? :x
     uri = None
-    if config.releases_release_uri:
+    if slug == 'master' and config.releases_future_release_uri:
+        uri = config.releases_future_release_uri % slug
+    elif config.releases_release_uri:
         # TODO: % vs .format()
         uri = config.releases_release_uri % slug
     elif config.releases_github_path:
@@ -620,6 +622,9 @@ def setup(app):
         # Release-tag base URI setting: releases_release_uri
         # E.g. 'https://github.com/fabric/fabric/tree/'
         ('release_uri', None),
+        # Future Release-tag base URI setting: releases_future_release_uri
+        # E.g. 'https://github.com/fabric/fabric/tree/develop/'
+        ('future_release_uri', None),
         # Convenience Github version of above
         ('github_path', None),
         # Which document to use as the changelog
