@@ -119,7 +119,9 @@ def release_nodes(text, slug, date, config):
     # title and give it these HTML attributes during render time) so...fuckit.
     # We were already doing fully raw elements elsewhere anyway. And who cares
     # about a PDF of a changelog? :x
-    if config.releases_release_uri:
+    if slug == 'master' and config.releases_future_release_uri:
+        uri = config.releases_future_release_uri
+    elif config.releases_release_uri:
         # TODO: % vs .format()
         uri = config.releases_release_uri % slug
     elif config.releases_github_path:
@@ -180,7 +182,7 @@ def append_unreleased_entries(app, lines, releases):
                 # TODO: should link to master for newest family and...what
                 # exactly, for the others? Expectation isn't necessarily to
                 # have a branch per family? Or is there? Maybe there must be..
-                'master', 
+                'master',
                 None,
                 app.config
             )]
@@ -541,6 +543,10 @@ def setup(app):
     # Release-tag base URI setting: releases_release_uri
     # E.g. 'https://github.com/fabric/fabric/tree/'
     app.add_config_value(name='releases_release_uri', default=None,
+        rebuild='html')
+    # Future Release-tag base URI setting: releases_future_release_uri
+    # E.g. 'https://github.com/fabric/fabric/tree/develop/'
+    app.add_config_value(name='releases_future_release_uri', default=None,
         rebuild='html')
     # Convenience Github version of above
     app.add_config_value(name='releases_github_path', default=None,
