@@ -454,6 +454,11 @@ class organization(Spec):
             }
             self._expect_releases(entries, expected, skip_initial=True)
 
+        def affects_unreleased_buckets_too(self):
+            # I.e. there is no unreleased_bugfix vs unreleased_feature, only
+            # Zuul^Wunreleased
+            skip()
+
         def does_not_affect_releases_after_1_0(self):
             # Mixed changelog crossing 1.0 boundary
             skip()
@@ -464,4 +469,8 @@ class organization(Spec):
 
         def doesnt_care_if_you_skipped_1_0_entirely(self):
             # Mixed changelog where 1.0 is totally skipped and one goes to 2.0
+            skip()
+
+        def is_not_enabled_by_default(self):
+            # Prove 'regular' behavior pre-1.0 if setting not enabled
             skip()
