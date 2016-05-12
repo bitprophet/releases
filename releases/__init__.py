@@ -7,6 +7,7 @@ from docutils import nodes, utils
 import six
 
 from .models import Issue, ISSUE_TYPES, Release, Version, Spec
+from .line_manager import LineManager
 
 
 def _log(txt, config):
@@ -160,7 +161,7 @@ def release_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     return [node], []
 
 
-def append_unreleased_entries(app, lines, releases):
+def append_unreleased_entries(app, manager, releases):
     """
     Generate new abstract 'releases' for unreleased issues.
 
@@ -170,10 +171,10 @@ def append_unreleased_entries(app, lines, releases):
     """
     # TODO: actually ignore major lines as stated above
     log = partial(_log, config=app.config)
-    for family, _lines in six.iteritems(lines):
+    for family, _lines in six.iteritems(manager):
         for type_ in ('bugfix', 'feature'):
             issues =  _lines['unreleased_{0}'.format(type_)]
-            fam_prefix = "{0}.x ".format(family) if len(lines) > 1 else ""
+            fam_prefix = "{0}.x ".format(family) if len(manager) > 1 else ""
             header = "Next {0}{1} release".format(fam_prefix, type_)
             nodelist = [release_nodes(
                 header,
@@ -202,7 +203,7 @@ def reorder_release_entries(releases):
         release['entries'] = sorted(entries, key=lambda x: order[x.type])
 
 
-def construct_entry_with_release(focus, issues, lines, log, releases, rest):
+def construct_entry_with_release(focus, issues, manager, log, releases, rest):
     """
     Releases 'eat' the entries in their line's list and get added to the
     final data structure. They also inform new release-line 'buffers'.
@@ -241,34 +242,33 @@ def construct_entry_with_release(focus, issues, lines, log, releases, rest):
                 # Major bugfix: remove from unreleased_feature
                 if obj.major:
                     log("Removing #%s from unreleased" % obj.number)
-                    # TODO: consider making 'lines' a richer object so this
-                    # sort of thing is easier vs repeated in a few places
-                    lines[focus.family]['unreleased_feature'].remove(obj)
+                    # TODO: consider making a LineManager method somehow
+                    manager[focus.family]['unreleased_feature'].remove(obj)
                 # Regular bugfix: remove from bucket for this release's
                 # line + unreleased_bugfix
                 else:
-                    if obj in lines[focus.family]['unreleased_bugfix']:
+                    if obj in manager[focus.family]['unreleased_bugfix']:
                         log("Removing #%s from unreleased" % obj.number)
-                        lines[focus.family]['unreleased_bugfix'].remove(obj)
-                    if obj in lines[focus.family][focus.minor]:
+                        manager[focus.family]['unreleased_bugfix'].remove(obj)
+                    if obj in manager[focus.family][focus.minor]:
                         log("Removing #%s from %s" % (obj.number, focus.minor))
-                        lines[focus.family][focus.minor].remove(obj)
+                        manager[focus.family][focus.minor].remove(obj)
             # Regular feature/support: remove from unreleased_feature
             # Backported feature/support: remove from bucket for this
             # release's line (if applicable) + unreleased_feature
             else:
                 log("Removing #%s from unreleased" % obj.number)
-                lines[focus.family]['unreleased_feature'].remove(obj)
-                if obj in lines[focus.family].get(focus.minor, []):
-                    lines[focus.family][focus.minor].remove(obj)
+                manager[focus.family]['unreleased_feature'].remove(obj)
+                if obj in manager[focus.family].get(focus.minor, []):
+                    manager[focus.family][focus.minor].remove(obj)
 
     # Implicit behavior otherwise
     else:
         # New release line/branch detected. Create it & dump unreleased
         # features.
-        if focus.minor not in lines[focus.family]:
+        if focus.minor not in manager[focus.family]:
             log("not seen prior, making feature release & bugfix bucket")
-            lines[focus.family][focus.minor] = []
+            manager[focus.family][focus.minor] = []
             # TODO: this used to explicitly say "go over everything in
             # unreleased_feature and dump if it's feature, support or major
             # bug". But what the hell else would BE in unreleased_feature? Why
@@ -279,9 +279,10 @@ def construct_entry_with_release(focus, issues, lines, log, releases, rest):
             # unreleased feature items.
             releases.append({
                 'obj': focus,
-                'entries': lines[focus.family]['unreleased_feature'][:],
+                'entries': manager[focus.family]['unreleased_feature'][:],
             })
-            lines[focus.family]['unreleased_feature'] = []
+            manager[focus.family]['unreleased_feature'] = []
+
         # Existing line -> empty out its bucket into new release.
         # Skip 'major' bugs as those "belong" to the next release (and will
         # also be in 'unreleased_feature' - so safe to nuke the entire
@@ -291,18 +292,18 @@ def construct_entry_with_release(focus, issues, lines, log, releases, rest):
             # TODO: as in other branch, I don't get why this wasn't just
             # dumping the whole thing - why would major bugs be in the regular
             # bugfix buckets?
-            entries = lines[focus.family][focus.minor][:]
+            entries = manager[focus.family][focus.minor][:]
             releases.append({'obj': focus, 'entries': entries})
-            lines[focus.family][focus.minor] = []
+            manager[focus.family][focus.minor] = []
             # Clean out the items we just released from
             # 'unreleased_bugfix'.  (Can't nuke it because there might
             # be some unreleased bugs for other release lines.)
             for x in entries:
-                if x in lines[focus.family]['unreleased_bugfix']:
-                    lines[focus.family]['unreleased_bugfix'].remove(x)
+                if x in manager[focus.family]['unreleased_bugfix']:
+                    manager[focus.family]['unreleased_bugfix'].remove(x)
 
 
-def construct_entry_without_release(focus, issues, lines, log, rest):
+def construct_entry_without_release(focus, issues, manager, log, rest):
     # Handle rare-but-valid non-issue-attached line items, which are
     # always bugs. (They are their own description.)
     if not isinstance(focus, Issue):
@@ -337,17 +338,10 @@ lists.
 
     # Add to per-release bugfix lines and/or unreleased bug/feature buckets, as
     # necessary.
-    focus.add_to_lines(lines)
+    focus.add_to_lines(manager)
 
 
-def new_line():
-    return {
-        'unreleased_bugfix': [],
-        'unreleased_feature': [],
-    }
-
-
-def handle_upcoming_major_release(entries, lines):
+def handle_upcoming_major_release(entries, manager):
     # Short-circuit if the future holds nothing for us
     if not entries:
         return
@@ -365,17 +359,17 @@ def handle_upcoming_major_release(entries, lines):
         elif next_releases:
             break
     # Examine result: is a major release present? If so, add its major number
-    # to the lines structure!
+    # to the line manager!
     for obj in next_releases:
         # TODO: update when Release gets tied closer w/ Version
         version = Version(obj.number)
         if version.minor == 0 and version.patch == 0:
-            lines[obj.family] = new_line()
+            manager.add_family(obj.family)
 
 
-def handle_first_release_line(entries, lines):
+def handle_first_release_line(entries, manager):
     """
-    Set up initial 'lines' entry for first encountered release line.
+    Set up initial line-manager entry for first encountered release line.
 
     To be called at start of overall process; afterwards, subsequent major
     lines are generated by `handle_upcoming_major_release`.
@@ -387,7 +381,7 @@ def handle_first_release_line(entries, lines):
         if isinstance(obj, Release):
             break
     # Here, obj must be the 1st release item. Set it up.
-    lines[obj.family] = new_line()
+    manager.add_family(obj.family)
 
 
 def construct_releases(entries, app):
@@ -397,7 +391,10 @@ def construct_releases(entries, app):
     releases = []
     # Release lines, to be organized by major releases, then by major+minor,
     # alongside per-major-release 'unreleased' bugfix/feature buckets.
-    lines = {}
+    # NOTE: With exception of unstable_prehistory=True, which triggers use of a
+    # separate, undifferentiated 'unreleased' bucket (albeit still within the
+    # '0' major line family).
+    manager = LineManager(app)
     # Also keep a master hash of issues by number to detect duplicates & assist
     # in explicitly defined release lists.
     issues = {}
@@ -407,8 +404,8 @@ def construct_releases(entries, app):
     # TODO: probs just merge the two into e.g. a list of 2-tuples of "actual
     # entry obj + rest"?
     stripped_entries = [x[0][0] for x in reversed_entries]
-    # Perform an initial lookahead to prime 'lines' with the 1st major release
-    handle_first_release_line(stripped_entries, lines)
+    # Perform an initial lookahead to prime manager with the 1st major release
+    handle_first_release_line(stripped_entries, manager)
     # Start crawling...
     for index, obj in enumerate(reversed_entries):
         # Issue object is always found in obj (LI) index 0 (first, often only
@@ -423,14 +420,14 @@ def construct_releases(entries, app):
         # comma-separated list of issue numbers.
         if isinstance(focus, Release):
             construct_entry_with_release(
-                focus, issues, lines, log, releases, rest
+                focus, issues, manager, log, releases, rest
             )
             # After each release is handled, look ahead to see if we're
             # entering "last stretch before a major release". If so,
-            # pre-emptively update the lines structure so upcoming features are
+            # pre-emptively update the line-manager so upcoming features are
             # correctly sorted into that major release by default (re: logic in
             # Release.add_to_lines)
-            handle_upcoming_major_release(stripped_entries[index + 1:], lines)
+            handle_upcoming_major_release(stripped_entries[index + 1:], manager)
 
         # Entries get copied into release line buckets as follows:
         # * Features and support go into 'unreleased_feature' for use in new
@@ -448,9 +445,9 @@ def construct_releases(entries, app):
         # important!) is preserved by stuffing it into the focus (issue)
         # object - it will get unpacked by construct_nodes() later.
         else:
-            construct_entry_without_release(focus, issues, lines, log, rest)
+            construct_entry_without_release(focus, issues, manager, log, rest)
 
-    append_unreleased_entries(app, lines, releases)
+    append_unreleased_entries(app, manager, releases)
 
     reorder_release_entries(releases)
 
@@ -547,6 +544,9 @@ def setup(app):
         ('document_name', 'changelog'),
         # Debug output
         ('debug', False),
+        # Whether to enable linear history during 0.x release timeline
+        # TODO: flip this to True by default in our 2.0 release
+        ('unstable_prehistory', False),
     ):
         app.add_config_value(
             name='releases_{0}'.format(key), default=default, rebuild='html'
