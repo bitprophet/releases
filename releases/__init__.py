@@ -534,22 +534,23 @@ def generate_changelog(app, doctree):
 
 
 def setup(app):
-    # Issue base URI setting: releases_issue_uri
-    # E.g. 'https://github.com/fabric/fabric/issues/'
-    app.add_config_value(name='releases_issue_uri', default=None,
-        rebuild='html')
-    # Release-tag base URI setting: releases_release_uri
-    # E.g. 'https://github.com/fabric/fabric/tree/'
-    app.add_config_value(name='releases_release_uri', default=None,
-        rebuild='html')
-    # Convenience Github version of above
-    app.add_config_value(name='releases_github_path', default=None,
-        rebuild='html')
-    # Which document to use as the changelog
-    app.add_config_value(name='releases_document_name', default='changelog',
-        rebuild='html')
-    # Debug output
-    app.add_config_value(name='releases_debug', default=False, rebuild='html')
+    for key, default in (
+        # Issue base URI setting: releases_issue_uri
+        # E.g. 'https://github.com/fabric/fabric/issues/'
+        ('issue_uri', None),
+        # Release-tag base URI setting: releases_release_uri
+        # E.g. 'https://github.com/fabric/fabric/tree/'
+        ('release_uri', None),
+        # Convenience Github version of above
+        ('github_path', None),
+        # Which document to use as the changelog
+        ('document_name', 'changelog'),
+        # Debug output
+        ('debug', False),
+    ):
+        app.add_config_value(
+            name='releases_{0}'.format(key), default=default, rebuild='html'
+        )
     # Register intermediate roles
     for x in list(ISSUE_TYPES) + ['issue']:
         app.add_role(x, issues_role)
