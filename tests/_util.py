@@ -22,9 +22,17 @@ from releases import setup as releases_setup # avoid unittest crap
 
 
 def make_app(**kwargs):
-    # Create a real Sphinx app, with stupid temp dirs because it assumes.
-    # Helps catch things like "testing a config option but forgot
-    # app.add_config_value()"
+    """
+    Create a real Sphinx app, with stupid temp dirs because it assumes.
+
+    Helps catch things like "testing a config option but forgot
+    app.add_config_value()"
+
+    Kwargs (w/ exception of 'docname' which is used for document name if given)
+    are turned into 'releases_xxx' config settings, so e.g.
+    ``make_app(foo='bar')`` is like setting ``releases_foo = 'bar'`` in
+    ``conf.py``.
+    """
     src, dst, doctree = mkdtemp(), mkdtemp(), mkdtemp()
     try:
         # STFU Sphinx :(
@@ -48,7 +56,7 @@ def make_app(**kwargs):
     # Allow tinkering with document filename
     if 'docname' in kwargs:
         app.env.temp_data['docname'] = kwargs.pop('docname')
-    # Allow config overrides
+    # Allow config overrides via kwargs
     for name in kwargs:
         config['releases_{0}'.format(name)] = kwargs[name]
     # Stitch together as the sphinx app init() usually does w/ real conf files
@@ -148,8 +156,11 @@ def setup_issues(self):
     self.bf = f(27, backported=True)
     self.bs = s(29, backported=True)
 
-def expect_releases(entries, release_map, skip_initial=False):
+def expect_releases(entries, release_map, skip_initial=False, app=None):
     kwargs = {'skip_initial': skip_initial}
+    # Let high level tests tickle config settings via make_app()
+    if app is not None:
+        kwargs['app'] = app
     changelog = changelog2dict(releases(*entries, **kwargs))
     err = "Got unexpected contents for {0}: wanted {1}, got {2}"
     for rel, issues in six.iteritems(release_map):

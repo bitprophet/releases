@@ -427,9 +427,32 @@ class organization(Spec):
         expect_releases(entries, expected)
 
     class unstable_prehistory:
+        def _expect_releases(self, *args, **kwargs):
+            """
+            expect_releases() wrapper setting unstable_prehistory by default
+            """
+            kwargs['app'] = make_app(unstable_prehistory=True)
+            return expect_releases(*args, **kwargs)
+
         def all_issue_types_rolled_up_together(self):
             # Pre-1.0-only base case
-            skip()
+            b1 = b(1)
+            f2 = f(2)
+            b3 = b(3)
+            f4 = f(4)
+            entries = (
+                '0.1.1',
+                f4,
+                b3,
+                '0.1.0',
+                f2,
+                b1,
+            )
+            expected = {
+                '0.1.1': [b3, f4],
+                '0.1.0': [b1, f2],
+            }
+            self._expect_releases(entries, expected, skip_initial=True)
 
         def does_not_affect_releases_after_1_0(self):
             # Mixed changelog crossing 1.0 boundary
