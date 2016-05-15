@@ -88,7 +88,8 @@ class Issue(nodes.Element):
         # could be consolidated & simplified...
         default = Spec()
         if self.is_featurelike:
-            # TODO: if app->config-><releases_always_forwardport_features or w/e
+            # TODO: if app->config-><releases_always_forwardport_features or
+            # w/e
             if True:
                 default = Spec(">={0}".format(max(manager.keys())))
         else:
