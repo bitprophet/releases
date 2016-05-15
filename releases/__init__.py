@@ -161,6 +161,24 @@ def release_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     return [node], []
 
 
+def generate_unreleased_entry(header, line, issues, manager, app):
+    log = partial(_log, config=app.config)
+    nodelist = [release_nodes(
+        header,
+        # TODO: should link to master for newest family and...what
+        # exactly, for the others? Expectation isn't necessarily to
+        # have a branch per family? Or is there? Maybe there must be..
+        'master',
+        None,
+        app.config
+    )]
+    log("Creating {0!r} faux-release with {1!r}".format(line, issues))
+    return {
+        'obj': Release(number=line, date=None, nodelist=nodelist),
+        'entries': issues,
+    }
+
+
 def append_unreleased_entries(app, manager, releases):
     """
     Generate new abstract 'releases' for unreleased issues.
@@ -169,28 +187,16 @@ def append_unreleased_entries(app, manager, releases):
 
     When only one major release line exists, that dimension is ignored.
     """
-    # TODO: actually ignore major lines as stated above
-    log = partial(_log, config=app.config)
-    for family, _lines in six.iteritems(manager):
+    # TODO: actually omit major line labels as stated above
+    for family, lines in six.iteritems(manager):
         for type_ in ('bugfix', 'feature'):
-            issues =  _lines['unreleased_{0}'.format(type_)]
+            issues =  lines['unreleased_{0}'.format(type_)]
             fam_prefix = "{0}.x ".format(family) if len(manager) > 1 else ""
             header = "Next {0}{1} release".format(fam_prefix, type_)
-            nodelist = [release_nodes(
-                header,
-                # TODO: should link to master for newest family and...what
-                # exactly, for the others? Expectation isn't necessarily to
-                # have a branch per family? Or is there? Maybe there must be..
-                'master', 
-                None,
-                app.config
-            )]
             line = "unreleased_{0}.x_{1}".format(family, type_)
-            log("Creating {0!r} faux-release with {1!r}".format(line, issues))
-            releases.append({
-                'obj': Release(number=line, date=None, nodelist=nodelist),
-                'entries': issues,
-            })
+            releases.append(
+                generate_unreleased_entry(header, line, issues, manager, app)
+            )
 
 
 def reorder_release_entries(releases):
@@ -264,43 +270,52 @@ def construct_entry_with_release(focus, issues, manager, log, releases, rest):
 
     # Implicit behavior otherwise
     else:
-        # New release line/branch detected. Create it & dump unreleased
-        # features.
-        if focus.minor not in manager[focus.family]:
-            log("not seen prior, making feature release & bugfix bucket")
-            manager[focus.family][focus.minor] = []
-            # TODO: this used to explicitly say "go over everything in
-            # unreleased_feature and dump if it's feature, support or major
-            # bug". But what the hell else would BE in unreleased_feature? Why
-            # not just dump the whole thing??
-            #
-            # Dump only the items in the bucket whose family this release
-            # object belongs to, i.e. 1.5.0 should only nab the 1.0 family's
-            # unreleased feature items.
+        # Unstable prehistory -> just dump 'unreleased' and continue
+        if manager.unstable_prehistory:
             releases.append({
                 'obj': focus,
-                'entries': manager[focus.family]['unreleased_feature'][:],
+                'entries': manager[focus.family]['unreleased'][:],
             })
-            manager[focus.family]['unreleased_feature'] = []
-
-        # Existing line -> empty out its bucket into new release.
-        # Skip 'major' bugs as those "belong" to the next release (and will
-        # also be in 'unreleased_feature' - so safe to nuke the entire
-        # line)
+            manager[focus.family]['unreleased'] = []
+        # Regular behavior from here
         else:
-            log("pre-existing, making bugfix release")
-            # TODO: as in other branch, I don't get why this wasn't just
-            # dumping the whole thing - why would major bugs be in the regular
-            # bugfix buckets?
-            entries = manager[focus.family][focus.minor][:]
-            releases.append({'obj': focus, 'entries': entries})
-            manager[focus.family][focus.minor] = []
-            # Clean out the items we just released from
-            # 'unreleased_bugfix'.  (Can't nuke it because there might
-            # be some unreleased bugs for other release lines.)
-            for x in entries:
-                if x in manager[focus.family]['unreleased_bugfix']:
-                    manager[focus.family]['unreleased_bugfix'].remove(x)
+            # New release line/branch detected. Create it & dump unreleased
+            # features.
+            if focus.minor not in manager[focus.family]:
+                log("not seen prior, making feature release & bugfix bucket")
+                manager[focus.family][focus.minor] = []
+                # TODO: this used to explicitly say "go over everything in
+                # unreleased_feature and dump if it's feature, support or major
+                # bug". But what the hell else would BE in unreleased_feature?
+                # Why not just dump the whole thing??
+                #
+                # Dump only the items in the bucket whose family this release
+                # object belongs to, i.e. 1.5.0 should only nab the 1.0
+                # family's unreleased feature items.
+                releases.append({
+                    'obj': focus,
+                    'entries': manager[focus.family]['unreleased_feature'][:],
+                })
+                manager[focus.family]['unreleased_feature'] = []
+
+            # Existing line -> empty out its bucket into new release.
+            # Skip 'major' bugs as those "belong" to the next release (and will
+            # also be in 'unreleased_feature' - so safe to nuke the entire
+            # line)
+            else:
+                log("pre-existing, making bugfix release")
+                # TODO: as in other branch, I don't get why this wasn't just
+                # dumping the whole thing - why would major bugs be in the
+                # regular bugfix buckets?
+                entries = manager[focus.family][focus.minor][:]
+                releases.append({'obj': focus, 'entries': entries})
+                manager[focus.family][focus.minor] = []
+                # Clean out the items we just released from
+                # 'unreleased_bugfix'.  (Can't nuke it because there might
+                # be some unreleased bugs for other release lines.)
+                for x in entries:
+                    if x in manager[focus.family]['unreleased_bugfix']:
+                        manager[focus.family]['unreleased_bugfix'].remove(x)
 
 
 def construct_entry_without_release(focus, issues, manager, log, rest):
@@ -338,7 +353,12 @@ lists.
 
     # Add to per-release bugfix lines and/or unreleased bug/feature buckets, as
     # necessary.
-    focus.add_to_lines(manager)
+    # TODO: suspect all of add_to_manager can now live in the manager; most of
+    # Release's methods should probably go that way
+    if manager.unstable_prehistory:
+        manager[focus.major]['unreleased'].append(focus)
+    else:
+        focus.add_to_manager(manager)
 
 
 def handle_upcoming_major_release(entries, manager):
@@ -447,7 +467,16 @@ def construct_releases(entries, app):
         else:
             construct_entry_without_release(focus, issues, manager, log, rest)
 
-    append_unreleased_entries(app, manager, releases)
+    if manager.unstable_prehistory:
+        releases.append(generate_unreleased_entry(
+            header="Next release",
+            line="unreleased",
+            issues=manager[0]['unreleased'],
+            manager=manager,
+            app=app,
+        ))
+    else:
+        append_unreleased_entries(app, manager, releases)
 
     reorder_release_entries(releases)
 

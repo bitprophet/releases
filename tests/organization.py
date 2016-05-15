@@ -434,6 +434,10 @@ class organization(Spec):
             kwargs['app'] = make_app(unstable_prehistory=True)
             return expect_releases(*args, **kwargs)
 
+        def is_not_enabled_by_default(self):
+            # Prove 'regular' behavior pre-1.0 if setting not enabled
+            skip()
+
         def all_issue_types_rolled_up_together(self):
             # Pre-1.0-only base case
             b1 = b(1)
@@ -471,6 +475,8 @@ class organization(Spec):
             # Mixed changelog where 1.0 is totally skipped and one goes to 2.0
             skip()
 
-        def is_not_enabled_by_default(self):
-            # Prove 'regular' behavior pre-1.0 if setting not enabled
+        def explicit_unstable_releases_still_eat_their_issues(self):
+            # I.e. an 0.x.y releases using explicit issue listings, works
+            # correctly - the explicitly listed issues don't appear in nearby
+            # implicit releases.
             skip()

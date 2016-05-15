@@ -27,7 +27,45 @@ class LineManager(dict):
         This will flesh out mandatory buckets like ``unreleased_bugfix`` and do
         other necessary bookkeeping.
         """
-        self[major_number] = {
-            'unreleased_bugfix': [],
-            'unreleased_feature': [],
-        }
+        # Normally, we have separate buckets for bugfixes vs features
+        keys = ['unreleased_bugfix', 'unreleased_feature']
+        # But unstable prehistorical releases roll all up into just
+        # 'unreleased'
+        if self.unstable_prehistory:
+            keys = ['unreleased']
+        # Either way, the buckets default to an empty list
+        empty = {}
+        for key in keys:
+            empty[key] = []
+        self[major_number] = empty
+
+    @property
+    def unstable_prehistory(self):
+        """
+        Returns True if 'unstable prehistory' behavior should be applied.
+
+        Specifically, checks config & whether any non-0.x releases exist.
+        """
+        return (
+            self.config.releases_unstable_prehistory
+            and not self.has_stable_releases
+        )
+
+    @property
+    def has_stable_releases(self):
+        """
+        Returns whether stable (post-0.x) releases seem to exist.
+        """
+        nonzeroes = [x for x in self if x != 0]
+        # Nothing but 0.x releases -> yup we're prehistory
+        if not nonzeroes:
+            return False
+        # Presumably, if there's >1 major family besides 0.x, we're at least
+        # one release into the 1.0 (or w/e) line.
+        if len(nonzeroes) > 1:
+            return True
+        # If there's only one, we may still be in the space before its N.0.0 as
+        # well; we can check by testing for existence of bugfix buckets
+        return any(
+            x for x in self[nonzeroes[0]] if not x.startswith('unreleased')
+        )
