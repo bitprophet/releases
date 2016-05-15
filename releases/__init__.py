@@ -426,7 +426,7 @@ def construct_releases(entries, app):
             # entering "last stretch before a major release". If so,
             # pre-emptively update the line-manager so upcoming features are
             # correctly sorted into that major release by default (re: logic in
-            # Release.add_to_lines)
+            # Release.add_to_manager)
             handle_upcoming_major_release(stripped_entries[index + 1:], manager)
 
         # Entries get copied into release line buckets as follows:

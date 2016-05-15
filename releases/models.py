@@ -51,27 +51,27 @@ class Issue(nodes.Element):
     def spec(self):
         return self.get('spec', None)
 
-    def minor_releases(self, lines):
+    def minor_releases(self, manager):
         """
-        Return all minor release line labels found in ``lines``.
+        Return all minor release line labels found in ``manager``.
         """
-        # TODO: yea deffo need a real object for 'lines', heh. E.g. we do a
+        # TODO: yea deffo need a real object for 'manager', heh. E.g. we do a
         # very similar test for "do you have any actual releases yet?"
         # elsewhere. (This may be fodder for changing how we roll up
         # pre-major-release features though...?)
         return [
-            key for key, value in six.iteritems(lines)
+            key for key, value in six.iteritems(manager)
             if any(x for x in value if not x.startswith('unreleased'))
         ]
 
-    def default_spec(self, lines):
+    def default_spec(self, manager):
         """
         Given the current release-lines structure, return a default Spec.
 
         Specifics:
 
         * For feature-like issues, only the highest major release is used, so
-          given a ``lines`` with top level keys of ``[1, 2]``, this would
+          given a ``manager`` with top level keys of ``[1, 2]``, this would
           return ``Spec(">=2")``.
 
             * When ``releases_always_forwardport_features`` is ``True``, that
@@ -84,31 +84,31 @@ class Issue(nodes.Element):
             * Thus the core difference here is that features are 'consumed' by
               upcoming major releases, and bugfixes are not.
         """
-        # TODO: I feel like this + the surrounding bits in add_to_lines() could
-        # be consolidated & simplified...
+        # TODO: I feel like this + the surrounding bits in add_to_manager()
+        # could be consolidated & simplified...
         default = Spec()
         if self.is_featurelike:
             # TODO: if app->config-><releases_always_forwardport_features or w/e
             if True:
-                default = Spec(">={0}".format(max(lines.keys())))
+                default = Spec(">={0}".format(max(manager.keys())))
         else:
             # Can only meaningfully limit to minor release buckets if they
             # actually exist yet.
-            buckets = self.minor_releases(lines)
+            buckets = self.minor_releases(manager)
             if buckets:
                 default = Spec(">={0}".format(max(buckets)))
         return default
 
-    def add_to_lines(self, lines):
+    def add_to_manager(self, manager):
         """
-        Given a 'lines' structure, add self to one or more of its 'buckets'.
+        Given a 'manager' structure, add self to one or more of its 'buckets'.
         """
         # Derive version spec allowing us to filter against major/minor buckets
-        spec = self.spec or self.default_spec(lines)
+        spec = self.spec or self.default_spec(manager)
         # Only look in appropriate major version/family; if self is an issue
         # declared as living in e.g. >=2, this means we don't even bother
         # looking in the 1.x family.
-        families = [Version(str(x)) for x in lines]
+        families = [Version(str(x)) for x in manager]
         versions = list(spec.filter(families))
         for version in versions:
             family = version.major
@@ -116,7 +116,7 @@ class Issue(nodes.Element):
             # to what self cares about (ignoring 'unreleased' until later)
             candidates = [
                 Version(x)
-                for x in lines[family]
+                for x in manager[family]
                 if not x.startswith('unreleased')
             ]
             # Select matching release lines (& stringify)
@@ -136,13 +136,13 @@ class Issue(nodes.Element):
             # unreleased_feature for the first release to consume.
             # NOTE: assumes first release is a minor or major one,
             # but...really? why would your first release be a bugfix one??
-            no_releases = not self.minor_releases(lines)
+            no_releases = not self.minor_releases(manager)
             if self.is_featurelike or self.backported or no_releases:
                 buckets.append('unreleased_feature')
             # Now that we know which buckets are appropriate, add ourself to
             # all of them. TODO: or just...do it above...instead...
             for bucket in buckets:
-                lines[family][bucket].append(self)
+                manager[family][bucket].append(self)
 
     def __repr__(self):
         flag = ''
