@@ -456,7 +456,25 @@ class organization(Spec):
 
         def does_not_affect_releases_after_1_0(self):
             # Mixed changelog crossing 1.0 boundary
-            skip()
+            entries = (
+                '1.1.0',
+                '1.0.1',
+                f(6),
+                b(5),
+                '1.0.0',
+                f(4),
+                b(3),
+                '0.1.0',
+                f(2),
+                b(1),
+            )
+            expected = {
+                '1.1.0': [f(6)],
+                '1.0.1': [b(5)],
+                '1.0.0': [b(3), f(4)],
+                '0.1.0': [b(1), f(2)],
+            }
+            self._expect_releases(entries, expected, skip_initial=True)
 
         def doesnt_care_if_you_skipped_literal_1_0_0(self):
             # Mixed changelog where 1.0.0 doesn't exist, only 1.0.1
