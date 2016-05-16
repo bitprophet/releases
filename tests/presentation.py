@@ -114,12 +114,13 @@ class presentation(Spec):
         assert not isinstance(node[0][2], reference)
 
     def un_prefixed_list_items_appear_as_unlinked_bugs(self):
-        fake = list_item('', paragraph('', '', raw('', 'whatever')))
+        text = "fixes an issue in ``methodname``"
+        fake = list_item('', paragraph('', '', raw('', text)))
         node = self._generate('1.0.2', fake)
         # [<raw prefix>, <inline colon>, <inline space>, <raw bug text>]
         eq_(len(node[0]), 4)
         assert 'Bug' in str(node[0][0])
-        assert 'whatever' in str(node[0][3])
+        assert 'fixes an issue' in str(node[0][3])
 
     def un_prefixed_list_items_get_no_prefix_under_unstable_prehistory(self):
         app = make_app(unstable_prehistory=True)
