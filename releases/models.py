@@ -100,19 +100,19 @@ class Issue(nodes.Element):
         """
         # TODO: I feel like this + the surrounding bits in add_to_manager()
         # could be consolidated & simplified...
-        default = Spec()
+        specstr = ""
         if self.is_featurelike:
             # TODO: if app->config-><releases_always_forwardport_features or
             # w/e
             if True:
-                default = Spec(">={0}".format(max(manager.keys())))
+                specstr = ">={0}".format(max(manager.keys()))
         else:
             # Can only meaningfully limit to minor release buckets if they
             # actually exist yet.
             buckets = self.minor_releases(manager)
             if buckets:
-                default = Spec(">={0}".format(max(buckets)))
-        return default
+                specstr = ">={0}".format(max(buckets))
+        return Spec(specstr) if specstr else Spec()
 
     def add_to_manager(self, manager):
         """
