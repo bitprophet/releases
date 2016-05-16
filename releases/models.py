@@ -1,3 +1,4 @@
+from functools import reduce
 from operator import xor
 
 from docutils import nodes
