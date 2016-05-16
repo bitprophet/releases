@@ -355,7 +355,7 @@ lists.
     # TODO: suspect all of add_to_manager can now live in the manager; most of
     # Release's methods should probably go that way
     if manager.unstable_prehistory:
-        manager[focus.major]['unreleased'].append(focus)
+        manager[0]['unreleased'].append(focus)
     else:
         focus.add_to_manager(manager)
 

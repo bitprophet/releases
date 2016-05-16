@@ -10,7 +10,7 @@ from releases import (
 )
 
 from _util import (
-    b, s,
+    b, f, s,
     entry,
     make_app,
     release,
@@ -221,7 +221,7 @@ class presentation(Spec):
 
     def unstable_prehistory_active_means_only_one_unreleased_release(self):
         app = make_app(unstable_prehistory=True)
-        entries = (b(1),)
-        result = self._generate(*entries, app=app, raw=True)
+        entries = (b(2), f(3), '0.1.0', b(1))
+        result = self._generate(*entries, app=app, raw=True, skip_initial=True)
         html = str(result[0][0][0])
         assert "Next release" in html
