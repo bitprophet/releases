@@ -31,7 +31,7 @@ class LineManager(dict):
         keys = ['unreleased_bugfix', 'unreleased_feature']
         # But unstable prehistorical releases roll all up into just
         # 'unreleased'
-        if self.unstable_prehistory:
+        if major_number == 0 and self.config.releases_unstable_prehistory:
             keys = ['unreleased']
         # Either way, the buckets default to an empty list
         empty = {}
@@ -52,11 +52,18 @@ class LineManager(dict):
         )
 
     @property
+    def stable_families(self):
+        """
+        Returns release family numbers which aren't 0 (i.e. prehistory).
+        """
+        return [x for x in self if x != 0]
+
+    @property
     def has_stable_releases(self):
         """
         Returns whether stable (post-0.x) releases seem to exist.
         """
-        nonzeroes = [x for x in self if x != 0]
+        nonzeroes = self.stable_families
         # Nothing but 0.x releases -> yup we're prehistory
         if not nonzeroes:
             return False

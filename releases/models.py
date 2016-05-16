@@ -97,10 +97,19 @@ class Issue(nodes.Element):
 
             * Thus the core difference here is that features are 'consumed' by
               upcoming major releases, and bugfixes are not.
+
+        * When the ``unstable_prehistory`` setting is ``True``, the default
+          spec starts at the oldest non-zero release line. (Otherwise, issues
+          posted after prehistory ends would try being added to the 0.x part of
+          the tree, which makes no sense in unstable-prehistory mode.)
         """
         # TODO: I feel like this + the surrounding bits in add_to_manager()
         # could be consolidated & simplified...
         specstr = ""
+        # Make sure truly-default spec skips 0.x if prehistory was unstable.
+        stable_families = manager.stable_families
+        if manager.config.releases_unstable_prehistory and stable_families:
+            specstr = ">={0}".format(min(stable_families))
         if self.is_featurelike:
             # TODO: if app->config-><releases_always_forwardport_features or
             # w/e

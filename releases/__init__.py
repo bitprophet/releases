@@ -189,7 +189,10 @@ def append_unreleased_entries(app, manager, releases):
     """
     for family, lines in six.iteritems(manager):
         for type_ in ('bugfix', 'feature'):
-            issues =  lines['unreleased_{0}'.format(type_)]
+            bucket = 'unreleased_{0}'.format(type_)
+            if bucket not in lines: # Implies unstable prehistory + 0.x fam
+                continue
+            issues =  lines[bucket]
             fam_prefix = "{0}.x ".format(family) if len(manager) > 1 else ""
             header = "Next {0}{1} release".format(fam_prefix, type_)
             line = "unreleased_{0}.x_{1}".format(family, type_)
@@ -271,11 +274,23 @@ def construct_entry_with_release(focus, issues, manager, log, releases, rest):
     else:
         # Unstable prehistory -> just dump 'unreleased' and continue
         if manager.unstable_prehistory:
+            # TODO: need to continue making LineManager actually OO, i.e. do
+            # away with the subdicts + keys, move to sub-objects with methods
+            # answering questions like "what should I give you for a release"
+            # or whatever
+            log("in unstable prehistory, dumping 'unreleased'")
             releases.append({
                 'obj': focus,
-                'entries': manager[focus.family]['unreleased'][:],
+                # NOTE: explicitly dumping 0, not focus.family, since this
+                # might be the last pre-historical release and thus not 0.x
+                'entries': manager[0]['unreleased'][:],
             })
-            manager[focus.family]['unreleased'] = []
+            manager[0]['unreleased'] = []
+            # If this isn't a 0.x release, it signals end of prehistory, make a
+            # new release bucket (as is also done below in regular behavior).
+            # Also acts like a sentinel that prehistory is over.
+            if focus.family != 0:
+                manager[focus.family][focus.minor] = []
         # Regular behavior from here
         else:
             # New release line/branch detected. Create it & dump unreleased
@@ -355,8 +370,10 @@ lists.
     # TODO: suspect all of add_to_manager can now live in the manager; most of
     # Release's methods should probably go that way
     if manager.unstable_prehistory:
+        log("Unstable prehistory -> adding to 0.x unreleased bucket")
         manager[0]['unreleased'].append(focus)
     else:
+        log("Adding to release line manager")
         focus.add_to_manager(manager)
 
 
