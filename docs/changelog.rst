@@ -2,6 +2,10 @@
 Changelog
 =========
 
+* :bug:`55 major` Non-annotated changelog line items (which implicitly become
+  bugs) were incorrectly truncating their contents in some situations
+  (basically, any time they included non-regular-text elements like monospace,
+  bold etc). This has been fixed.
 * :feature:`19` Add ``unstable_prehistory`` option/mode for changelogs whose
   0.x release cycle is "rapid" or "unstable" and doesn't closely follow normal
   semantic version-driven organization. See :ref:`unstable-prehistory`.
