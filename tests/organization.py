@@ -476,10 +476,6 @@ class organization(Spec):
             }
             self._expect_releases(entries, expected, skip_initial=True)
 
-        def doesnt_care_if_you_skipped_literal_1_0_0(self):
-            # Mixed changelog where 1.0.0 doesn't exist, only 1.0.1
-            skip()
-
         def doesnt_care_if_you_skipped_1_0_entirely(self):
             # Mixed changelog where 1.0 is totally skipped and one goes to 2.0
             skip()
