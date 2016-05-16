@@ -2,6 +2,9 @@
 Changelog
 =========
 
+* :feature:`19` Add ``unstable_prehistory`` option/mode for changelogs whose
+  0.x release cycle is "rapid" or "unstable" and doesn't closely follow normal
+  semantic version-driven organization. See :ref:`unstable-prehistory`.
 * :bug:`53` Tweak newly-updated models so bugfix items prior to an initial
   release are considered 'major bugs' so they get rolled into that initial
   release (instead of causing a ``ValueError``).
