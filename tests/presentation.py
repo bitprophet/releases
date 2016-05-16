@@ -38,10 +38,10 @@ class presentation(Spec):
         setup_issues(self)
 
     def _generate(self, *entries, **kwargs):
-        app = kwargs.get('app', None)
-        nodes = construct_nodes(releases(*entries, app=app))
+        raw = kwargs.pop('raw', False)
+        nodes = construct_nodes(releases(*entries, **kwargs))
         # By default, yield the contents of the bullet list.
-        return nodes if kwargs.get('raw', False) else nodes[0][1][0]
+        return nodes if raw else nodes[0][1][0]
 
     def _test_link(self, kwargs, type_, expected):
         app = make_app(**kwargs)
