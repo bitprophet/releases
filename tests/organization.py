@@ -478,7 +478,25 @@ class organization(Spec):
 
         def doesnt_care_if_you_skipped_1_0_entirely(self):
             # Mixed changelog where 1.0 is totally skipped and one goes to 2.0
-            skip()
+            entries = (
+                '2.1.0',
+                '2.0.1',
+                f(6),
+                b(5),
+                '2.0.0',
+                f(4),
+                b(3),
+                '0.1.0',
+                f(2),
+                b(1),
+            )
+            expected = {
+                '2.1.0': [f(6)],
+                '2.0.1': [b(5)],
+                '2.0.0': [b(3), f(4)],
+                '0.1.0': [b(1), f(2)],
+            }
+            self._expect_releases(entries, expected, skip_initial=True)
 
         def explicit_unstable_releases_still_eat_their_issues(self):
             # I.e. an 0.x.y releases using explicit issue listings, works
