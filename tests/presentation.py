@@ -116,11 +116,19 @@ class presentation(Spec):
     def un_prefixed_list_items_appear_as_unlinked_bugs(self):
         fake = list_item('', paragraph('', '', raw('', 'whatever')))
         node = self._generate('1.0.2', fake)
+        # [<raw prefix>, <inline colon>, <inline space>, <raw bug text>]
+        eq_(len(node[0]), 4)
         assert 'Bug' in str(node[0][0])
         assert 'whatever' in str(node[0][3])
 
     def un_prefixed_list_items_get_no_prefix_under_unstable_prehistory(self):
-        skip()
+        app = make_app(unstable_prehistory=True)
+        fake = list_item('', paragraph('', '', raw('', 'whatever')))
+        node = self._generate('0.1.0', fake, app=app, skip_initial=True)
+        # [<raw bug text>]
+        eq_(len(node[0]), 1)
+        assert 'Bug' not in str(node[0][0])
+        assert 'whatever' in str(node[0][0])
 
     def issues_remain_wrapped_in_unordered_list_nodes(self):
         node = self._generate('1.0.2', self.b, raw=True)[0][1]

@@ -354,9 +354,14 @@ lists.
             raise ValueError(msg.format(buried[0], str(buried[0].parent)))
         # OK, it looks legit - make it a bug.
         log("Found line item w/ no real issue object, creating bug")
+        nodelist = issue_nodelist('bug')
+        # Skip nodelist entirely if we're in unstable prehistory -
+        # classification doesn't matter there.
+        if manager.unstable_prehistory:
+            nodelist = []
         focus = Issue(
             type_='bug',
-            nodelist=issue_nodelist('bug'),
+            nodelist=nodelist,
             description=nodes.list_item('', nodes.paragraph('', '', focus)),
         )
     else:
