@@ -218,3 +218,10 @@ class presentation(Spec):
         eq_(len(result), 2)
         html = str(result[0][0][0])
         assert "Next 1.x bugfix release" in html
+
+    def unstable_prehistory_active_means_only_one_unreleased_release(self):
+        app = make_app(unstable_prehistory=True)
+        entries = (b(1),)
+        result = self._generate(*entries, app=app, raw=True)
+        html = str(result[0][0][0])
+        assert "Next release" in html
