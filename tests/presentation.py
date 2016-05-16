@@ -1,4 +1,4 @@
-from spec import Spec, eq_, skip
+from spec import Spec, eq_
 from docutils.nodes import (
     reference, bullet_list, list_item, literal, raw, paragraph, Text
 )

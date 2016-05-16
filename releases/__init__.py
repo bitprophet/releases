@@ -192,7 +192,7 @@ def append_unreleased_entries(app, manager, releases):
             bucket = 'unreleased_{0}'.format(type_)
             if bucket not in lines: # Implies unstable prehistory + 0.x fam
                 continue
-            issues =  lines[bucket]
+            issues = lines[bucket]
             fam_prefix = "{0}.x ".format(family) if len(manager) > 1 else ""
             header = "Next {0}{1} release".format(fam_prefix, type_)
             line = "unreleased_{0}.x_{1}".format(family, type_)
@@ -471,7 +471,9 @@ def construct_releases(entries, app):
             # pre-emptively update the line-manager so upcoming features are
             # correctly sorted into that major release by default (re: logic in
             # Release.add_to_manager)
-            handle_upcoming_major_release(stripped_entries[index + 1:], manager)
+            handle_upcoming_major_release(
+                stripped_entries[index + 1:], manager
+            )
 
         # Entries get copied into release line buckets as follows:
         # * Features and support go into 'unreleased_feature' for use in new
