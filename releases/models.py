@@ -1,3 +1,5 @@
+from operator import xor
+
 from docutils import nodes
 from semantic_version import Version as StrictVersion, Spec
 import six
@@ -20,6 +22,9 @@ ISSUE_TYPES = {
 
 
 class Issue(nodes.Element):
+    # Technically, we just need number, but heck, you never know...
+    _cmp_keys = ('type', 'number', 'backported', 'major')
+
     @property
     def type(self):
         return self['type_']
@@ -50,6 +55,15 @@ class Issue(nodes.Element):
     @property
     def spec(self):
         return self.get('spec', None)
+
+    def __eq__(self, other):
+        for attr in self._cmp_keys:
+            if getattr(self, attr) != getattr(other, attr):
+                return False
+        return True
+
+    def __hash__(self):
+        return reduce(xor, [hash(getattr(self, x)) for x in self._cmp_keys])
 
     def minor_releases(self, manager):
         """
