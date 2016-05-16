@@ -1,6 +1,6 @@
 from spec import Spec, eq_, skip
 from docutils.nodes import (
-    reference, bullet_list, list_item, raw, paragraph,
+    reference, bullet_list, list_item, literal, raw, paragraph, Text
 )
 
 from releases import (
@@ -114,13 +114,14 @@ class presentation(Spec):
         assert not isinstance(node[0][2], reference)
 
     def un_prefixed_list_items_appear_as_unlinked_bugs(self):
-        text = "fixes an issue in ``methodname``"
-        fake = list_item('', paragraph('', '', raw('', text)))
+        fake = list_item('', paragraph('', '',
+            Text("fixes an issue in "), literal('', 'methodname')))
         node = self._generate('1.0.2', fake)
-        # [<raw prefix>, <inline colon>, <inline space>, <raw bug text>]
-        eq_(len(node[0]), 4)
+        # [<raw prefix>, <inline colon>, <inline space>, <text>, <monospace>]
+        eq_(len(node[0]), 5)
         assert 'Bug' in str(node[0][0])
         assert 'fixes an issue' in str(node[0][3])
+        assert 'methodname' in str(node[0][4])
 
     def un_prefixed_list_items_get_no_prefix_under_unstable_prehistory(self):
         app = make_app(unstable_prehistory=True)

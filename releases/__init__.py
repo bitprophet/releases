@@ -359,10 +359,13 @@ lists.
         # classification doesn't matter there.
         if manager.unstable_prehistory:
             nodelist = []
+        # Undo the 'pop' from outer scope. TODO: rework things so we don't have
+        # to do this dumb shit uggggh
+        rest[0].insert(0, focus)
         focus = Issue(
             type_='bug',
             nodelist=nodelist,
-            description=nodes.list_item('', nodes.paragraph('', '', focus)),
+            description=rest,
         )
     else:
         focus.attributes['description'] = rest
