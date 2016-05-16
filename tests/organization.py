@@ -434,10 +434,6 @@ class organization(Spec):
             kwargs['app'] = make_app(unstable_prehistory=True)
             return expect_releases(*args, **kwargs)
 
-        def is_not_enabled_by_default(self):
-            # Prove 'regular' behavior pre-1.0 if setting not enabled
-            skip()
-
         def all_issue_types_rolled_up_together(self):
             # Pre-1.0-only base case
             entries = (
