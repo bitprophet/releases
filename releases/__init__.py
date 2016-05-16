@@ -187,7 +187,6 @@ def append_unreleased_entries(app, manager, releases):
 
     When only one major release line exists, that dimension is ignored.
     """
-    # TODO: actually omit major line labels as stated above
     for family, lines in six.iteritems(manager):
         for type_ in ('bugfix', 'feature'):
             issues =  lines['unreleased_{0}'.format(type_)]
