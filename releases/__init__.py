@@ -129,7 +129,7 @@ def release_nodes(text, slug, date, config):
     link = '<a class="reference external" href="{0}">{1}</a>'.format(uri, text)
     datespan = ''
     if date:
-        datespan = ' <span style="font-size: 75%%;">{0}</span>'.format(date)
+        datespan = ' <span style="font-size: 75%;">{0}</span>'.format(date)
     header = '<h2 style="margin-bottom: 0.3em;">{0}{1}</h2>'.format(
         link, datespan)
     return nodes.section('',
