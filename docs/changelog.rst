@@ -2,6 +2,8 @@
 Changelog
 =========
 
+* :bug:`- major` Fix formatting of release header dates; a "75% text size"
+  style rule has had an uncaught typo for some time.
 * :bug:`55 major` Non-annotated changelog line items (which implicitly become
   bugs) were incorrectly truncating their contents in some situations
   (basically, any time they included non-regular-text elements like monospace,
