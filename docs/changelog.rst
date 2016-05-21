@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* :release:`1.2.0 <2016-05-20>`
 * :bug:`- major` Fix formatting of release header dates; a "75% text size"
   style rule has had an uncaught typo for some time.
 * :bug:`55 major` Non-annotated changelog line items (which implicitly become
