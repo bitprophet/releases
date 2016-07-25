@@ -2,6 +2,11 @@
 Changelog
 =========
 
+* :bug:`36` Changelogs with no releases whatsoever should still be viable
+  instead of raising exceptions. This is now happily the case. All items in
+  such changelogs will end up in a single "unreleased features" list, just as
+  with regular prehistory entries. Thanks to Steve Ivy for initial report and
+  André Caron for additional feedback.
 * :release:`1.2.0 <2016-05-20>`
 * :bug:`- major` Fix formatting of release header dates; a "75% text size"
   style rule has had an uncaught typo for some time.
