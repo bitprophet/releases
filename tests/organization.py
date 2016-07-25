@@ -426,6 +426,17 @@ class organization(Spec):
         }
         expect_releases(entries, expected)
 
+    def changelogs_without_any_releases_display_unreleased_normally(self):
+        changelog = releases(self.f, self.b, skip_initial=True)
+        # Ensure only the two unreleased 'releases' showed up
+        eq_(len(changelog), 2)
+        # And assert that both items appeared in one of them (since there's no
+        # real releases at all, the bugfixes are treated as 'major' bugs, as
+        # per concepts doc.)
+        bugfix, feature = changelog
+        eq_(len(feature['entries']), 2)
+        eq_(len(bugfix['entries']), 0)
+
     class unstable_prehistory:
         def _expect_releases(self, *args, **kwargs):
             """

@@ -421,11 +421,18 @@ def handle_first_release_line(entries, manager):
     # It's remotely possible the changelog is totally empty...
     if not entries:
         return
+    # Obtain (short-circuiting) first Release obj.
+    first_release = None
     for obj in entries:
         if isinstance(obj, Release):
+            first_release = obj
             break
-    # Here, obj must be the 1st release item. Set it up.
-    manager.add_family(obj.family)
+    # It's also possible it's non-empty but has no releases yet.
+    if first_release:
+        manager.add_family(obj.family)
+    # If God did not exist, man would be forced to invent him.
+    else:
+        manager.add_family(0)
 
 
 def construct_releases(entries, app):
