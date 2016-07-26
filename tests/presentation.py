@@ -50,6 +50,9 @@ class presentation(Spec):
             entry(b(15, app=app)),
             release('1.0.0'),
         ], app=app))
+        # Shorthand for "I'll do my own asserts"
+        if expected is None:
+            return nodes
         if type_ == 'release':
             header = nodes[0][0][0].astext()
             assert expected in header
