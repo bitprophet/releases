@@ -10,4 +10,8 @@ ns.configure({
     'tests': {
         'package': 'releases',
     },
+    'packaging': {
+        'sign': True,
+        'wheel': True,
+    },
 })
