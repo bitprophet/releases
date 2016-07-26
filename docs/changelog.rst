@@ -2,6 +2,10 @@
 Changelog
 =========
 
+* :bug:`56` Fix exceptions that occurred when no release/issue link options
+  were configured. Now those options are truly optional: release version and
+  issue number text will simply display normally instead of as hyperlinks.
+  Thanks to André Caron for the report.
 * :bug:`36` Changelogs with no releases whatsoever should still be viable
   instead of raising exceptions. This is now happily the case. All items in
   such changelogs will end up in a single "unreleased features" list, just as
