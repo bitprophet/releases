@@ -2,6 +2,9 @@
 Changelog
 =========
 
+* :support:`51 backported` Modernize release management so PyPI trove
+  classifiers are more accurate, wheel archives are universal instead of Python
+  2 only, and release artifacts are GPG signed.
 * :bug:`56` Fix exceptions that occurred when no release/issue link options
   were configured. Now those options are truly optional: release version and
   issue number text will simply display normally instead of as hyperlinks.
