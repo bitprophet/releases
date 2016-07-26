@@ -73,19 +73,30 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     # Lol @ access back to Sphinx
     config = inliner.document.settings.env.app.config
     if issue_no not in ('-', '0'):
+        ref = None
         if config.releases_issue_uri:
             # TODO: deal with % vs .format()
             ref = config.releases_issue_uri % issue_no
         elif config.releases_github_path:
             ref = "https://github.com/{0}/issues/{1}".format(
                 config.releases_github_path, issue_no)
-        link = nodes.reference(rawtext, '#' + issue_no, refuri=ref, **options)
+        # Only generate a reference/link if we were able to make a URI
+        if ref:
+            identifier = nodes.reference(
+                rawtext, '#' + issue_no, refuri=ref, **options
+            )
+        # Otherwise, just make it regular text
+        else:
+            identifier = nodes.raw(
+                rawtext=rawtext, text='#' + issue_no, format='html',
+                **options
+            )
     else:
-        link = None
+        identifier = None
         issue_no = None # So it doesn't gum up dupe detection later
     # Additional 'new-style changelog' stuff
     if name in ISSUE_TYPES:
-        nodelist = issue_nodelist(name, link)
+        nodelist = issue_nodelist(name, identifier)
         spec = None
         keyword = None
         # TODO: sanity checks re: e.g. >2 parts, >1 instance of keywords, >1
@@ -112,7 +123,7 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
         return [node], []
     # Return old style info for 'issue' for older changelog entries
     else:
-        return [link], []
+        return [identifier], []
 
 
 def release_nodes(text, slug, date, config):
@@ -120,13 +131,18 @@ def release_nodes(text, slug, date, config):
     # title and give it these HTML attributes during render time) so...fuckit.
     # We were already doing fully raw elements elsewhere anyway. And who cares
     # about a PDF of a changelog? :x
+    uri = None
     if config.releases_release_uri:
         # TODO: % vs .format()
         uri = config.releases_release_uri % slug
     elif config.releases_github_path:
         uri = "https://github.com/{0}/tree/{1}".format(
             config.releases_github_path, slug)
-    link = '<a class="reference external" href="{0}">{1}</a>'.format(uri, text)
+    # Only construct link tag if user actually configured release URIs somehow
+    if uri:
+        link = '<a class="reference external" href="{0}">{1}</a>'.format(uri, text)
+    else:
+        link = text
     datespan = ''
     if date:
         datespan = ' <span style="font-size: 75%;">{0}</span>'.format(date)

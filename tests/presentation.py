@@ -96,6 +96,24 @@ class presentation(Spec):
         }
         self._test_link(kwargs, 'release', 'explicit_release_1.0.2')
 
+    def completely_blank_uri_settings_does_not_asplode(self):
+        kwargs = {
+            'release_uri': None,
+            'issue_uri': None,
+            'github_path': None,
+        }
+        # Get nodes for direct inspection
+        nodes = self._test_link(kwargs, 'release', None)
+        # Ensure release entry still displays release version.
+        # (These are curently constructed as raw text nodes so no other great
+        # way to test this. Meh.)
+        text = nodes[0][0][0].astext()
+        assert '>1.0.2 <span' in text
+        # Ensure issues still display issue number. (Ditto.)
+        text = nodes[0][1][0][0].astext()
+        assert '>Bug</span>] #15:' in text
+
+
     def _assert_prefix(self, entries, expectation):
         assert expectation in self._generate(*entries)[0][0][0]
 
