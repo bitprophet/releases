@@ -21,14 +21,14 @@ def _log(txt, config):
         sys.stderr.flush()
 
 
-def issue_nodelist(name, link=None):
+def issue_nodelist(name, identifier=None):
     which = '[<span style="color: #%s;">%s</span>]' % (
         ISSUE_TYPES[name], name.capitalize()
     )
     signifier = [nodes.raw(text=which, format='html')]
-    hyperlink = [nodes.inline(text=" "), link] if link else []
-    trail = [] if link else [nodes.inline(text=" ")]
-    return signifier + hyperlink + [nodes.inline(text=":")] + trail
+    id_nodelist = [nodes.inline(text=" "), identifier] if identifier else []
+    trail = [] if identifier else [nodes.inline(text=" ")]
+    return signifier + id_nodelist + [nodes.inline(text=":")] + trail
 
 
 release_line_re = re.compile(r'^(\d+\.\d+)\+$') # e.g. '1.2+'
