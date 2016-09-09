@@ -8,6 +8,7 @@ import six
 
 from .models import Issue, ISSUE_TYPES, Release, Version, Spec
 from .line_manager import LineManager
+from ._version import __version__
 
 
 def _log(txt, config):
@@ -635,3 +636,6 @@ def setup(app):
     app.add_role('release', release_role)
     # Hook in our changelog transmutation at appropriate step
     app.connect('doctree-read', generate_changelog)
+
+    # identifies the version of our extension
+    return {'version': __version__}
