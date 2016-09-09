@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* :bug:`-` Report extension version to Sphinx.
 * :release:`1.2.1 <2016-07-25>`
 * :support:`51 backported` Modernize release management so PyPI trove
   classifiers are more accurate, wheel archives are universal instead of Python
