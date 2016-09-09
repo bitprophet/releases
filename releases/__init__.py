@@ -598,8 +598,8 @@ class BulletListVisitor(nodes.NodeVisitor):
 
 def generate_changelog(app, doctree):
     # Don't scan/mutate documents that don't match the configured document name
-    # (which by default is changelog.rst).
-    if app.env.docname != app.config.releases_document_name:
+    # (which by default is ['changelog.rst', ]).
+    if app.env.docname not in app.config.releases_document_name:
         return
 
     # Find the first bullet-list node & replace it with our organized/parsed
@@ -619,7 +619,7 @@ def setup(app):
         # Convenience Github version of above
         ('github_path', None),
         # Which document to use as the changelog
-        ('document_name', 'changelog'),
+        ('document_name', ['changelog', ]),
         # Debug output
         ('debug', False),
         # Whether to enable linear history during 0.x release timeline
@@ -629,6 +629,12 @@ def setup(app):
         app.add_config_value(
             name='releases_{0}'.format(key), default=default, rebuild='html'
         )
+    # if a string is given for `document_name`, convert it to a list
+    # done to maintain backwards compatibility
+    if isinstance(app.config.releases_document_name, str):
+        app.config.releases_document_name = \
+            [app.config.releases_document_name, ]
+
     # Register intermediate roles
     for x in list(ISSUE_TYPES) + ['issue']:
         app.add_role(x, issues_role)

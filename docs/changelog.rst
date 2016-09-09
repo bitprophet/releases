@@ -2,6 +2,8 @@
 Changelog
 =========
 
+* :feature:`59` Allow multiple changelog files. Thanks to William Minchin for
+  the patch.
 * :release:`1.2.1 <2016-07-25>`
 * :support:`51 backported` Modernize release management so PyPI trove
   classifiers are more accurate, wheel archives are universal instead of Python

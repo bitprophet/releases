@@ -48,6 +48,12 @@ Specifically:
       (as per previous bullet point), ``releases_document_name``. E.g.
       ``releases_document_name = "CHANGES"`` would cause Releases to mutate a
       file called ``CHANGES.rst`` instead of ``changelog.rst``.
+    * It is possible to have multiple changelogs (useful, for example, if you
+      are documenting multiple sub-projects). In this case set
+      ``releases_docuement_name`` to a list containing all the changelogs you
+      want processed. Each changelog must be explicitly listed. E.g.
+      ``releases_document_name = ['project_1/changelog', 'project_2/changes',
+      'changelog']``
     * Elements before or after this bulleted list will be untouched by
       Releases, allowing you to place e.g. paragraphs, comments etc at the top
       (or bottom) of the document.
