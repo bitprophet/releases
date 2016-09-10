@@ -619,7 +619,7 @@ def setup(app):
         # Convenience Github version of above
         ('github_path', None),
         # Which document to use as the changelog
-        ('document_name', ['changelog', ]),
+        ('document_name', ['changelog']),
         # Debug output
         ('debug', False),
         # Whether to enable linear history during 0.x release timeline
@@ -631,9 +631,15 @@ def setup(app):
         )
     # if a string is given for `document_name`, convert it to a list
     # done to maintain backwards compatibility
-    if isinstance(app.config.releases_document_name, str):
-        app.config.releases_document_name = \
-            [app.config.releases_document_name, ]
+    # https://stackoverflow.com/questions/1303243/how-to-find-out-if-a-python-object-is-a-string
+    PY2 = sys.version_info[0] == 2
+    if PY2:
+        string_types = basestring,
+    else:
+        string_types = str,
+
+    if isinstance(app.config.releases_document_name, string_types):
+        app.config.releases_document_name = [app.config.releases_document_name]
 
     # Register intermediate roles
     for x in list(ISSUE_TYPES) + ['issue']:
