@@ -12,18 +12,21 @@ class integration(Spec):
     def teardown(self):
         os.chdir(self.cwd)
 
-    def _build(self, folder, opts, target, asserts=None):
+    def _build(self, folder, opts, target, asserts=None, conf='.'):
         # Dynamic sphinx opt overrides
-        pairs = map(lambda x: '='.join(x), (opts or {}).items())
-        flags = map(lambda x: '-D {0}'.format(x), pairs)
-        flagstr = ' '.join(flags)
+        if opts:
+            pairs = map(lambda x: '='.join(x), (opts or {}).items())
+            flags = map(lambda x: '-D {0}'.format(x), pairs)
+            flagstr = ' '.join(flags)
+        else:
+            flagstr = ''
         # Setup
         os.chdir(os.path.join('integration', '_support'))
         build = os.path.join(folder, '_build')
         try:
             # Build
-            cmd = 'sphinx-build {2} -c . -W {0} {1}'.format(
-                folder, build, flagstr)
+            cmd = 'sphinx-build {2} -c {3} -W {0} {1}'.format(
+                folder, build, flagstr, conf)
             result = run(cmd, warn=True, hide=True)
             if callable(asserts):
                 asserts(result, build, target)
@@ -31,8 +34,9 @@ class integration(Spec):
         finally:
             shutil.rmtree(build)
 
-    def _assert_worked(self, folder, opts=None, target='changelog'):
-        self._build(folder, opts, target, asserts=self._basic_asserts)
+    def _assert_worked(self, folder, opts=None, target='changelog', conf='.'):
+        self._build(folder, opts, target, asserts=self._basic_asserts,
+                    conf=conf)
 
     def _basic_asserts(self, result, build, target):
         # Check for errors
@@ -82,3 +86,11 @@ class integration(Spec):
         assert "ValueError" in result.stderr
         assert "double-check" in result.stderr
         assert "innocuous" in result.stderr
+
+    def multiple_changelogs(self):
+        # support multiple changelogs
+        self._assert_worked(
+            folder='multiple_changelogs',
+            opts=None,
+            conf='multiple_changelogs',
+            target='a_changelog')
