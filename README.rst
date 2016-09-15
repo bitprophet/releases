@@ -26,6 +26,5 @@ Some background on why this tool was created can be found in `this blog post
 For more documentation, please see http://releases.readthedocs.io.
 
 .. note::
-    You can install the `development version
-    <https://github.com/bitprophet/releases/tarball/master#egg=releases-dev>`_
-    via ``pip install releases==dev``.
+    You can install the development version via ``pip install -e
+    git+https://github.com/bitprophet/releases/#egg=releases``.
