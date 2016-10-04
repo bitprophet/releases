@@ -1,14 +1,9 @@
-from tempfile import mkdtemp
-from shutil import rmtree
-
 from docutils.nodes import (
     list_item, paragraph,
 )
 from mock import Mock
 from spec import eq_, ok_
-from sphinx.application import Sphinx
 import six
-import sphinx
 
 from releases import (
     Issue,
@@ -17,56 +12,8 @@ from releases import (
     release_role,
     construct_releases,
 )
-from releases import setup as releases_setup # avoid unittest crap
+from releases.util import make_app
 
-
-
-def make_app(**kwargs):
-    """
-    Create a real Sphinx app, with stupid temp dirs because it assumes.
-
-    Helps catch things like "testing a config option but forgot
-    app.add_config_value()"
-
-    Kwargs (w/ exception of 'docname' which is used for document name if given)
-    are turned into 'releases_xxx' config settings, so e.g.
-    ``make_app(foo='bar')`` is like setting ``releases_foo = 'bar'`` in
-    ``conf.py``.
-    """
-    src, dst, doctree = mkdtemp(), mkdtemp(), mkdtemp()
-    try:
-        # STFU Sphinx :(
-        Sphinx._log = lambda self, message, wfile, nonl=False: None
-        app = Sphinx(
-            srcdir=src,
-            confdir=None,
-            outdir=dst,
-            doctreedir=doctree,
-            buildername='html',
-        )
-    finally:
-        [rmtree(x) for x in (src, doctree)]
-    releases_setup(app)
-    # Mock out the config within. More horrible assumptions by Sphinx :(
-    config = {
-        'releases_release_uri': 'foo_%s',
-        'releases_issue_uri': 'bar_%s',
-        'releases_debug': False,
-    }
-    # Allow tinkering with document filename
-    if 'docname' in kwargs:
-        app.env.temp_data['docname'] = kwargs.pop('docname')
-    # Allow config overrides via kwargs
-    for name in kwargs:
-        config['releases_{0}'.format(name)] = kwargs[name]
-    # Stitch together as the sphinx app init() usually does w/ real conf files
-    app.config._raw_config = config
-    # init_values() requires a 'warn' runner on Sphinx 1.3+, give it no-op.
-    init_args = []
-    if sphinx.version_info[:2] > (1, 2):
-        init_args = [lambda x: x]
-    app.config.init_values(*init_args)
-    return app
 
 def inliner(app=None):
     app = app or make_app()
