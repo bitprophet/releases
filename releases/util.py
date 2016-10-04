@@ -6,7 +6,7 @@ from shutil import rmtree
 from tempfile import mkdtemp
 
 import sphinx
-from sphinx.application import Sphinx
+from sphinx.application import Sphinx # not exposed at top level
 
 from . import setup
 
