@@ -8,7 +8,54 @@ from tempfile import mkdtemp
 import sphinx
 from sphinx.application import Sphinx # not exposed at top level
 
-from . import setup
+from . import generate_changelog, setup
+
+
+def parse_changelog(path):
+    """
+    Load and parse changelog file from ``path``, returning data structures.
+
+    This function does not alter any files on disk; it is solely for
+    introspecting a Releases ``changelog.rst`` and programmatically answering
+    questions like "are there any unreleased bugfixes for the 2.3 line?" or
+    "what was included in release 1.2.1?".
+
+    :param str path: A relative or absolute file path string.
+
+    :returns: Stuff.
+    """
+
+
+def get_doctree(path):
+    """
+    Obtain a Sphinx doctree from the file at ``path``.
+
+    Performs no Releases-specific processing; this code would, ideally, be in
+    Sphinx itself, but things there are pretty tightly coupled. So we wrote
+    this.
+
+    :param str path: A relative or absolute file path string.
+
+    :returns: Stuff.
+    """
+    from sphinx.io import SphinxStandaloneReader, SphinxDummyWriter, SphinxFileInput
+    from docutils.core import Publisher
+    from docutils.io import NullOutput
+
+    app = make_app()
+    reader = SphinxStandaloneReader(app, parsers={})
+    pub = Publisher(reader=reader,
+                    writer=SphinxDummyWriter(),
+                    destination_class=NullOutput)
+    pub.set_components(None, 'restructuredtext', None)
+    pub.process_programmatic_settings(None, {}, None)
+    source = SphinxFileInput(app, None, source=None, source_path=path,
+                             encoding='utf-8')
+    pub.source = source
+    pub.settings._source = path
+    pub.set_destination(None, None)
+    pub.publish()
+    return pub.document
 
 
 def make_app(**kwargs):
