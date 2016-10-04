@@ -8,7 +8,7 @@ from tempfile import mkdtemp
 import sphinx
 from sphinx.application import Sphinx
 
-from releases import setup as releases_setup # avoid unittest crap
+from . import setup
 
 
 def make_app(**kwargs):
@@ -43,7 +43,7 @@ def make_app(**kwargs):
         )
     finally:
         [rmtree(x) for x in (src, doctree)]
-    releases_setup(app)
+    setup(app)
     # Mock out the config within. More horrible assumptions by Sphinx :(
     config = {
         'releases_release_uri': 'foo_%s',
