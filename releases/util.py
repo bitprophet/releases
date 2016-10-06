@@ -2,7 +2,7 @@
 Utility functions, such as helpers for standalone changelog parsing.
 """
 
-from shutil import rmtree
+from os import rmdir
 from tempfile import mkdtemp
 
 import sphinx
@@ -64,38 +64,58 @@ def make_app(**kwargs):
 
     For example, Sphinx assumes the existence of various source/dest
     directories, even if you're only calling internals that never generate (or
-    read!) on-disk files. This function creates safe temp directories for these
-    instances.
+    sometimes, even read!) on-disk files. This function creates safe temp
+    directories for these instances.
 
     It also neuters Sphinx's internal logging, which otherwise causes verbosity
     in one's own test output and/or debug logs.
 
-    ----
+    All args are stored in a single ``**kwargs``. Aside from the params listed
+    below (all of which are optional), all kwargs given are turned into
+    'releases_xxx' config settings; e.g. ``make_app(foo='bar')`` is like
+    setting ``releases_foo = 'bar'`` in ``conf.py``.
 
-    Kwargs (w/ exception of ``docname``, which is used for document name if
-    given) are turned into 'releases_xxx' config settings, so e.g.
-    ``make_app(foo='bar')`` is like setting ``releases_foo = 'bar'`` in
-    ``conf.py``.
+    :param str docname:
+        Override the document name used (mostly for internal testing).
+
+    :param str srcdir:
+        Sphinx source directory path.
+
+    :param str dstdir:
+        Sphinx dest directory path.
+
+    :param str doctreedir:
+        Sphinx doctree directory path.
+
+    :returns: A Sphinx ``Application`` instance.
     """
-    src, dst, doctree = mkdtemp(), mkdtemp(), mkdtemp()
+    srcdir = kwargs.pop('srcdir', mkdtemp())
+    dstdir = kwargs.pop('dstdir', mkdtemp())
+    doctreedir = kwargs.pop('doctreedir', mkdtemp())
     try:
-        # STFU Sphinx :(
         Sphinx._log = lambda self, message, wfile, nonl=False: None
         app = Sphinx(
-            srcdir=src,
+            srcdir=srcdir,
             confdir=None,
-            outdir=dst,
-            doctreedir=doctree,
+            outdir=dstdir,
+            doctreedir=doctreedir,
             buildername='html',
         )
     finally:
-        [rmtree(x) for x in (src, doctree)]
+        for d in (srcdir, dstdir, doctreedir):
+            # Only remove empty dirs; non-empty dirs are implicitly something
+            # that existed before we ran, and should not be touched.
+            try:
+                rmdir(d)
+            except OSError:
+                pass
     setup(app)
-    # Mock out the config within. More horrible assumptions by Sphinx :(
+    # Mock out the config within. More assumptions by Sphinx :(
     config = {
         'releases_release_uri': 'foo_%s',
         'releases_issue_uri': 'bar_%s',
         'releases_debug': False,
+        'master_doc': 'index',
     }
     # Allow tinkering with document filename
     if 'docname' in kwargs:
