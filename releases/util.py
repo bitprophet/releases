@@ -38,21 +38,45 @@ def get_doctree(path):
 
     :returns: Stuff.
     """
-    from sphinx.io import SphinxStandaloneReader, SphinxDummyWriter, SphinxFileInput
+    import os
+    root, filename = os.path.split(path)
+    docname, _ = os.path.splitext(filename)
+    # TODO: this only works for top level changelog files (i.e. ones where
+    # their dirname is the project/doc root)
+    app = make_app(srcdir=root)
+    # Create a BuildEnvironment. Mm, tasty side effects.
+    app._init_env(freshenv=True)
+    build_env = app.env
+    # Pretend our doc has been updated so BuildEnvironment.update() triggers a
+    # .read_doc() of it (while the app is set; otherwise actual extensions like
+    # Releases may not work, as they may reference it or its config).
+    # TODO: how to actually fake the fact that a given doc needs updating?
+    # TODO: may be worth actually just re-ripping out that chunk of
+    # env.read_doc again now that we have a sorta-working env instance
+    build_env.update(config=app.config, srcdir=root, doctreedir=app.doctreedir, app=app)
+
+    # Code taken from sphinx.environment.read_doc; easier to manually call
+    # it with a working Environment object, instead of doing more random crap
+    # to trick the higher up build system into thinking our single changelog
+    # document was "updated".
+    build_env.temp_data['docname'] = docname
+    build_env.app = app
+    from sphinx.io import SphinxStandaloneReader, SphinxFileInput, SphinxDummyWriter
     from docutils.core import Publisher
     from docutils.io import NullOutput
-
-    app = make_app()
-    reader = SphinxStandaloneReader(app, parsers={})
+    self = build_env # TODO: make explicit
+    reader = SphinxStandaloneReader(self.app, parsers=self.config.source_parsers)
     pub = Publisher(reader=reader,
                     writer=SphinxDummyWriter(),
                     destination_class=NullOutput)
     pub.set_components(None, 'restructuredtext', None)
-    pub.process_programmatic_settings(None, {}, None)
-    source = SphinxFileInput(app, None, source=None, source_path=path,
-                             encoding='utf-8')
+    pub.process_programmatic_settings(None, self.settings, None)
+    # NOTE: docname derived higher up, from our given path
+    src_path = self.doc2path(docname)
+    source = SphinxFileInput(app, self, source=None, source_path=src_path,
+                             encoding=self.config.source_encoding)
     pub.source = source
-    pub.settings._source = path
+    pub.settings._source = src_path
     pub.set_destination(None, None)
     pub.publish()
     return pub.document
