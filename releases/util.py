@@ -8,12 +8,13 @@ from tempfile import mkdtemp
 import sphinx
 from docutils.core import Publisher
 from docutils.io import NullOutput
+from docutils.nodes import bullet_list
 from sphinx.application import Sphinx # not exposed at top level
 from sphinx.io import (
     SphinxStandaloneReader, SphinxFileInput, SphinxDummyWriter,
 )
 
-from . import generate_changelog, setup
+from . import construct_releases, setup
 
 
 def parse_changelog(path):
@@ -27,8 +28,22 @@ def parse_changelog(path):
 
     :param str path: A relative or absolute file path string.
 
-    :returns: Stuff.
+    :returns:
+        A dict of releases (including, if applicable, entries for
+        per-major-line unreleased issues). Keys are release numbers/versions
+        (`"1.0.2"`, `"unreleased_1.x_bugfix"`, etc), values are lists of
+        ``releases.models.Issue`` objects.
     """
+    app, doctree = get_doctree(path)
+    # Have to semi-reproduce the 'find first bullet list' bit from main code,
+    # which is unfortunately side-effect-heavy (thanks to Sphinx plugin
+    # design).
+    first_list = None
+    for node in doctree[0]:
+        if isinstance(node, bullet_list):
+            first_list = node
+            break
+    return changelog2dict(construct_releases(first_list.children, app))
 
 
 def get_doctree(path):
@@ -150,3 +165,15 @@ def make_app(**kwargs):
         init_args = [lambda x: x]
     app.config.init_values(*init_args)
     return app
+
+
+def changelog2dict(changelog):
+    """
+    Helper turning internal list-o-releases structure into a dict.
+
+    See `parse_changelog` docstring for return value details.
+    """
+    d = {}
+    for r in changelog:
+        d[r['obj'].number] = r['entries']
+    return d

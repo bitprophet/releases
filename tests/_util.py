@@ -12,7 +12,7 @@ from releases import (
     release_role,
     construct_releases,
 )
-from releases.util import make_app
+from releases.util import make_app, changelog2dict
 
 
 def inliner(app=None):
@@ -84,12 +84,6 @@ def release_list(*entries, **kwargs):
     if not skip_initial:
         entries.append(release('1.0.0'))
     return entries
-
-def changelog2dict(changelog):
-    d = {}
-    for r in changelog:
-        d[r['obj'].number] = r['entries']
-    return d
 
 def releases(*entries, **kwargs):
     app = kwargs.pop('app', None) or make_app()
