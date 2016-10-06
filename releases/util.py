@@ -41,7 +41,9 @@ def get_doctree(path):
 
     :param str path: A relative or absolute file path string.
 
-    :returns: A ``docutils.document`` object.
+    :returns:
+        A two-tuple of the generated ``sphinx.application.Sphinx`` app and the
+        doctree (a ``docutils.document`` object).
     """
     root, filename = os.path.split(path)
     docname, _ = os.path.splitext(filename)
@@ -72,7 +74,7 @@ def get_doctree(path):
     pub.settings._source = src_path
     pub.set_destination(None, None)
     pub.publish()
-    return pub.document
+    return app, pub.document
 
 
 def make_app(**kwargs):
