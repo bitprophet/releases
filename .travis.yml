@@ -9,7 +9,15 @@ python:
   #- "pypy3" # Looks like Sphinx (as of 1.4.1) is not pypy3 compat
 install:
   - pip install -r dev-requirements.txt
+env:
+  - SPHINX_13=true
+  - SPHINX_13=false
 script:
+  # NOTE: this is the best-supported method for testing multiple dependency
+  # versions right now, see
+  # https://docs.travis-ci.com/user/languages/python/#Testing-Against-Multiple-Versions-of-Dependencies-(e.g.-Django-or-Flask)
+  # NOTE: could strip out from dev-reqs.txt entirely, but what's the point?
+  - "if [[ $SPHINX_13 == true ]]; then pip install -y sphinx<1.4; fi"
   # Primary test suite
   - inv test
   # Integration-level test suite (hard to reliably test full stack in-code :()
