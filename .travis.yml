@@ -17,7 +17,7 @@ script:
   # versions right now, see
   # https://docs.travis-ci.com/user/languages/python/#Testing-Against-Multiple-Versions-of-Dependencies-(e.g.-Django-or-Flask)
   # NOTE: could strip out from dev-reqs.txt entirely, but what's the point?
-  - "if [[ $SPHINX_13 == true ]]; then pip install -y sphinx<1.4; fi"
+  - "if [[ $SPHINX_13 == true ]]; then pip install -y 'sphinx<1.4'; fi"
   # Primary test suite
   - inv test
   # Integration-level test suite (hard to reliably test full stack in-code :()
