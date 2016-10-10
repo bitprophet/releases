@@ -52,7 +52,7 @@ class parse_changelog_(Spec):
         issue = releases['1.0.1'][0]
         eq_(issue.type, 'bug')
         eq_(issue.number, '1')
-        eq_(manager.keys(), [1])
+        eq_(list(manager.keys()), [1])
         buckets = manager[1]
         eq_(len(buckets), 3)
         eq_(buckets['1.0'], []) # emptied into 1.0.1
