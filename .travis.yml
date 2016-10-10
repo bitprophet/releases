@@ -9,9 +9,11 @@ python:
   #- "pypy3" # Looks like Sphinx (as of 1.4.1) is not pypy3 compat
 install:
   - pip install -r dev-requirements.txt
-env:
-  - SPHINX_13=true
-  - SPHINX_13=false
+matrix:
+  # Only need to really test Sphinx 1.3 once, all combos is pointless.
+  include:
+    - python: 2.7
+      env: SPHINX_13=true
 script:
   # NOTE: this is the best-supported method for testing multiple dependency
   # versions right now, see
