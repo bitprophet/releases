@@ -87,7 +87,7 @@ def release_list(*entries, **kwargs):
 
 def releases(*entries, **kwargs):
     app = kwargs.pop('app', None) or make_app()
-    return construct_releases(release_list(*entries, **kwargs), app)
+    return construct_releases(release_list(*entries, **kwargs), app)[0]
 
 def setup_issues(self):
     self.f = f(12)

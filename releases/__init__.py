@@ -529,7 +529,7 @@ def construct_releases(entries, app):
 
     reorder_release_entries(releases)
 
-    return releases
+    return releases, manager
 
 
 def construct_nodes(releases):
@@ -588,7 +588,7 @@ class BulletListVisitor(nodes.NodeVisitor):
         if not self.found_changelog:
             self.found_changelog = True
             # Walk + parse into release mapping
-            releases = construct_releases(node.children, self.app)
+            releases, _ = construct_releases(node.children, self.app)
             # Construct new set of nodes to replace the old, and we're done
             node.replace_self(construct_nodes(releases))
 

@@ -35,9 +35,10 @@ class get_doctree_(Spec):
 
 
 class parse_changelog_(Spec):
-    def yields_releases_dict_from_changelog_path(self):
-        releases = parse_changelog(vanilla)
+    def yields_releases_dict_and_manager_from_changelog_path(self):
+        releases, manager = parse_changelog(vanilla)
         ok_(releases)
+        ok_(manager)
         ok_(isinstance(releases, dict))
         eq_(
             set(releases.keys()),
@@ -51,3 +52,7 @@ class parse_changelog_(Spec):
         issue = releases['1.0.1'][0]
         eq_(issue.type, 'bug')
         eq_(issue.number, '1')
+        eq_(manager.keys(), [1])
+        buckets = manager[1]
+        eq_(len(buckets), 3)
+        eq_(buckets['1.0'], []) # emptied into 1.0.1

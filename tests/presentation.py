@@ -49,7 +49,7 @@ class presentation(Spec):
             release('1.0.2', app=app),
             entry(b(15, app=app)),
             release('1.0.0'),
-        ], app=app))
+        ], app=app)[0])
         # Shorthand for "I'll do my own asserts"
         if expected is None:
             return nodes

@@ -43,7 +43,8 @@ def parse_changelog(path):
         if isinstance(node, bullet_list):
             first_list = node
             break
-    return changelog2dict(construct_releases(first_list.children, app))
+    releases, manager = construct_releases(first_list.children, app)
+    return changelog2dict(releases), manager
 
 
 def get_doctree(path):
