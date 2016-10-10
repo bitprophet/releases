@@ -10,7 +10,8 @@ from docutils.core import Publisher
 from docutils.io import NullOutput
 from docutils.nodes import bullet_list
 from sphinx.application import Sphinx # not exposed at top level
-from sphinx.io import (
+# NOTE: importing these from environment for backwards compat with Sphinx 1.3
+from sphinx.environment import (
     SphinxStandaloneReader, SphinxFileInput, SphinxDummyWriter,
 )
 
@@ -76,7 +77,11 @@ def get_doctree(path):
     # document was "updated".
     env.temp_data['docname'] = docname
     env.app = app
-    reader = SphinxStandaloneReader(env.app, parsers=env.config.source_parsers)
+    # NOTE: SphinxStandaloneReader API changed in 1.4 :(
+    reader_kwargs = {'app': env.app, 'parsers': env.config.source_parsers}
+    if sphinx.version_info[:2] < (1, 4):
+        del reader_kwargs['app']
+    reader = SphinxStandaloneReader(**reader_kwargs)
     pub = Publisher(reader=reader,
                     writer=SphinxDummyWriter(),
                     destination_class=NullOutput)
