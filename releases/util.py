@@ -27,13 +27,30 @@ def parse_changelog(path):
     questions like "are there any unreleased bugfixes for the 2.3 line?" or
     "what was included in release 1.2.1?".
 
+    For example, to answer that first question::
+
+        releases, manager = parse_changelog("/path/to/changelog")
+        unreleased_23 = manager[2]["2.3"] # List of Issue objects
+
+    And the second::
+
+        releases, manager = parse_changelog("/path/to/changelog")
+        v121_issues = releases["1.2.1"] # Also a list of Issue objects
+
     :param str path: A relative or absolute file path string.
 
     :returns:
-        A dict of releases (including, if applicable, entries for
-        per-major-line unreleased issues). Keys are release numbers/versions
-        (`"1.0.2"`, `"unreleased_1.x_bugfix"`, etc), values are lists of
-        ``releases.models.Issue`` objects.
+        A two-tuple consisting of:
+
+        - A dict of releases (including, if applicable, entries for
+          per-major-line unreleased issues). Keys are release numbers/versions
+          (`"1.0.2"`, `"unreleased_1.x_bugfix"`, etc), values are lists of
+          ``releases.models.Issue`` objects.
+        - A ``LineManager`` object, which (among other things) acts as a nested
+          dict whose top level keys are major release family integers (``1``,
+          ``2`` etc) and whose secondary keys are minor release line strings
+          (``"1.1"``, ``"1.2"``, ``"unreleased_feature"``, etc). Final values
+          are lists of ``Issue`` objects.
     """
     app, doctree = get_doctree(path)
     # Have to semi-reproduce the 'find first bullet list' bit from main code,
