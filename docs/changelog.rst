@@ -2,6 +2,11 @@
 Changelog
 =========
 
+* :feature:`-` Add ``releases.util``, exposing (among other things) a highly
+  useful ``parse_changelog(path)`` function that returns a user-facing dict
+  representing a parsed changelog. Allows users to examine their changelogs
+  programmatically and answer questions like "do I have any outstanding bugs in
+  the 1.1 release line?".
 * :release:`1.2.1 <2016-07-25>`
 * :support:`51 backported` Modernize release management so PyPI trove
   classifiers are more accurate, wheel archives are universal instead of Python
