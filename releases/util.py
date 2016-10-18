@@ -27,30 +27,27 @@ def parse_changelog(path):
     questions like "are there any unreleased bugfixes for the 2.3 line?" or
     "what was included in release 1.2.1?".
 
-    For example, to answer that first question::
+    For example, answering the above questions is as simple as::
 
-        releases, manager = parse_changelog("/path/to/changelog")
-        unreleased_23 = manager[2]["2.3"] # List of Issue objects
-
-    And the second::
-
-        releases, manager = parse_changelog("/path/to/changelog")
-        v121_issues = releases["1.2.1"] # Also a list of Issue objects
+        changelog = parse_changelog("/path/to/changelog")
+        print("Unreleased issues for 2.3.x: {0}".format(changelog['2.3']))
+        print("Contents of v1.2.1: {0}".format(changelog['1.2.1']))
 
     :param str path: A relative or absolute file path string.
 
     :returns:
-        A two-tuple consisting of:
+        A dict whose keys map to lists of ``releases.models.Issue`` objects, as
+        follows:
 
-        - A dict of releases (including, if applicable, entries for
-          per-major-line unreleased issues). Keys are release numbers/versions
-          (`"1.0.2"`, `"unreleased_1.x_bugfix"`, etc), values are lists of
-          ``releases.models.Issue`` objects.
-        - A ``LineManager`` object, which (among other things) acts as a nested
-          dict whose top level keys are major release family integers (``1``,
-          ``2`` etc) and whose secondary keys are minor release line strings
-          (``"1.1"``, ``"1.2"``, ``"unreleased_feature"``, etc). Final values
-          are lists of ``Issue`` objects.
+        - Actual releases are full version number keys, such as ``"1.2.1"`` or
+          ``"2.0.0"``.
+        - Unreleased bugs (or bug-like issues; see the Releases docs) are
+          stored in minor-release buckets, e.g. ``"1.2"`` or ``"2.0"``.
+        - Unreleased features (or feature-like issues) are found in
+          ``"unreleased_N_feature"``, where ``N`` is one of the major release
+          families (so, a changelog spanning only 1.x will only have
+          ``unreleased_1_feature``, whereas one with 1.x and 2.x releases will
+          have ``unreleased_1_feature`` and ``unreleased_2_feature``, etc).
     """
     app, doctree = get_doctree(path)
     # Have to semi-reproduce the 'find first bullet list' bit from main code,
@@ -61,8 +58,29 @@ def parse_changelog(path):
         if isinstance(node, bullet_list):
             first_list = node
             break
+    # Initial parse into the structures Releases finds useful internally
     releases, manager = construct_releases(first_list.children, app)
-    return changelog2dict(releases), manager
+    ret = changelog2dict(releases)
+    # Stitch them together into something an end-user would find better:
+    # - nuke unreleased_N.N_Y as their contents will be represented in the
+    # per-line buckets
+    for key in ret.copy():
+        if key.startswith('unreleased'):
+            del ret[key]
+    for family in manager:
+        # - remove unreleased_bugfix, as they are accounted for in the per-line
+        # buckets too. No need to store anywhere.
+        manager[family].pop('unreleased_bugfix', None)
+        # - bring over each major family's unreleased_feature as
+        # unreleased_N_feature
+        unreleased = manager[family].pop('unreleased_feature', None)
+        if unreleased is not None:
+            ret['unreleased_{0}_feature'.format(family)] = unreleased
+        # - bring over all per-line buckets from manager (flattening)
+        # Here, all that's left in the per-family bucket should be lines, not
+        # unreleased_*
+        ret.update(manager[family])
+    return ret
 
 
 def get_doctree(path):
