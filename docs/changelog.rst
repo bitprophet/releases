@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* :release:`1.3.0 <2016-12-09>`
 * :feature:`-` Add ``releases.util``, exposing (among other things) a highly
   useful ``parse_changelog(path)`` function that returns a user-facing dict
   representing a parsed changelog. Allows users to examine their changelogs
