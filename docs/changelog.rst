@@ -2,7 +2,8 @@
 Changelog
 =========
 
-* :bug:`-` Report extension version to Sphinx.
+* :bug:`60` Report extension version to Sphinx for improved Sphinx debug
+  output. Credit: William Minchin.
 * :bug:`66` (via :issue:`67`) Deal with some Sphinx 1.6.1 brokenness causing
   ``AttributeError`` by leveraging ``getattr()``'s default-value argument.
   Thanks to Ian Cordasco for catch & patch.
