@@ -2,6 +2,9 @@
 Changelog
 =========
 
+* :bug:`66` (via :issue:`67`) Deal with some Sphinx 1.6.1 brokenness causing
+  ``AttributeError`` by leveraging ``getattr()``'s default-value argument.
+  Thanks to Ian Cordasco for catch & patch.
 * :release:`1.3.0 <2016-12-09>`
 * :feature:`-` Add ``releases.util``, exposing (among other things) a highly
   useful ``parse_changelog(path)`` function that returns a user-facing dict
