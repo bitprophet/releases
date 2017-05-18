@@ -59,7 +59,7 @@ class Issue(nodes.Element):
 
     def __eq__(self, other):
         for attr in self._cmp_keys:
-            if getattr(self, attr) != getattr(other, attr):
+            if getattr(self, attr, None) != getattr(other, attr, None):
                 return False
         return True
 
