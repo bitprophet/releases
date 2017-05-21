@@ -16,7 +16,7 @@ setup(
     author_email='jeff@bitprophet.org',
     url='https://github.com/bitprophet/releases',
     packages=['releases'],
-    install_requires=['semantic_version<3.0', 'sphinx>=1.3,<1.5'],
+    install_requires=['semantic_version<3.0', 'sphinx>=1.3'],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
