@@ -2,6 +2,8 @@
 Changelog
 =========
 
+* :support:`68` Update packaging requirements to allow for ``sphinx>=1.3,<2``.
+  Thanks to William Minchin.
 * :release:`1.3.1 <2017-05-18>`
 * :bug:`60` Report extension version to Sphinx for improved Sphinx debug
   output. Credit: William Minchin.
