@@ -105,7 +105,22 @@ def get_doctree(path):
     # Create & init a BuildEnvironment. Mm, tasty side effects.
     app._init_env(freshenv=True)
     env = app.env
-    env.update(config=app.config, srcdir=root, doctreedir=app.doctreedir, app=app)
+    # More arity/API changes: Sphinx 1.3/1.4-ish require one to pass in the app
+    # obj in BuildEnvironment.update(); modern Sphinx performs that inside
+    # Application._init_env() (which we just called above) and so that kwarg is
+    # removed from update(). EAFP.
+    kwargs = dict(
+        config=app.config,
+        srcdir=root,
+        doctreedir=app.doctreedir,
+        app=app,
+    )
+    try:
+        env.update(**kwargs)
+    except TypeError:
+        # Assume newer Sphinx w/o an app= kwarg
+        del kwargs['app']
+        env.update(**kwargs)
     # Code taken from sphinx.environment.read_doc; easier to manually call
     # it with a working Environment object, instead of doing more random crap
     # to trick the higher up build system into thinking our single changelog
