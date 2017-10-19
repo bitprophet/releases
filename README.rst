@@ -4,9 +4,9 @@
 What is Releases?
 =================
 
-Releases is a Python 2+3 compatible `Sphinx <http://sphinx-doc.org>`_ extension
-designed to help you keep a source control friendly, merge friendly changelog
-file & turn it into useful, human readable HTML output.
+Releases is a Python (2.7, 3.4+) compatible `Sphinx <http://sphinx-doc.org>`_
+(1.3+) extension designed to help you keep a source control friendly, merge
+friendly changelog file & turn it into useful, human readable HTML output.
 
 Specifically:
 
