@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* :release:`1.3.2 <2017-10-19>`
 * :support:`68 backported` Update packaging requirements to allow for
   ``sphinx>=1.3,<2``. Thanks to William Minchin.
 * :release:`1.3.1 <2017-05-18>`
