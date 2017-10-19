@@ -46,7 +46,7 @@ class parse_changelog_(Spec):
         ok_(isinstance(changelog, dict))
         eq_(
             set(changelog.keys()),
-            set(('1.0.0', '1.0.1', '1.0', 'unreleased_1_feature')),
+            {'1.0.0', '1.0.1', '1.0', 'unreleased_1_feature'},
         )
         eq_(len(changelog['1.0.0']), 0)
         eq_(len(changelog['unreleased_1_feature']), 0)

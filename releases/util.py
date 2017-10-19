@@ -30,8 +30,8 @@ def parse_changelog(path):
     For example, answering the above questions is as simple as::
 
         changelog = parse_changelog("/path/to/changelog")
-        print("Unreleased issues for 2.3.x: {0}".format(changelog['2.3']))
-        print("Contents of v1.2.1: {0}".format(changelog['1.2.1']))
+        print("Unreleased issues for 2.3.x: {}".format(changelog['2.3']))
+        print("Contents of v1.2.1: {}".format(changelog['1.2.1']))
 
     :param str path: A relative or absolute file path string.
 
@@ -75,7 +75,7 @@ def parse_changelog(path):
         # unreleased_N_feature
         unreleased = manager[family].pop('unreleased_feature', None)
         if unreleased is not None:
-            ret['unreleased_{0}_feature'.format(family)] = unreleased
+            ret['unreleased_{}_feature'.format(family)] = unreleased
         # - bring over all per-line buckets from manager (flattening)
         # Here, all that's left in the per-family bucket should be lines, not
         # unreleased_*
@@ -212,7 +212,7 @@ def make_app(**kwargs):
         app.env.temp_data['docname'] = kwargs.pop('docname')
     # Allow config overrides via kwargs
     for name in kwargs:
-        config['releases_{0}'.format(name)] = kwargs[name]
+        config['releases_{}'.format(name)] = kwargs[name]
     # Stitch together as the sphinx app init() usually does w/ real conf files
     app.config._raw_config = config
     # init_values() requires a 'warn' runner on Sphinx 1.3-1.6, so if we seem
@@ -231,7 +231,4 @@ def changelog2dict(changelog):
 
     See `parse_changelog` docstring for return value details.
     """
-    d = {}
-    for r in changelog:
-        d[r['obj'].number] = r['entries']
-    return d
+    return {r['obj'].number: r['entries'] for r in changelog}

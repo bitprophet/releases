@@ -112,8 +112,8 @@ def expect_releases(entries, release_map, skip_initial=False, app=None):
         kwargs['app'] = app
     changelog = changelog2dict(releases(*entries, **kwargs))
     snapshot = dict(changelog)
-    err = "Got unexpected contents for {0}: wanted {1}, got {2}"
-    err += "\nFull changelog: {3!r}\n"
+    err = "Got unexpected contents for {}: wanted {}, got {}"
+    err += "\nFull changelog: {!r}\n"
     for rel, issues in six.iteritems(release_map):
         found = changelog.pop(rel)
         eq_(set(found), set(issues), err.format(rel, issues, found, snapshot))
@@ -121,4 +121,4 @@ def expect_releases(entries, release_map, skip_initial=False, app=None):
     for key in list(changelog.keys()):
         if not changelog[key]:
             del changelog[key]
-    ok_(not changelog, "Found leftovers: {0}".format(changelog))
+    ok_(not changelog, "Found leftovers: {}".format(changelog))
