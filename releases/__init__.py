@@ -4,6 +4,7 @@ import sys
 from functools import partial
 
 from docutils import nodes, utils
+from docutils.parsers.rst import roles
 import six
 
 from .models import Issue, ISSUE_TYPES, Release, Version, Spec
@@ -632,10 +633,19 @@ def setup(app):
         )
     # Register intermediate roles
     for x in list(ISSUE_TYPES) + ['issue']:
-        app.add_role(x, issues_role)
-    app.add_role('release', release_role)
+        add_role(app, x, issues_role)
+    add_role(app, 'release', release_role)
     # Hook in our changelog transmutation at appropriate step
     app.connect('doctree-read', generate_changelog)
 
     # identifies the version of our extension
     return {'version': __version__}
+
+
+def add_role(app, name, role_obj):
+    # This (introspecting docutils.parser.rst.roles._roles) is the same trick
+    # Sphinx uses to emit warnings about double-registering; it's a PITA to try
+    # and configure the app early on so it doesn't emit those warnings, so we
+    # instead just...don't double-register. Meh.
+    if name not in roles._roles:
+        app.add_role(name, role_obj)
