@@ -130,7 +130,7 @@ def get_doctree(path):
     env.app = app
     # NOTE: SphinxStandaloneReader API changed in 1.4 :(
     reader_kwargs = {
-        'app': env.app,
+        'app': app,
         'parsers': env.config.source_parsers,
     }
     if sphinx.version_info[:2] < (1, 4):
