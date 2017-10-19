@@ -2,6 +2,9 @@
 Changelog
 =========
 
+* :bug:`-` Identified a handful of issues with our Sphinx pin & subsequently,
+  internal changes in Sphinx 1.6 which broke (and/or appear to break, such as
+  noisy warnings) our own behavior. These have (hopefully) all been fixed.
 * :release:`1.3.2 <2017-10-19>`
 * :support:`68 backported` Update packaging requirements to allow for
   ``sphinx>=1.3,<2``. Thanks to William Minchin.
