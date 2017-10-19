@@ -2,6 +2,7 @@
 Utility functions, such as helpers for standalone changelog parsing.
 """
 
+import logging
 import os
 from tempfile import mkdtemp
 
@@ -191,7 +192,12 @@ def make_app(**kwargs):
     dstdir = kwargs.pop('dstdir', mkdtemp())
     doctreedir = kwargs.pop('doctreedir', mkdtemp())
     try:
+        # Sphinx <1.6ish
         Sphinx._log = lambda self, message, wfile, nonl=False: None
+        # Sphinx >=1.6ish. Technically still lets Very Bad Things through,
+        # unlike the total muting above, but probably OK.
+        logging.getLogger('sphinx').setLevel(logging.ERROR)
+        # App API seems to work on all versions so far.
         app = Sphinx(
             srcdir=srcdir,
             confdir=None,

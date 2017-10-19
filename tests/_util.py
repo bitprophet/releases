@@ -1,5 +1,3 @@
-import logging
-
 from docutils.nodes import (
     list_item, paragraph,
 )
@@ -15,12 +13,6 @@ from releases import (
     construct_releases,
 )
 from releases.util import make_app, changelog2dict
-
-
-# Mute Sphinx's own logging, as it makes test output quite verbose (many
-# 'Running Sphinx' / 'loading pickled environment' messages since we recreate
-# new app objects each time for a clean context.)
-logging.getLogger('sphinx').setLevel(logging.ERROR)
 
 
 def inliner(app=None):

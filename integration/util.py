@@ -4,7 +4,6 @@ Tests for the ``releases.util`` module.
 These are in the integration suite because they deal with on-disk files.
 """
 
-import logging
 import os
 
 from docutils.nodes import document
@@ -14,9 +13,6 @@ from sphinx.application import Sphinx
 from releases.models import Release, Issue
 from releases.util import get_doctree, parse_changelog
 
-
-# Mute Sphinx's own logging, as it makes test output quite verbose
-logging.getLogger('sphinx').setLevel(logging.ERROR)
 
 support = os.path.join(os.path.dirname(__file__), '_support')
 vanilla = os.path.join(support, 'vanilla', 'changelog.rst')
