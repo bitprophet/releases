@@ -200,11 +200,13 @@ def make_app(**kwargs):
         config['releases_{0}'.format(name)] = kwargs[name]
     # Stitch together as the sphinx app init() usually does w/ real conf files
     app.config._raw_config = config
-    # init_values() requires a 'warn' runner on Sphinx 1.3+, give it no-op.
-    init_args = []
-    if sphinx.version_info[:2] > (1, 2):
-        init_args = [lambda x: x]
-    app.config.init_values(*init_args)
+    # init_values() requires a 'warn' runner on Sphinx 1.3-1.6, so if we seem
+    # to be hitting arity errors, give it a dummy such callable. Hopefully
+    # calling twice doesn't introduce any wacko state issues :(
+    try:
+        app.config.init_values()
+    except TypeError: # boy I wish Python had an ArityError or w/e
+        app.config.init_values(lambda x: x)
     return app
 
 
