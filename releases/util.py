@@ -128,7 +128,10 @@ def get_doctree(path):
     env.temp_data['docname'] = docname
     env.app = app
     # NOTE: SphinxStandaloneReader API changed in 1.4 :(
-    reader_kwargs = {'app': env.app, 'parsers': env.config.source_parsers}
+    reader_kwargs = {
+        'app': env.app,
+        'parsers': env.config.source_parsers,
+    }
     if sphinx.version_info[:2] < (1, 4):
         del reader_kwargs['app']
     reader = SphinxStandaloneReader(**reader_kwargs)
@@ -139,8 +142,13 @@ def get_doctree(path):
     pub.process_programmatic_settings(None, env.settings, None)
     # NOTE: docname derived higher up, from our given path
     src_path = env.doc2path(docname)
-    source = SphinxFileInput(app, env, source=None, source_path=src_path,
-                             encoding=env.config.source_encoding)
+    source = SphinxFileInput(
+        app,
+        env,
+        source=None,
+        source_path=src_path,
+        encoding=env.config.source_encoding,
+    )
     pub.source = source
     pub.settings._source = src_path
     pub.set_destination(None, None)
