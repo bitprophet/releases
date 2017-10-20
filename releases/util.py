@@ -13,7 +13,7 @@ from docutils.nodes import bullet_list
 from sphinx.application import Sphinx # not exposed at top level
 # NOTE: importing these from environment for backwards compat with Sphinx 1.3
 from sphinx.environment import (
-    SphinxStandaloneReader, SphinxFileInput, SphinxDummyWriter,
+    SphinxStandaloneReader, SphinxFileInput, SphinxDummyWriter, sphinx_domains,
 )
 
 from . import construct_releases, setup
@@ -132,29 +132,34 @@ def get_doctree(path):
     reader_kwargs = {
         'app': app,
         'parsers': env.config.source_parsers,
+        #'parsers': app.registry.get_source_parsers()
     }
     if sphinx.version_info[:2] < (1, 4):
         del reader_kwargs['app']
-    reader = SphinxStandaloneReader(**reader_kwargs)
-    pub = Publisher(reader=reader,
-                    writer=SphinxDummyWriter(),
-                    destination_class=NullOutput)
-    pub.set_components(None, 'restructuredtext', None)
-    pub.process_programmatic_settings(None, env.settings, None)
-    # NOTE: docname derived higher up, from our given path
-    src_path = env.doc2path(docname)
-    source = SphinxFileInput(
-        app,
-        env,
-        source=None,
-        source_path=src_path,
-        encoding=env.config.source_encoding,
-    )
-    pub.source = source
-    pub.settings._source = src_path
-    pub.set_destination(None, None)
-    pub.publish()
-    return app, pub.document
+    # This monkeypatches (!!!) docutils to 'inject' all registered Sphinx
+    # domains' roles & so forth. Without this, rendering the doctree lacks
+    # almost all Sphinx magic, including things like :ref: and :doc:!
+    with sphinx_domains(env):
+        reader = SphinxStandaloneReader(**reader_kwargs)
+        pub = Publisher(reader=reader,
+                        writer=SphinxDummyWriter(),
+                        destination_class=NullOutput)
+        pub.set_components(None, 'restructuredtext', None)
+        pub.process_programmatic_settings(None, env.settings, None)
+        # NOTE: docname derived higher up, from our given path
+        src_path = env.doc2path(docname)
+        source = SphinxFileInput(
+            app,
+            env,
+            source=None,
+            source_path=src_path,
+            encoding=env.config.source_encoding,
+        )
+        pub.source = source
+        pub.settings._source = src_path
+        pub.set_destination(None, None)
+        pub.publish()
+        return app, pub.document
 
 
 def make_app(**kwargs):
