@@ -13,8 +13,18 @@ from docutils.nodes import bullet_list
 from sphinx.application import Sphinx # not exposed at top level
 # NOTE: importing these from environment for backwards compat with Sphinx 1.3
 from sphinx.environment import (
-    SphinxStandaloneReader, SphinxFileInput, SphinxDummyWriter, sphinx_domains,
+    SphinxStandaloneReader, SphinxFileInput, SphinxDummyWriter,
 )
+# sphinx_domains is only in Sphinx 1.5+, but is presumably necessary from then
+# onwards.
+try:
+    from sphinx.util.docutils import sphinx_domains
+except ImportError:
+    # Just dummy it up.
+    from contextlib import contextmanager
+    @contextmanager
+    def sphinx_domains(env):
+        yield
 
 from . import construct_releases, setup
 
