@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* :release:`1.4.0 <2017-10-20>`
 * :support:`-` Drop Python 2.6 and 3.3 support, to correspond with earlier
   changes in Sphinx and most other public Python projects.
 * :bug:`- major` Identified a handful of issues with our Sphinx pin &
