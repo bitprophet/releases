@@ -18,7 +18,7 @@ setup(
     packages=['releases'],
     install_requires=[
         'semantic_version<3.0',
-        'sphinx>=1.3,<2',
+        'sphinx>=1.3,<1.7',
     ],
     classifiers=[
         'Development Status :: 5 - Production/Stable',

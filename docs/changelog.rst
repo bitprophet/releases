@@ -2,6 +2,10 @@
 Changelog
 =========
 
+* :support:`73` Sphinx 1.7.x changed some semi-public APIs; given this is the
+  second minor release in a row to do so, we're explicitly bracketing our
+  ``setup.py`` dependencies to Sphinx >= 1.3 and < 1.7. We expect to bump this
+  up one minor release at a time as we add compatibility back in.
 * :release:`1.4.0 <2017-10-20>`
 * :support:`-` Drop Python 2.6 and 3.3 support, to correspond with earlier
   changes in Sphinx and most other public Python projects.
