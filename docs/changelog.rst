@@ -2,6 +2,10 @@
 Changelog
 =========
 
+* :release:`1.4.2 <2018-04-27>`
+* :support:`74` We never pulled our README into our ``setup.py`` metadata,
+  resulting in a rather sparse PyPI page! This has been fixed. Thanks to Peter
+  Demin for the report.
 * :release:`1.4.1 <2018-03-28>`
 * :support:`73` Sphinx 1.7.x changed some semi-public APIs; given this is the
   second minor release in a row to do so, we're explicitly bracketing our
