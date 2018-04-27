@@ -12,6 +12,7 @@ setup(
     name='releases',
     version=version,
     description='A Sphinx extension for changelog manipulation',
+    long_description=open("README.rst").read(),
     author='Jeff Forcier',
     author_email='jeff@bitprophet.org',
     url='https://github.com/bitprophet/releases',
