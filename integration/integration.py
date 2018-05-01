@@ -12,7 +12,7 @@ class integration(Spec):
     def teardown(self):
         os.chdir(self.cwd)
 
-    def _build(self, folder, opts, target, asserts=None, conf='.'):
+    def _build(self, folder, opts, target, asserts=None, conf='.', warn=False):
         # Dynamic sphinx opt overrides
         if opts:
             pairs = map(lambda x: '='.join(x), (opts or {}).items())
@@ -27,7 +27,7 @@ class integration(Spec):
             # Build
             cmd = 'sphinx-build {} -c {} -W {} {}'.format(
                 flagstr, conf, folder, build)
-            result = run(cmd, warn=True, hide=True)
+            result = run(cmd, warn=warn, hide=True)
             if callable(asserts):
                 asserts(result, build, target)
             return result
@@ -81,6 +81,7 @@ class integration(Spec):
             folder='hidden_issues',
             opts=None,
             target='changelog',
+            warn=True,
         )
         assert result.failed
         assert "ValueError" in result.stderr
