@@ -34,10 +34,7 @@ class LineManager(dict):
         if major_number == 0 and self.config.releases_unstable_prehistory:
             keys = ['unreleased']
         # Either way, the buckets default to an empty list
-        empty = {}
-        for key in keys:
-            empty[key] = []
-        self[major_number] = empty
+        self[major_number] = {key: [] for key in keys}
 
     @property
     def unstable_prehistory(self):

@@ -1,14 +1,9 @@
-from tempfile import mkdtemp
-from shutil import rmtree
-
 from docutils.nodes import (
     list_item, paragraph,
 )
 from mock import Mock
 from spec import eq_, ok_
-from sphinx.application import Sphinx
 import six
-import sphinx
 
 from releases import (
     Issue,
@@ -17,56 +12,8 @@ from releases import (
     release_role,
     construct_releases,
 )
-from releases import setup as releases_setup # avoid unittest crap
+from releases.util import make_app, changelog2dict
 
-
-
-def make_app(**kwargs):
-    """
-    Create a real Sphinx app, with stupid temp dirs because it assumes.
-
-    Helps catch things like "testing a config option but forgot
-    app.add_config_value()"
-
-    Kwargs (w/ exception of 'docname' which is used for document name if given)
-    are turned into 'releases_xxx' config settings, so e.g.
-    ``make_app(foo='bar')`` is like setting ``releases_foo = 'bar'`` in
-    ``conf.py``.
-    """
-    src, dst, doctree = mkdtemp(), mkdtemp(), mkdtemp()
-    try:
-        # STFU Sphinx :(
-        Sphinx._log = lambda self, message, wfile, nonl=False: None
-        app = Sphinx(
-            srcdir=src,
-            confdir=None,
-            outdir=dst,
-            doctreedir=doctree,
-            buildername='html',
-        )
-    finally:
-        [rmtree(x) for x in (src, doctree)]
-    releases_setup(app)
-    # Mock out the config within. More horrible assumptions by Sphinx :(
-    config = {
-        'releases_release_uri': 'foo_%s',
-        'releases_issue_uri': 'bar_%s',
-        'releases_debug': False,
-    }
-    # Allow tinkering with document filename
-    if 'docname' in kwargs:
-        app.env.temp_data['docname'] = kwargs.pop('docname')
-    # Allow config overrides via kwargs
-    for name in kwargs:
-        config['releases_{0}'.format(name)] = kwargs[name]
-    # Stitch together as the sphinx app init() usually does w/ real conf files
-    app.config._raw_config = config
-    # init_values() requires a 'warn' runner on Sphinx 1.3+, give it no-op.
-    init_args = []
-    if sphinx.version_info[:2] > (1, 2):
-        init_args = [lambda x: x]
-    app.config.init_values(*init_args)
-    return app
 
 def inliner(app=None):
     app = app or make_app()
@@ -138,15 +85,9 @@ def release_list(*entries, **kwargs):
         entries.append(release('1.0.0'))
     return entries
 
-def changelog2dict(changelog):
-    d = {}
-    for r in changelog:
-        d[r['obj'].number] = r['entries']
-    return d
-
 def releases(*entries, **kwargs):
     app = kwargs.pop('app', None) or make_app()
-    return construct_releases(release_list(*entries, **kwargs), app)
+    return construct_releases(release_list(*entries, **kwargs), app)[0]
 
 def setup_issues(self):
     self.f = f(12)
@@ -163,8 +104,8 @@ def expect_releases(entries, release_map, skip_initial=False, app=None):
         kwargs['app'] = app
     changelog = changelog2dict(releases(*entries, **kwargs))
     snapshot = dict(changelog)
-    err = "Got unexpected contents for {0}: wanted {1}, got {2}"
-    err += "\nFull changelog: {3!r}\n"
+    err = "Got unexpected contents for {}: wanted {}, got {}"
+    err += "\nFull changelog: {!r}\n"
     for rel, issues in six.iteritems(release_map):
         found = changelog.pop(rel)
         eq_(set(found), set(issues), err.format(rel, issues, found, snapshot))
@@ -172,4 +113,4 @@ def expect_releases(entries, release_map, skip_initial=False, app=None):
     for key in list(changelog.keys()):
         if not changelog[key]:
             del changelog[key]
-    ok_(not changelog, "Found leftovers: {0}".format(changelog))
+    ok_(not changelog, "Found leftovers: {}".format(changelog))

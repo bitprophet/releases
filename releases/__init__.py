@@ -4,10 +4,12 @@ import sys
 from functools import partial
 
 from docutils import nodes, utils
+from docutils.parsers.rst import roles
 import six
 
 from .models import Issue, ISSUE_TYPES, Release, Version, Spec
 from .line_manager import LineManager
+from ._version import __version__
 
 
 def _log(txt, config):
@@ -44,7 +46,7 @@ def scan_for_spec(keyword):
     # First, test for intermediate '1.2+' style
     matches = release_line_re.findall(keyword)
     if matches:
-        return Spec(">={0}".format(matches[0]))
+        return Spec(">={}".format(matches[0]))
     # Failing that, see if Spec can make sense of it
     try:
         return Spec(keyword)
@@ -78,7 +80,7 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
             # TODO: deal with % vs .format()
             ref = config.releases_issue_uri % issue_no
         elif config.releases_github_path:
-            ref = "https://github.com/{0}/issues/{1}".format(
+            ref = "https://github.com/{}/issues/{}".format(
                 config.releases_github_path, issue_no)
         # Only generate a reference/link if we were able to make a URI
         if ref:
@@ -109,7 +111,7 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
                 if part in ('backported', 'major'):
                     keyword = part
                 else:
-                    err = "Gave unknown keyword {0!r} for issue no. {1}"
+                    err = "Gave unknown keyword {!r} for issue no. {}"
                     raise ValueError(err.format(keyword, issue_no))
         # Create temporary node w/ data & final nodes to publish
         node = Issue(
@@ -136,17 +138,17 @@ def release_nodes(text, slug, date, config):
         # TODO: % vs .format()
         uri = config.releases_release_uri % slug
     elif config.releases_github_path:
-        uri = "https://github.com/{0}/tree/{1}".format(
+        uri = "https://github.com/{}/tree/{}".format(
             config.releases_github_path, slug)
     # Only construct link tag if user actually configured release URIs somehow
     if uri:
-        link = '<a class="reference external" href="{0}">{1}</a>'.format(uri, text)
+        link = '<a class="reference external" href="{}">{}</a>'.format(uri, text)
     else:
         link = text
     datespan = ''
     if date:
-        datespan = ' <span style="font-size: 75%;">{0}</span>'.format(date)
-    header = '<h2 style="margin-bottom: 0.3em;">{0}{1}</h2>'.format(
+        datespan = ' <span style="font-size: 75%;">{}</span>'.format(date)
+    header = '<h2 style="margin-bottom: 0.3em;">{}{}</h2>'.format(
         link, datespan)
     return nodes.section('',
         nodes.raw(rawtext='', text=header, format='html'),
@@ -188,7 +190,7 @@ def generate_unreleased_entry(header, line, issues, manager, app):
         None,
         app.config
     )]
-    log("Creating {0!r} faux-release with {1!r}".format(line, issues))
+    log("Creating {!r} faux-release with {!r}".format(line, issues))
     return {
         'obj': Release(number=line, date=None, nodelist=nodelist),
         'entries': issues,
@@ -205,13 +207,13 @@ def append_unreleased_entries(app, manager, releases):
     """
     for family, lines in six.iteritems(manager):
         for type_ in ('bugfix', 'feature'):
-            bucket = 'unreleased_{0}'.format(type_)
+            bucket = 'unreleased_{}'.format(type_)
             if bucket not in lines: # Implies unstable prehistory + 0.x fam
                 continue
             issues = lines[bucket]
-            fam_prefix = "{0}.x ".format(family) if len(manager) > 1 else ""
-            header = "Next {0}{1} release".format(fam_prefix, type_)
-            line = "unreleased_{0}.x_{1}".format(family, type_)
+            fam_prefix = "{}.x ".format(family) if len(manager) > 1 else ""
+            header = "Next {}{} release".format(fam_prefix, type_)
+            line = "unreleased_{}.x_{}".format(family, type_)
             releases.append(
                 generate_unreleased_entry(header, line, issues, manager, app)
             )
@@ -246,7 +248,7 @@ def construct_entry_with_release(focus, issues, manager, log, releases, rest):
         missing = [i for i in explicit if i not in issues]
         if missing:
             raise ValueError(
-                "Couldn't find issue(s) #{0} in the changelog!".format(
+                "Couldn't find issue(s) #{} in the changelog!".format(
                     ', '.join(missing)))
         # Obtain the explicitly named issues from global list
         entries = []
@@ -357,9 +359,9 @@ def construct_entry_without_release(focus, issues, manager, log, rest):
         buried = focus.traverse(Issue)
         if buried:
             msg = """
-Found issue node ({0!r}) buried inside another node:
+Found issue node ({!r}) buried inside another node:
 
-{1}
+{}
 
 Please double-check your ReST syntax! There is probably text in the above
 output that will show you which part of your changelog to look at.
@@ -529,7 +531,7 @@ def construct_releases(entries, app):
 
     reorder_release_entries(releases)
 
-    return releases
+    return releases, manager
 
 
 def construct_nodes(releases):
@@ -588,7 +590,7 @@ class BulletListVisitor(nodes.NodeVisitor):
         if not self.found_changelog:
             self.found_changelog = True
             # Walk + parse into release mapping
-            releases = construct_releases(node.children, self.app)
+            releases, _ = construct_releases(node.children, self.app)
             # Construct new set of nodes to replace the old, and we're done
             node.replace_self(construct_nodes(releases))
 
@@ -627,7 +629,7 @@ def setup(app):
         ('unstable_prehistory', False),
     ):
         app.add_config_value(
-            name='releases_{0}'.format(key), default=default, rebuild='html'
+            name='releases_{}'.format(key), default=default, rebuild='html'
         )
     # if a string is given for `document_name`, convert it to a list
     # done to maintain backwards compatibility
@@ -643,7 +645,19 @@ def setup(app):
 
     # Register intermediate roles
     for x in list(ISSUE_TYPES) + ['issue']:
-        app.add_role(x, issues_role)
-    app.add_role('release', release_role)
+        add_role(app, x, issues_role)
+    add_role(app, 'release', release_role)
     # Hook in our changelog transmutation at appropriate step
     app.connect('doctree-read', generate_changelog)
+
+    # identifies the version of our extension
+    return {'version': __version__}
+
+
+def add_role(app, name, role_obj):
+    # This (introspecting docutils.parser.rst.roles._roles) is the same trick
+    # Sphinx uses to emit warnings about double-registering; it's a PITA to try
+    # and configure the app early on so it doesn't emit those warnings, so we
+    # instead just...don't double-register. Meh.
+    if name not in roles._roles:
+        app.add_role(name, role_obj)

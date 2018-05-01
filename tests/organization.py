@@ -159,7 +159,7 @@ class organization(Spec):
         )
         # Modify 1.0.1 release to be speshul
         changelog[0][0].append(Text("2, 3"))
-        rendered = construct_releases(changelog, make_app())
+        rendered, _ = construct_releases(changelog, make_app())
         # 1.0.1 includes just 2 and 3, not bug 1
         one_0_1 = rendered[3]['entries']
         one_1_1 = rendered[2]['entries']
@@ -184,7 +184,7 @@ class organization(Spec):
         changelog = release_list('1.1.0', f1, f2)
         # Ensure that 1.1.0 specifies feature 2
         changelog[0][0].append(Text("2"))
-        rendered = changelog2dict(construct_releases(changelog, make_app()))
+        rendered = changelog2dict(construct_releases(changelog, make_app())[0])
         # 1.1.0 should have feature 2 only
         assert f2 in rendered['1.1.0']
         assert f1 not in rendered['1.1.0']
@@ -199,7 +199,7 @@ class organization(Spec):
         changelog = release_list('1.0.1', b1, b2)
         # Ensure that 1.0.1 specifies bug 2
         changelog[0][0].append(Text('2'))
-        rendered = construct_releases(changelog, make_app())
+        rendered, _ = construct_releases(changelog, make_app())
         # 1.0.1 should have bug 2 only
         assert b2 in rendered[1]['entries']
         assert b1 not in rendered[1]['entries']

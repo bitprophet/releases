@@ -4,6 +4,37 @@ Changelog
 
 * :feature:`59` Allow multiple changelog files. Thanks to William Minchin for
   the patch.
+* :release:`1.4.2 <2018-04-27>`
+* :support:`74` We never pulled our README into our ``setup.py`` metadata,
+  resulting in a rather sparse PyPI page! This has been fixed. Thanks to Peter
+  Demin for the report.
+* :release:`1.4.1 <2018-03-28>`
+* :support:`73` Sphinx 1.7.x changed some semi-public APIs; given this is the
+  second minor release in a row to do so, we're explicitly bracketing our
+  ``setup.py`` dependencies to Sphinx >= 1.3 and < 1.7. We expect to bump this
+  up one minor release at a time as we add compatibility back in.
+* :release:`1.4.0 <2017-10-20>`
+* :support:`-` Drop Python 2.6 and 3.3 support, to correspond with earlier
+  changes in Sphinx and most other public Python projects.
+* :bug:`- major` Identified a handful of issues with our Sphinx pin &
+  subsequently, internal changes in Sphinx 1.6 which broke (and/or appear to
+  break, such as noisy warnings) our own behavior. These have (hopefully) all
+  been fixed.
+* :release:`1.3.2 <2017-10-19>`
+* :support:`68 backported` Update packaging requirements to allow for
+  ``sphinx>=1.3,<2``. Thanks to William Minchin.
+* :release:`1.3.1 <2017-05-18>`
+* :bug:`60` Report extension version to Sphinx for improved Sphinx debug
+  output. Credit: William Minchin.
+* :bug:`66` (via :issue:`67`) Deal with some Sphinx 1.6.1 brokenness causing
+  ``AttributeError`` by leveraging ``getattr()``'s default-value argument.
+  Thanks to Ian Cordasco for catch & patch.
+* :release:`1.3.0 <2016-12-09>`
+* :feature:`-` Add ``releases.util``, exposing (among other things) a highly
+  useful ``parse_changelog(path)`` function that returns a user-facing dict
+  representing a parsed changelog. Allows users to examine their changelogs
+  programmatically and answer questions like "do I have any outstanding bugs in
+  the 1.1 release line?".
 * :release:`1.2.1 <2016-07-25>`
 * :support:`51 backported` Modernize release management so PyPI trove
   classifiers are more accurate, wheel archives are universal instead of Python

@@ -59,7 +59,7 @@ class Issue(nodes.Element):
 
     def __eq__(self, other):
         for attr in self._cmp_keys:
-            if getattr(self, attr) != getattr(other, attr):
+            if getattr(self, attr, None) != getattr(other, attr, None):
                 return False
         return True
 
@@ -110,18 +110,18 @@ class Issue(nodes.Element):
         # Make sure truly-default spec skips 0.x if prehistory was unstable.
         stable_families = manager.stable_families
         if manager.config.releases_unstable_prehistory and stable_families:
-            specstr = ">={0}".format(min(stable_families))
+            specstr = ">={}".format(min(stable_families))
         if self.is_featurelike:
             # TODO: if app->config-><releases_always_forwardport_features or
             # w/e
             if True:
-                specstr = ">={0}".format(max(manager.keys()))
+                specstr = ">={}".format(max(manager.keys()))
         else:
             # Can only meaningfully limit to minor release buckets if they
             # actually exist yet.
             buckets = self.minor_releases(manager)
             if buckets:
-                specstr = ">={0}".format(max(buckets))
+                specstr = ">={}".format(max(buckets))
         return Spec(specstr) if specstr else Spec()
 
     def add_to_manager(self, manager):
@@ -178,7 +178,7 @@ class Issue(nodes.Element):
         elif self.spec:
             flag = self.spec
         if flag:
-            flag = ' ({0})'.format(flag)
+            flag = ' ({})'.format(flag)
         return '<{issue.type} #{issue.number}{flag}>'.format(issue=self,
                                                              flag=flag)
 
@@ -200,4 +200,4 @@ class Release(nodes.Element):
         return int(self.number.split('.')[0])
 
     def __repr__(self):
-        return '<release {0}>'.format(self.number)
+        return '<release {}>'.format(self.number)
