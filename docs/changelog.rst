@@ -2,8 +2,9 @@
 Changelog
 =========
 
-* :feature:`59` Allow multiple changelog files. Thanks to William Minchin for
-  the patch.
+* :feature:`59` Allow multiple changelog files -- ``releases_document_name``
+  may now optionally be a list of strings instead of a single string. Thanks to
+  William Minchin for the patch.
 * :release:`1.4.2 <2018-04-27>`
 * :support:`74` We never pulled our README into our ``setup.py`` metadata,
   resulting in a rather sparse PyPI page! This has been fixed. Thanks to Peter
