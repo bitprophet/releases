@@ -35,8 +35,9 @@ class integration(Spec):
             shutil.rmtree(build)
 
     def _assert_worked(self, folder, opts=None, target='changelog', conf='.'):
-        self._build(folder, opts, target, asserts=self._basic_asserts,
-                    conf=conf)
+        self._build(
+            folder, opts, target, asserts=self._basic_asserts, conf=conf,
+        )
 
     def _basic_asserts(self, result, build, target):
         # Check for errors
