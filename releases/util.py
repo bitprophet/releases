@@ -142,7 +142,6 @@ def get_doctree(path):
     reader_kwargs = {
         'app': app,
         'parsers': env.config.source_parsers,
-        #'parsers': app.registry.get_source_parsers()
     }
     if sphinx.version_info[:2] < (1, 4):
         del reader_kwargs['app']

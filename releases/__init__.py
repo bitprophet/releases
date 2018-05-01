@@ -142,7 +142,9 @@ def release_nodes(text, slug, date, config):
             config.releases_github_path, slug)
     # Only construct link tag if user actually configured release URIs somehow
     if uri:
-        link = '<a class="reference external" href="{}">{}</a>'.format(uri, text)
+        link = '<a class="reference external" href="{}">{}</a>'.format(
+            uri, text,
+        )
     else:
         link = text
     datespan = ''
