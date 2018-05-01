@@ -4,6 +4,8 @@ import shutil
 from spec import Spec, skip
 from invoke import run
 
+from invoke.vendor.six import string_types
+
 
 class integration(Spec):
     def setup(self):
@@ -29,7 +31,12 @@ class integration(Spec):
                 flagstr, conf, folder, build)
             result = run(cmd, warn=warn, hide=True)
             if callable(asserts):
-                asserts(result, build, target)
+                if isinstance(target, string_types):
+                    targets = [target]
+                else:
+                    targets = target
+                for target in targets:
+                    asserts(result, build, target)
             return result
         finally:
             shutil.rmtree(build)
@@ -95,4 +102,6 @@ class integration(Spec):
             folder='multiple_changelogs',
             opts=None,
             conf='multiple_changelogs',
-            target='a_changelog')
+            # Ensure the asserts check both changelogs
+            target=['a_changelog', 'b_changelog'],
+        )
