@@ -636,9 +636,9 @@ def setup(app):
     # https://stackoverflow.com/questions/1303243/how-to-find-out-if-a-python-object-is-a-string
     PY2 = sys.version_info[0] == 2
     if PY2:
-        string_types = basestring,
+        string_types = (basestring,)
     else:
-        string_types = str,
+        string_types = (str,)
 
     if isinstance(app.config.releases_document_name, string_types):
         app.config.releases_document_name = [app.config.releases_document_name]
