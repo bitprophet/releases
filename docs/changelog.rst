@@ -7,14 +7,15 @@ Changelog
   may now optionally be a list of strings instead of a single string. Thanks to
   William Minchin for the patch.
 * :release:`1.4.2 <2018-04-27>`
-* :support:`74` We never pulled our README into our ``setup.py`` metadata,
-  resulting in a rather sparse PyPI page! This has been fixed. Thanks to Peter
-  Demin for the report.
+* :support:`74 backported` We never pulled our README into our ``setup.py``
+  metadata, resulting in a rather sparse PyPI page! This has been fixed. Thanks
+  to Peter Demin for the report.
 * :release:`1.4.1 <2018-03-28>`
-* :support:`73` Sphinx 1.7.x changed some semi-public APIs; given this is the
-  second minor release in a row to do so, we're explicitly bracketing our
-  ``setup.py`` dependencies to Sphinx >= 1.3 and < 1.7. We expect to bump this
-  up one minor release at a time as we add compatibility back in.
+* :support:`73 backported` Sphinx 1.7.x changed some semi-public APIs; given
+  this is the second minor release in a row to do so, we're explicitly
+  bracketing our ``setup.py`` dependencies to Sphinx >= 1.3 and < 1.7. We
+  expect to bump this up one minor release at a time as we add compatibility
+  back in.
 * :release:`1.4.0 <2017-10-20>`
 * :support:`-` Drop Python 2.6 and 3.3 support, to correspond with earlier
   changes in Sphinx and most other public Python projects.
