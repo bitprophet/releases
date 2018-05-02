@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* :release:`1.5.0 <2018-05-02>`
 * :feature:`59` Allow multiple changelog files -- ``releases_document_name``
   may now optionally be a list of strings instead of a single string. Thanks to
   William Minchin for the patch.
