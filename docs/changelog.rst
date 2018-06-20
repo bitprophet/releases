@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* :release:`1.6.0 <2018-06-20>`
 * :feature:`75` Update ``releases.util.parse_changelog`` so it hands kwargs
   into ``releases.util.make_app``, which in turn now accepts a
   ``load_extensions`` argument triggering loading of one's configured
