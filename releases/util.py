@@ -297,7 +297,7 @@ def make_app(**kwargs):
     # Initialize extensions (the internal call to this happens at init time,
     # which of course had no valid config yet here...)
     if load_extensions:
-        for extension in real_conf['extensions']:
+        for extension in real_conf.get('extensions', []):
             # But don't set up ourselves again, that causes errors
             if extension == 'releases':
                 continue
