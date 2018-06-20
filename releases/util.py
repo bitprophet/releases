@@ -63,6 +63,9 @@ def parse_changelog(path, **kwargs):
           families (so, a changelog spanning only 1.x will only have
           ``unreleased_1_feature``, whereas one with 1.x and 2.x releases will
           have ``unreleased_1_feature`` and ``unreleased_2_feature``, etc).
+
+    .. versionchanged:: 1.6
+        Added support for passing kwargs to `get_doctree`/`make_app`.
     """
     app, doctree = get_doctree(path, **kwargs)
     # Have to semi-reproduce the 'find first bullet list' bit from main code,
@@ -114,6 +117,9 @@ def get_doctree(path, **kwargs):
     :returns:
         A two-tuple of the generated ``sphinx.application.Sphinx`` app and the
         doctree (a ``docutils.document`` object).
+
+    .. versionchanged:: 1.6
+        Added support for passing kwargs to `make_app`.
     """
     root, filename = os.path.split(path)
     docname, _ = os.path.splitext(filename)
@@ -228,6 +234,9 @@ def make_app(**kwargs):
         configures. Default: ``False``.
 
     :returns: A Sphinx ``Application`` instance.
+
+    .. versionchanged:: 1.6
+        Added the ``load_extensions`` kwarg.
     """
     srcdir = kwargs.pop('srcdir', mkdtemp())
     dstdir = kwargs.pop('dstdir', mkdtemp())
