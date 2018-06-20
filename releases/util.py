@@ -197,7 +197,7 @@ def make_app(**kwargs):
     in one's own test output and/or debug logs.
 
     Finally, it does load the given srcdir's ``conf.py``, but only to read
-    specific bits like ``extensions``; most of it is ignored.
+    specific bits like ``extensions`` (if requested); most of it is ignored.
 
     All args are stored in a single ``**kwargs``. Aside from the params listed
     below (all of which are optional), all kwargs given are turned into
@@ -216,11 +216,17 @@ def make_app(**kwargs):
     :param str doctreedir:
         Sphinx doctree directory path.
 
+    :param bool load_extensions:
+        Whether to load the real ``conf.py`` and setup any extensions it
+        configures. Default: ``False``.
+
     :returns: A Sphinx ``Application`` instance.
     """
     srcdir = kwargs.pop('srcdir', mkdtemp())
     dstdir = kwargs.pop('dstdir', mkdtemp())
     doctreedir = kwargs.pop('doctreedir', mkdtemp())
+    load_extensions = kwargs.pop('load_extensions', False)
+    real_conf = None
     try:
         # Sphinx <1.6ish
         Sphinx._log = lambda self, message, wfile, nonl=False: None
@@ -236,7 +242,8 @@ def make_app(**kwargs):
             buildername='html',
         )
         # Might as well load the conf file here too.
-        real_conf = load_conf(srcdir)
+        if load_extensions:
+            real_conf = load_conf(srcdir)
     finally:
         for d in (srcdir, dstdir, doctreedir):
             # Only remove empty dirs; non-empty dirs are implicitly something
@@ -273,11 +280,12 @@ def make_app(**kwargs):
         app.config.init_values(lambda x: x)
     # Initialize extensions (the internal call to this happens at init time,
     # which of course had no valid config yet here...)
-    for extension in real_conf['extensions']:
-        # But don't set up ourselves again, that's bad...
-        if extension == 'releases':
-            continue
-        app.setup_extension(extension)
+    if load_extensions:
+        for extension in real_conf['extensions']:
+            # But don't set up ourselves again, that causes errors
+            if extension == 'releases':
+                continue
+            app.setup_extension(extension)
     return app
 
 
