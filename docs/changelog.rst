@@ -2,6 +2,10 @@
 Changelog
 =========
 
+* :feature:`75` When loading changelogs for programmatic use (via
+  ``releases.util.parse_changelog`` and friends), there's now an optional
+  ``load_extensions`` kwarg for parsing the real underlying ``conf.py`` and
+  using it to initialize extensions.
 * :release:`1.5.0 <2018-05-02>`
 * :feature:`59` Allow multiple changelog files -- ``releases_document_name``
   may now optionally be a list of strings instead of a single string. Thanks to
