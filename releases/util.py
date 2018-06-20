@@ -171,6 +171,19 @@ def get_doctree(path):
         return app, pub.document
 
 
+def load_conf(srcdir):
+    """
+    Load ``conf.py`` from given ``srcdir``.
+
+    :returns: Dictionary derived from the conf module.
+    """
+    path = os.path.join(srcdir, 'conf.py')
+    mylocals = {'__file__': path}
+    with open(path) as fd:
+        exec(fd.read(), mylocals)
+    return mylocals
+
+
 def make_app(**kwargs):
     """
     Create a dummy Sphinx app, filling in various hardcoded assumptions.
@@ -182,6 +195,9 @@ def make_app(**kwargs):
 
     It also neuters Sphinx's internal logging, which otherwise causes verbosity
     in one's own test output and/or debug logs.
+
+    Finally, it does load the given srcdir's ``conf.py``, but only to read
+    specific bits like ``extensions``; most of it is ignored.
 
     All args are stored in a single ``**kwargs``. Aside from the params listed
     below (all of which are optional), all kwargs given are turned into
@@ -219,6 +235,8 @@ def make_app(**kwargs):
             doctreedir=doctreedir,
             buildername='html',
         )
+        # Might as well load the conf file here too.
+        real_conf = load_conf(srcdir)
     finally:
         for d in (srcdir, dstdir, doctreedir):
             # Only remove empty dirs; non-empty dirs are implicitly something
@@ -229,6 +247,9 @@ def make_app(**kwargs):
                 pass
     setup(app)
     # Mock out the config within. More assumptions by Sphinx :(
+    # TODO: just use real config and overlay what truly needs changing? is that
+    # feasible given the rest of the weird ordering we have to do? If it is,
+    # maybe just literally slap this over the return value of load_conf()...
     config = {
         'releases_release_uri': 'foo_%s',
         'releases_issue_uri': 'bar_%s',
@@ -250,6 +271,13 @@ def make_app(**kwargs):
         app.config.init_values()
     except TypeError: # boy I wish Python had an ArityError or w/e
         app.config.init_values(lambda x: x)
+    # Initialize extensions (the internal call to this happens at init time,
+    # which of course had no valid config yet here...)
+    for extension in real_conf['extensions']:
+        # But don't set up ourselves again, that's bad...
+        if extension == 'releases':
+            continue
+        app.setup_extension(extension)
     return app
 
 
