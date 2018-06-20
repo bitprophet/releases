@@ -29,7 +29,7 @@ except ImportError:
 from . import construct_releases, setup
 
 
-def parse_changelog(path):
+def parse_changelog(path, **kwargs):
     """
     Load and parse changelog file from ``path``, returning data structures.
 
@@ -43,6 +43,10 @@ def parse_changelog(path):
         changelog = parse_changelog("/path/to/changelog")
         print("Unreleased issues for 2.3.x: {}".format(changelog['2.3']))
         print("Contents of v1.2.1: {}".format(changelog['1.2.1']))
+
+    Aside from the documented arguments, any additional keyword arguments are
+    passed unmodified into an internal `get_doctree` call (which then passes
+    them to `make_app`).
 
     :param str path: A relative or absolute file path string.
 
@@ -60,7 +64,7 @@ def parse_changelog(path):
           ``unreleased_1_feature``, whereas one with 1.x and 2.x releases will
           have ``unreleased_1_feature`` and ``unreleased_2_feature``, etc).
     """
-    app, doctree = get_doctree(path)
+    app, doctree = get_doctree(path, **kwargs)
     # Have to semi-reproduce the 'find first bullet list' bit from main code,
     # which is unfortunately side-effect-heavy (thanks to Sphinx plugin
     # design).
@@ -94,13 +98,16 @@ def parse_changelog(path):
     return ret
 
 
-def get_doctree(path):
+def get_doctree(path, **kwargs):
     """
     Obtain a Sphinx doctree from the RST file at ``path``.
 
     Performs no Releases-specific processing; this code would, ideally, be in
     Sphinx itself, but things there are pretty tightly coupled. So we wrote
     this.
+
+    Any additional kwargs are passed unmodified into an internal `make_app`
+    call.
 
     :param str path: A relative or absolute file path string.
 
@@ -112,7 +119,7 @@ def get_doctree(path):
     docname, _ = os.path.splitext(filename)
     # TODO: this only works for top level changelog files (i.e. ones where
     # their dirname is the project/doc root)
-    app = make_app(srcdir=root)
+    app = make_app(srcdir=root, **kwargs)
     # Create & init a BuildEnvironment. Mm, tasty side effects.
     app._init_env(freshenv=True)
     env = app.env
