@@ -11,6 +11,7 @@ env:
   - SPHINX=">=1.4,<1.5"
   - SPHINX=">=1.5,<1.6"
   - SPHINX=">=1.6,<1.7"
+  - SPHINX=">=1.7,<1.8"
 install:
   - pip install -r dev-requirements.txt
   - pip install "sphinx$SPHINX"
