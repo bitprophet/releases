@@ -2,7 +2,9 @@
 Changelog
 =========
 
-* :support:`73` Add support for Sphinx 1.7.x.
+* :support:`73 backported` (via :issue:`77`) Add support for Sphinx 1.7.x
+  (while retaining support for previous versions of Sphinx). Thanks to Miro
+  Hrončok for the patch.
 * :release:`1.6.0 <2018-06-20>`
 * :feature:`75` Update ``releases.util.parse_changelog`` so it hands kwargs
   into ``releases.util.make_app``, which in turn now accepts a
