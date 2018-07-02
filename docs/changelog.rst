@@ -2,6 +2,7 @@
 Changelog
 =========
 
+- :release:`1.5.1 <2018-07-02>`
 - :support:`73 backported` (via :issue:`77`) Add support for Sphinx 1.7.x
   (while retaining support for previous versions of Sphinx). Thanks to Miro
   Hrončok for the patch.
