@@ -210,7 +210,10 @@ def make_app(**kwargs):
         Sphinx._log = lambda self, message, wfile, nonl=False: None
         # Sphinx >=1.6ish. Technically still lets Very Bad Things through,
         # unlike the total muting above, but probably OK.
-        logging.getLogger('sphinx').setLevel(logging.ERROR)
+        # NOTE: used to just do 'sphinx' but that stopped working, even on
+        # sphinx 1.6.x. Weird. Unsure why hierarchy not functioning.
+        for name in ('sphinx', 'sphinx.sphinx.application'):
+            logging.getLogger(name).setLevel(logging.ERROR)
         # App API seems to work on all versions so far.
         app = Sphinx(
             srcdir=srcdir,
