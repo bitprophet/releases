@@ -11,10 +11,15 @@ from docutils.core import Publisher
 from docutils.io import NullOutput
 from docutils.nodes import bullet_list
 from sphinx.application import Sphinx # not exposed at top level
-# NOTE: importing these from environment for backwards compat with Sphinx 1.3
-from sphinx.environment import (
-    SphinxStandaloneReader, SphinxFileInput, SphinxDummyWriter,
-)
+try:
+    from sphinx.io import (
+        SphinxStandaloneReader, SphinxFileInput, SphinxDummyWriter,
+    )
+except ImportError:
+    # NOTE: backwards compat with Sphinx 1.3
+    from sphinx.environment import (
+        SphinxStandaloneReader, SphinxFileInput, SphinxDummyWriter,
+    )
 # sphinx_domains is only in Sphinx 1.5+, but is presumably necessary from then
 # onwards.
 try:
@@ -162,7 +167,12 @@ def get_doctree(path, **kwargs):
     # domains' roles & so forth. Without this, rendering the doctree lacks
     # almost all Sphinx magic, including things like :ref: and :doc:!
     with sphinx_domains(env):
-        reader = SphinxStandaloneReader(**reader_kwargs)
+        try:
+            reader = SphinxStandaloneReader(**reader_kwargs)
+        except TypeError:
+            # If we import from io, this happens automagically, not in API
+            del reader_kwargs['parsers']
+            reader = SphinxStandaloneReader(**reader_kwargs)
         pub = Publisher(reader=reader,
                         writer=SphinxDummyWriter(),
                         destination_class=NullOutput)

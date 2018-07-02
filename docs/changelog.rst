@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* :support:`73` Add support for Sphinx 1.7.x.
 * :release:`1.6.0 <2018-06-20>`
 * :feature:`75` Update ``releases.util.parse_changelog`` so it hands kwargs
   into ``releases.util.make_app``, which in turn now accepts a
