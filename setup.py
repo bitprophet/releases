@@ -19,6 +19,7 @@ setup(
     packages=['releases'],
     install_requires=[
         'semantic_version<3.0',
+        'six>=1.4.1,<2.0',
         'sphinx>=1.3,<1.8',
     ],
     classifiers=[
