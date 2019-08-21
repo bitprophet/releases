@@ -289,6 +289,7 @@ def make_app(**kwargs):
     config = {
         'releases_release_uri': 'foo_%s',
         'releases_issue_uri': 'bar_%s',
+        'releases_feature_uri': 'baz_%s',
         'releases_debug': False,
         'master_doc': 'index',
     }

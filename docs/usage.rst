@@ -26,6 +26,9 @@ Specifically:
           (If only one is configured, the other link type will continue using
           ``releases_github_path``.)
 
+        * Aditionally you can set the `releases_feautre_uri` which
+          will then be used for the `:feature:` role. This is useful,
+          if your feature additions coincide with pull requests.
     * See `Fabric's docs/conf.py
       <https://github.com/fabric/fabric/blob/4afd33e971f1c6831cc33fd3228013f7484fbe35/docs/conf.py#L31>`_
       for an example.

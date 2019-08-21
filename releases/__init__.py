@@ -76,7 +76,9 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     config = inliner.document.settings.env.app.config
     if issue_no not in ('-', '0'):
         ref = None
-        if config.releases_issue_uri:
+        if name == 'feature' and config.releases_feature_uri:
+            ref = config.releases_feature_uri % issue_no
+        elif config.releases_issue_uri:
             # TODO: deal with % vs .format()
             ref = config.releases_issue_uri % issue_no
         elif config.releases_github_path:
@@ -617,6 +619,9 @@ def setup(app):
         # Issue base URI setting: releases_issue_uri
         # E.g. 'https://github.com/fabric/fabric/issues/'
         ('issue_uri', None),
+        # Feature base URI setting: releases_feature_uri
+        # E.g. 'https://github.com/fabric/fabric/pulls/'
+        ('feature_uri', None),
         # Release-tag base URI setting: releases_release_uri
         # E.g. 'https://github.com/fabric/fabric/tree/'
         ('release_uri', None),
