@@ -11,7 +11,7 @@ class Version(StrictVersion):
     Version subclass toggling ``partial=True`` by default.
     """
     def __init__(self, version_string, partial=True):
-        super(Version, self).__init__(version_string, partial)
+        super(Version, self).__init__(version_string, partial=partial)
 
 
 # Issue type list (keys) + color values
