@@ -2,16 +2,8 @@ from functools import reduce
 from operator import xor
 
 from docutils import nodes
-from semantic_version import Version as StrictVersion, Spec
+from semantic_version import Version, Spec
 import six
-
-
-class Version(StrictVersion):
-    """
-    Version subclass toggling ``partial=True`` by default.
-    """
-    def __init__(self, version_string, partial=True):
-        super(Version, self).__init__(version_string, partial)
 
 
 # Issue type list (keys) + color values
@@ -122,7 +114,7 @@ class Issue(nodes.Element):
             buckets = self.minor_releases(manager)
             if buckets:
                 specstr = ">={}".format(max(buckets))
-        return Spec(specstr) if specstr else Spec()
+        return Spec(specstr) if specstr else Spec('*')
 
     def add_to_manager(self, manager):
         """
@@ -130,32 +122,43 @@ class Issue(nodes.Element):
         """
         # Derive version spec allowing us to filter against major/minor buckets
         spec = self.spec or self.default_spec(manager)
-        # Only look in appropriate major version/family; if self is an issue
-        # declared as living in e.g. >=2, this means we don't even bother
-        # looking in the 1.x family.
-        families = [Version(str(x)) for x in manager]
-        versions = list(spec.filter(families))
-        for version in versions:
-            family = version.major
-            # Within each family, we further limit which bugfix lines match up
-            # to what self cares about (ignoring 'unreleased' until later)
-            candidates = [
-                Version(x)
+
+        # Browse through families, adding us to every line we match.
+        for family in manager:
+            # Map changelog keys to Version objects, keeping a link
+            # to the original text
+            versions = {
+                Version.coerce(x): x
                 for x in manager[family]
                 if not x.startswith('unreleased')
-            ]
-            # Select matching release lines (& stringify)
+            }
+
+            # Bail out if no listed version (included pending feature/bugfix)
+            # match self.spec: if self is an issue for >=2, don't look
+            # at the 1.x family. If self is an issue for >=1.0, include it
+            # in the 1.x family even if no 1.0 release exists yet.
+            candidates = list(spec.filter(versions))
+            # Also compare the first release in the family, for cases
+            # where no release has been performed yet.
+            if not candidates and Version.coerce(str(family)) not in spec:
+                continue
+
+            # `buckets` has the list of line families
             buckets = []
-            bugfix_buckets = [str(x) for x in spec.filter(candidates)]
+            bugfix_buckets = candidates
             # Add back in unreleased_* as appropriate
             # TODO: probably leverage Issue subclasses for this eventually?
             if self.is_buglike:
-                buckets.extend(bugfix_buckets)
+                # Convert back Version() to line
+                buckets.extend([
+                    versions[bucket] for bucket in bugfix_buckets
+                ])
                 # Don't put into JUST unreleased_bugfix; it implies that this
                 # major release/family hasn't actually seen any releases yet
                 # and only exists for features to go into.
                 if bugfix_buckets:
                     buckets.append('unreleased_bugfix')
+
             # Obtain list of minor releases to check for "haven't had ANY
             # releases yet" corner case, in which case ALL issues get thrown in
             # unreleased_feature for the first release to consume.
@@ -164,6 +167,7 @@ class Issue(nodes.Element):
             no_releases = not self.minor_releases(manager)
             if self.is_featurelike or self.backported or no_releases:
                 buckets.append('unreleased_feature')
+
             # Now that we know which buckets are appropriate, add ourself to
             # all of them. TODO: or just...do it above...instead...
             for bucket in buckets:
