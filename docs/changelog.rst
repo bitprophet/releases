@@ -2,6 +2,11 @@
 Changelog
 =========
 
+- :support:`84 backported` Pin us to ``semantic-version<2.7`` as they changed
+  their APIs (...) in that version in a way that breaks us. We do not need
+  anything they've added recently, so the conservative response is to just pin
+  until we truly need to upgrade. Thanks to everyone who reported and submitted
+  workarounds for this.
 - :release:`1.5.1 <2018-07-02>`
 - :support:`73 backported` (via :issue:`77`) Add support for Sphinx 1.7.x
   (while retaining support for previous versions of Sphinx). Thanks to Miro
