@@ -18,7 +18,7 @@ setup(
     url='https://github.com/bitprophet/releases',
     packages=['releases'],
     install_requires=[
-        'semantic_version<3.0',
+        'semantic_version<2.7',
         'sphinx>=1.3,<1.8',
     ],
     classifiers=[
