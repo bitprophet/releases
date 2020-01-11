@@ -2,6 +2,7 @@
 Changelog
 =========
 
+- :release:`1.5.2 <2020-01-10>`
 - :support:`84 backported` Pin us to ``semantic-version<2.7`` as they changed
   their APIs (...) in that version in a way that breaks us. We do not need
   anything they've added recently, so the conservative response is to just pin
