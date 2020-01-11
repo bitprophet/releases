@@ -2,6 +2,10 @@
 Changelog
 =========
 
+- :support:`87 backported` (via :issue:`88`) Our upper Sphinx version limit was
+  mostly defensive and at this point is just too old to even build on
+  ReadTheDocs successfully. Removed it for the time being. Thanks to José
+  Sánchez-Gallego for the nudge and the patch.
 - :release:`1.6.2 <2020-01-10>`
 - :release:`1.5.2 <2020-01-10>`
 - :support:`84 backported` Pin us to ``semantic-version<2.7`` as they changed
