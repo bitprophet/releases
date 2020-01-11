@@ -13,7 +13,7 @@ env:
   - SPHINX=">=2.3,<2.4"
 install:
   - pip install -r dev-requirements.txt
-  - pip install "sphinx$SPHINX"
+  - pip install "sphinx$SPHINX" || echo "No Sphinx$SPHINX available for $TRAVIS_PYTHON_VERSION"
 script:
   # Primary test suite
   - inv test
