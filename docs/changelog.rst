@@ -2,6 +2,7 @@
 Changelog
 =========
 
+- :release:`1.6.3 <2020-01-10>`
 - :support:`87 backported` (via :issue:`88`) Our upper Sphinx version limit was
   mostly defensive and at this point is just too old to even build on
   ReadTheDocs successfully. Removed it for the time being. Thanks to José
