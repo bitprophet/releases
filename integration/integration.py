@@ -40,6 +40,10 @@ class integration(object):
             return result
         finally:
             shutil.rmtree(build)
+            # TODO: there's apparently NO way to just turn this off instead?
+            shutil.rmtree(
+                os.path.join(folder, ".doctrees"), ignore_errors=True
+            )
 
     def _assert_worked(self, folder, opts=None, target='changelog', conf='.'):
         self._build(
