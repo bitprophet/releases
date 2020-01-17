@@ -93,16 +93,18 @@ def parse_changelog(path, **kwargs):
 
 def get_doctree(path, **kwargs):
     """
-    Obtain a Sphinx doctree from the RST file at ``path``.
+    Obtain a mostly-rendered Sphinx doctree from the RST file at ``path``.
 
-    Performs no Releases-specific processing; this code would, ideally, be in
-    Sphinx itself, but things there are pretty tightly coupled. So we wrote
-    this.
+    The returned doctree is parsed to the point where Releases' own objects
+    (such as Release and Issue nodes) have been injected, but not yet turned
+    into their final representation (such as HTML tags). This is primarily
+    useful for the use case of `parse_changelog` in this module; if you want a
+    real 100%-rendered doctree, try using ``sphinx.io.read_doc`` directly.
 
     Any additional kwargs are passed unmodified into an internal `make_app`
     call.
 
-    :param str path: A relative or absolute file path string.
+    :param str path: A relative or absolute Sphinx sourcedir path.
 
     :returns:
         A two-tuple of the generated ``sphinx.application.Sphinx`` app and the
