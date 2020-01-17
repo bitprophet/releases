@@ -5,7 +5,7 @@ What is Releases?
 =================
 
 Releases is a Python (2.7, 3.4+) compatible `Sphinx <http://sphinx-doc.org>`_
-(1.3+) extension designed to help you keep a source control friendly, merge
+(1.8+) extension designed to help you keep a source control friendly, merge
 friendly changelog file & turn it into useful, human readable HTML output.
 
 Specifically:

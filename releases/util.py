@@ -11,25 +11,10 @@ from docutils.core import Publisher
 from docutils.io import NullOutput
 from docutils.nodes import bullet_list
 from sphinx.application import Sphinx # not exposed at top level
-try:
-    from sphinx.io import (
-        SphinxStandaloneReader, SphinxFileInput, SphinxDummyWriter,
-    )
-except ImportError:
-    # NOTE: backwards compat with Sphinx 1.3
-    from sphinx.environment import (
-        SphinxStandaloneReader, SphinxFileInput, SphinxDummyWriter,
-    )
-# sphinx_domains is only in Sphinx 1.5+, but is presumably necessary from then
-# onwards.
-try:
-    from sphinx.util.docutils import sphinx_domains
-except ImportError:
-    # Just dummy it up.
-    from contextlib import contextmanager
-    @contextmanager
-    def sphinx_domains(env):
-        yield
+from sphinx.io import (
+    SphinxStandaloneReader, SphinxFileInput, SphinxDummyWriter,
+)
+from sphinx.util.docutils import sphinx_domains
 
 from . import construct_releases, setup
 
@@ -134,35 +119,22 @@ def get_doctree(path, **kwargs):
     # Create & init a BuildEnvironment. Mm, tasty side effects.
     app._init_env(freshenv=True)
     env = app.env
-    # More arity/API changes: Sphinx 1.3/1.4-ish require one to pass in the app
-    # obj in BuildEnvironment.update(); modern Sphinx performs that inside
-    # Application._init_env() (which we just called above) and so that kwarg is
-    # removed from update(). EAFP.
-    kwargs = dict(
+    env.update(
         config=app.config,
         srcdir=root,
         doctreedir=app.doctreedir,
-        app=app,
     )
-    try:
-        env.update(**kwargs)
-    except TypeError:
-        # Assume newer Sphinx w/o an app= kwarg
-        del kwargs['app']
-        env.update(**kwargs)
+    # Update "temp" data (must be done here as it's wiped on update())
+    env.temp_data['docname'] = docname
     # Code taken from sphinx.environment.read_doc; easier to manually call
     # it with a working Environment object, instead of doing more random crap
     # to trick the higher up build system into thinking our single changelog
     # document was "updated".
-    env.temp_data['docname'] = docname
     env.app = app
-    # NOTE: SphinxStandaloneReader API changed in 1.4 :(
     reader_kwargs = {
         'app': app,
         'parsers': env.config.source_parsers,
     }
-    if sphinx.version_info[:2] < (1, 4):
-        del reader_kwargs['app']
     # This monkeypatches (!!!) docutils to 'inject' all registered Sphinx
     # domains' roles & so forth. Without this, rendering the doctree lacks
     # almost all Sphinx magic, including things like :ref: and :doc:!
@@ -254,12 +226,10 @@ def make_app(**kwargs):
     load_extensions = kwargs.pop('load_extensions', False)
     real_conf = None
     try:
-        # Sphinx <1.6ish
-        Sphinx._log = lambda self, message, wfile, nonl=False: None
-        # Sphinx >=1.6ish. Technically still lets Very Bad Things through,
-        # unlike the total muting above, but probably OK.
-        # NOTE: used to just do 'sphinx' but that stopped working, even on
-        # sphinx 1.6.x. Weird. Unsure why hierarchy not functioning.
+        # Turn off most logging, which is rarely useful and usually just gums
+        # up the output of whatever tool is calling us.
+        # NOTE: used to just do 'sphinx' but that stopped working. Unsure why
+        # hierarchy not functioning.
         for name in ('sphinx', 'sphinx.sphinx.application'):
             logging.getLogger(name).setLevel(logging.ERROR)
         # App API seems to work on all versions so far.
@@ -300,13 +270,7 @@ def make_app(**kwargs):
         config['releases_{}'.format(name)] = kwargs[name]
     # Stitch together as the sphinx app init() usually does w/ real conf files
     app.config._raw_config = config
-    # init_values() requires a 'warn' runner on Sphinx 1.3-1.6, so if we seem
-    # to be hitting arity errors, give it a dummy such callable. Hopefully
-    # calling twice doesn't introduce any wacko state issues :(
-    try:
-        app.config.init_values()
-    except TypeError: # boy I wish Python had an ArityError or w/e
-        app.config.init_values(lambda x: x)
+    app.config.init_values()
     # Initialize extensions (the internal call to this happens at init time,
     # which of course had no valid config yet here...)
     if load_extensions:
