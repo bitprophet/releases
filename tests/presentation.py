@@ -1,4 +1,3 @@
-from spec import Spec, eq_
 from docutils.nodes import (
     reference, bullet_list, list_item, literal, raw, paragraph, Text
 )
@@ -30,7 +29,7 @@ def _expect_type(node, cls):
     assert isinstance(node, cls), msg
 
 
-class presentation(Spec):
+class presentation(object):
     """
     Expansion/extension of docutils nodes (rendering)
     """
@@ -58,7 +57,7 @@ class presentation(Spec):
             assert expected in header
         elif type_ == 'issue':
             link = nodes[0][1][0][0][2]
-            eq_(link['refuri'], expected)
+            assert link['refuri'] == expected
         else:
             raise Exception("Gave unknown type_ kwarg to _test_link()!")
 
@@ -139,7 +138,7 @@ class presentation(Spec):
             Text("fixes an issue in "), literal('', 'methodname')))
         node = self._generate('1.0.2', fake)
         # [<raw prefix>, <inline colon>, <inline space>, <text>, <monospace>]
-        eq_(len(node[0]), 5)
+        assert len(node[0]) == 5
         assert 'Bug' in str(node[0][0])
         assert 'fixes an issue' in str(node[0][3])
         assert 'methodname' in str(node[0][4])
@@ -149,7 +148,7 @@ class presentation(Spec):
         fake = list_item('', paragraph('', '', raw('', 'whatever')))
         node = self._generate('0.1.0', fake, app=app, skip_initial=True)
         # [<raw bug text>]
-        eq_(len(node[0]), 1)
+        assert len(node[0]) == 1
         assert 'Bug' not in str(node[0][0])
         assert 'whatever' in str(node[0][0])
 
@@ -173,9 +172,9 @@ class presentation(Spec):
         )
         # Trailing nodes should appear post-processing after the link/etc
         rest = self._generate('1.0.2', issue)[0]
-        eq_(len(rest), 5)
+        assert len(rest) == 5
         _expect_type(rest[4], raw)
-        eq_(rest[4].astext(), 'x')
+        assert rest[4].astext() == 'x'
 
     def complex_descriptions_are_preserved(self):
         # Complex 'entry' mapping to an outer list_item (list) containing two
@@ -188,14 +187,14 @@ class presentation(Spec):
         li = self._generate('1.0.2', issue)
         # Expect that the machinery parsing issue nodes/nodelists, is not
         # discarding our 2nd 'paragraph'
-        eq_(len(li), 2)
+        assert len(li) == 2
         p1, p2 = li
         # Last item in 1st para is our 1st raw node
         _expect_type(p1[4], raw)
-        eq_(p1[4].astext(), 'x')
+        assert p1[4].astext() == 'x'
         # Only item in 2nd para is our 2nd raw node
         _expect_type(p2[0], raw)
-        eq_(p2[0].astext(), 'y')
+        assert p2[0].astext() == 'y'
 
     def descriptions_are_parsed_for_issue_roles(self):
         item = list_item('',
@@ -207,11 +206,11 @@ class presentation(Spec):
         assert not isinstance(para[4], Issue)
         # First/primary link
         _expect_type(para[2], reference)
-        eq_(para[2].astext(), '#15')
+        assert para[2].astext() == '#15'
         assert 'Bug' in para[0].astext()
         # Second/inline link
         _expect_type(para[6], reference)
-        eq_(para[6].astext(), '#5')
+        assert para[6].astext() == '#5'
         assert 'Support' in para[4].astext()
 
     def unreleased_buckets_omit_major_version_when_only_one_exists(self):
@@ -246,7 +245,7 @@ class presentation(Spec):
         )
         # Expectation: [1.x unreleased, 1.0.1] - no 2.x.
         result = self._generate(*entries, raw=True)
-        eq_(len(result), 2)
+        assert len(result) == 2
         html = str(result[0][0][0])
         assert "Next 1.x bugfix release" in html
 

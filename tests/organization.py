@@ -1,5 +1,6 @@
 import six
-from spec import Spec, eq_, raises, skip
+from pytest import skip
+from pytest_relaxed import raises
 from docutils.nodes import (
     list_item, raw, paragraph, Text,
 )
@@ -20,7 +21,7 @@ from _util import (
 )
 
 
-class organization(Spec):
+class organization(object):
     """
     Organization of issues into releases (parsing)
     """
@@ -30,7 +31,7 @@ class organization(Spec):
     def _expect_entries(self, all_entries, in_, not_in):
         # Grab 2nd release as 1st is the empty 'beginning of time' one
         entries = releases(*all_entries)[1]['entries']
-        eq_(len(entries), len(in_))
+        assert len(entries) == len(in_)
         for x in in_:
             assert x in entries
         for x in not_in:
@@ -86,22 +87,22 @@ class organization(Spec):
         fake = list_item('', paragraph('', '', raw('', 'whatever')))
         changelog = releases('1.0.2', self.f, fake)
         entries = changelog[1]['entries']
-        eq_(len(entries), 1)
+        assert len(entries) == 1
         assert self.f not in entries
         assert isinstance(entries[0], Issue)
-        eq_(entries[0].number, None)
+        assert entries[0].number is None
 
     def unreleased_items_go_in_unreleased_releases(self):
         changelog = releases(self.f, self.b)
         # Should have two unreleased lists, one feature w/ feature, one bugfix
         # w/ bugfix.
         bugfix, feature = changelog[1:]
-        eq_(len(feature['entries']), 1)
-        eq_(len(bugfix['entries']), 1)
+        assert len(feature['entries']) == 1
+        assert len(bugfix['entries']) == 1
         assert self.f in feature['entries']
         assert self.b in bugfix['entries']
-        eq_(feature['obj'].number, 'unreleased_1.x_feature')
-        eq_(bugfix['obj'].number, 'unreleased_1.x_bugfix')
+        assert feature['obj'].number == 'unreleased_1.x_feature'
+        assert bugfix['obj'].number == 'unreleased_1.x_bugfix'
 
     def issues_consumed_by_releases_are_not_in_unreleased(self):
         changelog = releases('1.0.2', self.f, self.b, self.s, self.bs)
@@ -148,7 +149,7 @@ class organization(Spec):
             ('1.1.2', [b50, b42]),
             ('1.2.1', [b50, b42]),
         ):
-            eq_(set(c[rel]), set(issues))
+            assert set(c[rel]) == set(issues)
 
     def releases_can_specify_issues_explicitly(self):
         # Build regular list-o-entries
@@ -218,7 +219,7 @@ class organization(Spec):
     def duplicate_issue_numbers_adds_two_issue_items(self):
         test_changelog = releases('1.0.1', self.b, self.b)
         test_changelog = changelog2dict(test_changelog)
-        eq_(len(test_changelog['1.0.1']), 2)
+        assert len(test_changelog['1.0.1']) == 2
 
     def duplicate_zeroes_dont_error(self):
         cl = releases('1.0.1', b(0), b(0))
@@ -239,7 +240,7 @@ class organization(Spec):
         # Order should be feature, bug, support. While it doesn't REALLY
         # matter, assert that within each category the order matches the old
         # 'reverse chronological' order.
-        eq_(changelog['1.1'], [f2, f1, b2, b1, s2, s1])
+        assert changelog['1.1'], [f2, f1, b2, b1, s2 == s1]
 
     def rolling_release_works_without_annotation(self):
         b1 = b(1)
@@ -397,8 +398,8 @@ class organization(Spec):
         second = changelog['0.1.1']
         assert b1 in first
         assert f2 in first
-        eq_(len(first), 3) # Meh, hard to assert about the implicit one
-        eq_(second, [b3])
+        assert len(first) == 3 # Meh, hard to assert about the implicit one
+        assert second == [b3]
 
     def specs_and_keywords_play_together_nicely(self):
         b1 = b(1)
@@ -429,13 +430,13 @@ class organization(Spec):
     def changelogs_without_any_releases_display_unreleased_normally(self):
         changelog = releases(self.f, self.b, skip_initial=True)
         # Ensure only the two unreleased 'releases' showed up
-        eq_(len(changelog), 2)
+        assert len(changelog) == 2
         # And assert that both items appeared in one of them (since there's no
         # real releases at all, the bugfixes are treated as 'major' bugs, as
         # per concepts doc.)
         bugfix, feature = changelog
-        eq_(len(feature['entries']), 2)
-        eq_(len(bugfix['entries']), 0)
+        assert len(feature['entries']) == 2
+        assert len(bugfix['entries']) == 0
 
     class unstable_prehistory:
         def _expect_releases(self, *args, **kwargs):

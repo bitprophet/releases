@@ -2,6 +2,8 @@
 Changelog
 =========
 
+- :support:`-` Migrated the test suite to use ``pytest-relaxed`` (and thus
+  pytest) instead of ``spec``.
 - :release:`1.6.3 <2020-01-10>`
 - :support:`87 backported` (via :issue:`88`) Our upper Sphinx version limit was
   mostly defensive and at this point is just too old to even build on
