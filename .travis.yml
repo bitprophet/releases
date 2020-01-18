@@ -12,8 +12,12 @@ env:
   - SPHINX=">=2.3,<2.4"
 jobs:
   exclude:
-    # Sphinx 2.something dropped support for Python 2
+    # Sphinx 2.x(?) dropped support for Py(thon|Py) 2, and I guess also 3.4,
     - python: "2.7"
+      env: SPHINX=">=2.3,<2.4"
+    - python: "3.4"
+      env: SPHINX=">=2.3,<2.4"
+    - python: "pypy"
       env: SPHINX=">=2.3,<2.4"
 install:
   - pip install -r dev-requirements.txt
