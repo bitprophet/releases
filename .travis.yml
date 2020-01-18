@@ -22,6 +22,6 @@ script:
   # Primary test suite
   - inv test
   # Integration-level test suite (hard to reliably test full stack in-code :()
-  - inv test -o --tests=integration
+  - inv integration
   # Docs sanity check
   - inv docs
