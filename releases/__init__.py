@@ -25,15 +25,17 @@ def _log(txt, config):
 
 def issue_nodelist(name, identifier=None):
     which = '[<span style="color: #%s;">%s</span>]' % (
-        ISSUE_TYPES[name], name.capitalize()
+        ISSUE_TYPES[name],
+        name.capitalize(),
     )
-    signifier = [nodes.raw(text=which, format='html')]
+    signifier = [nodes.raw(text=which, format="html")]
     id_nodelist = [nodes.inline(text=" "), identifier] if identifier else []
     trail = [] if identifier else [nodes.inline(text=" ")]
     return signifier + id_nodelist + [nodes.inline(text=":")] + trail
 
 
-release_line_re = re.compile(r'^(\d+\.\d+)\+$') # e.g. '1.2+'
+release_line_re = re.compile(r"^(\d+\.\d+)\+$")  # e.g. '1.2+'
+
 
 def scan_for_spec(keyword):
     """
@@ -42,7 +44,7 @@ def scan_for_spec(keyword):
     Returns None if one could not be derived.
     """
     # Both 'spec' formats are wrapped in parens, discard
-    keyword = keyword.lstrip('(').rstrip(')')
+    keyword = keyword.lstrip("(").rstrip(")")
     # First, test for intermediate '1.2+' style
     matches = release_line_re.findall(keyword)
     if matches:
@@ -74,28 +76,28 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     issue_no = parts.pop(0)
     # Lol @ access back to Sphinx
     config = inliner.document.settings.env.app.config
-    if issue_no not in ('-', '0'):
+    if issue_no not in ("-", "0"):
         ref = None
         if config.releases_issue_uri:
             # TODO: deal with % vs .format()
             ref = config.releases_issue_uri % issue_no
         elif config.releases_github_path:
             ref = "https://github.com/{}/issues/{}".format(
-                config.releases_github_path, issue_no)
+                config.releases_github_path, issue_no
+            )
         # Only generate a reference/link if we were able to make a URI
         if ref:
             identifier = nodes.reference(
-                rawtext, '#' + issue_no, refuri=ref, **options
+                rawtext, "#" + issue_no, refuri=ref, **options
             )
         # Otherwise, just make it regular text
         else:
             identifier = nodes.raw(
-                rawtext=rawtext, text='#' + issue_no, format='html',
-                **options
+                rawtext=rawtext, text="#" + issue_no, format="html", **options
             )
     else:
         identifier = None
-        issue_no = None # So it doesn't gum up dupe detection later
+        issue_no = None  # So it doesn't gum up dupe detection later
     # Additional 'new-style changelog' stuff
     if name in ISSUE_TYPES:
         nodelist = issue_nodelist(name, identifier)
@@ -108,7 +110,7 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
             if maybe_spec:
                 spec = maybe_spec
             else:
-                if part in ('backported', 'major'):
+                if part in ("backported", "major"):
                     keyword = part
                 else:
                     err = "Gave unknown keyword {!r} for issue no. {}"
@@ -118,8 +120,8 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
             number=issue_no,
             type_=name,
             nodelist=nodelist,
-            backported=(keyword == 'backported'),
-            major=(keyword == 'major'),
+            backported=(keyword == "backported"),
+            major=(keyword == "major"),
             spec=spec,
         )
         return [node], []
@@ -139,26 +141,27 @@ def release_nodes(text, slug, date, config):
         uri = config.releases_release_uri % slug
     elif config.releases_github_path:
         uri = "https://github.com/{}/tree/{}".format(
-            config.releases_github_path, slug)
+            config.releases_github_path, slug
+        )
     # Only construct link tag if user actually configured release URIs somehow
     if uri:
         link = '<a class="reference external" href="{}">{}</a>'.format(
-            uri, text,
+            uri, text
         )
     else:
         link = text
-    datespan = ''
+    datespan = ""
     if date:
         datespan = ' <span style="font-size: 75%;">{}</span>'.format(date)
     header = '<h2 style="margin-bottom: 0.3em;">{}{}</h2>'.format(
-        link, datespan)
-    return nodes.section('',
-        nodes.raw(rawtext='', text=header, format='html'),
-        ids=[text]
+        link, datespan
+    )
+    return nodes.section(
+        "", nodes.raw(rawtext="", text=header, format="html"), ids=[text]
     )
 
 
-year_arg_re = re.compile(r'^(.+?)\s*(?<!\x00)<(.*?)>$', re.DOTALL)
+year_arg_re = re.compile(r"^(.+?)\s*(?<!\x00)<(.*?)>$", re.DOTALL)
 
 
 def release_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
@@ -183,19 +186,21 @@ def release_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
 
 def generate_unreleased_entry(header, line, issues, manager, app):
     log = partial(_log, config=app.config)
-    nodelist = [release_nodes(
-        header,
-        # TODO: should link to master for newest family and...what
-        # exactly, for the others? Expectation isn't necessarily to
-        # have a branch per family? Or is there? Maybe there must be..
-        'master',
-        None,
-        app.config
-    )]
+    nodelist = [
+        release_nodes(
+            header,
+            # TODO: should link to master for newest family and...what
+            # exactly, for the others? Expectation isn't necessarily to
+            # have a branch per family? Or is there? Maybe there must be..
+            "master",
+            None,
+            app.config,
+        )
+    ]
     log("Creating {!r} faux-release with {!r}".format(line, issues))
     return {
-        'obj': Release(number=line, date=None, nodelist=nodelist),
-        'entries': issues,
+        "obj": Release(number=line, date=None, nodelist=nodelist),
+        "entries": issues,
     }
 
 
@@ -208,9 +213,9 @@ def append_unreleased_entries(app, manager, releases):
     When only one major release line exists, that dimension is ignored.
     """
     for family, lines in six.iteritems(manager):
-        for type_ in ('bugfix', 'feature'):
-            bucket = 'unreleased_{}'.format(type_)
-            if bucket not in lines: # Implies unstable prehistory + 0.x fam
+        for type_ in ("bugfix", "feature"):
+            bucket = "unreleased_{}".format(type_)
+            if bucket not in lines:  # Implies unstable prehistory + 0.x fam
                 continue
             issues = lines[bucket]
             fam_prefix = "{}.x ".format(family) if len(manager) > 1 else ""
@@ -225,10 +230,10 @@ def reorder_release_entries(releases):
     """
     Mutate ``releases`` so the entrylist in each is ordered by feature/bug/etc.
     """
-    order = {'feature': 0, 'bug': 1, 'support': 2}
+    order = {"feature": 0, "bug": 1, "support": 2}
     for release in releases:
-        entries = release['entries'][:]
-        release['entries'] = sorted(entries, key=lambda x: order[x.type])
+        entries = release["entries"][:]
+        release["entries"] = sorted(entries, key=lambda x: order[x.type])
 
 
 def construct_entry_with_release(focus, issues, manager, log, releases, rest):
@@ -242,7 +247,7 @@ def construct_entry_with_release(focus, issues, manager, log, releases, rest):
     # Check for explicitly listed issues first
     explicit = None
     if rest[0].children:
-        explicit = [x.strip() for x in rest[0][0].split(',')]
+        explicit = [x.strip() for x in rest[0][0].split(",")]
     # Do those by themselves since they override all other logic
     if explicit:
         log("Explicit issues requested: %r" % (explicit,))
@@ -251,7 +256,9 @@ def construct_entry_with_release(focus, issues, manager, log, releases, rest):
         if missing:
             raise ValueError(
                 "Couldn't find issue(s) #{} in the changelog!".format(
-                    ', '.join(missing)))
+                    ", ".join(missing)
+                )
+            )
         # Obtain the explicitly named issues from global list
         entries = []
         for i in explicit:
@@ -259,25 +266,22 @@ def construct_entry_with_release(focus, issues, manager, log, releases, rest):
                 entries.append(flattened_issue_item)
         # Create release
         log("entries in this release: %r" % (entries,))
-        releases.append({
-            'obj': focus,
-            'entries': entries,
-        })
+        releases.append({"obj": focus, "entries": entries})
         # Introspect these entries to determine which buckets they should get
         # removed from (it's not "all of them"!)
         for obj in entries:
-            if obj.type == 'bug':
+            if obj.type == "bug":
                 # Major bugfix: remove from unreleased_feature
                 if obj.major:
                     log("Removing #%s from unreleased" % obj.number)
                     # TODO: consider making a LineManager method somehow
-                    manager[focus.family]['unreleased_feature'].remove(obj)
+                    manager[focus.family]["unreleased_feature"].remove(obj)
                 # Regular bugfix: remove from bucket for this release's
                 # line + unreleased_bugfix
                 else:
-                    if obj in manager[focus.family]['unreleased_bugfix']:
+                    if obj in manager[focus.family]["unreleased_bugfix"]:
                         log("Removing #%s from unreleased" % obj.number)
-                        manager[focus.family]['unreleased_bugfix'].remove(obj)
+                        manager[focus.family]["unreleased_bugfix"].remove(obj)
                     if obj in manager[focus.family][focus.minor]:
                         log("Removing #%s from %s" % (obj.number, focus.minor))
                         manager[focus.family][focus.minor].remove(obj)
@@ -286,7 +290,7 @@ def construct_entry_with_release(focus, issues, manager, log, releases, rest):
             # release's line (if applicable) + unreleased_feature
             else:
                 log("Removing #%s from unreleased" % obj.number)
-                manager[focus.family]['unreleased_feature'].remove(obj)
+                manager[focus.family]["unreleased_feature"].remove(obj)
                 if obj in manager[focus.family].get(focus.minor, []):
                     manager[focus.family][focus.minor].remove(obj)
 
@@ -299,13 +303,15 @@ def construct_entry_with_release(focus, issues, manager, log, releases, rest):
             # answering questions like "what should I give you for a release"
             # or whatever
             log("in unstable prehistory, dumping 'unreleased'")
-            releases.append({
-                'obj': focus,
-                # NOTE: explicitly dumping 0, not focus.family, since this
-                # might be the last pre-historical release and thus not 0.x
-                'entries': manager[0]['unreleased'][:],
-            })
-            manager[0]['unreleased'] = []
+            releases.append(
+                {
+                    "obj": focus,
+                    # NOTE: explicitly dumping 0, not focus.family, since this
+                    # might be the last pre-historical release and thus not 0.x
+                    "entries": manager[0]["unreleased"][:],
+                }
+            )
+            manager[0]["unreleased"] = []
             # If this isn't a 0.x release, it signals end of prehistory, make a
             # new release bucket (as is also done below in regular behavior).
             # Also acts like a sentinel that prehistory is over.
@@ -326,11 +332,15 @@ def construct_entry_with_release(focus, issues, manager, log, releases, rest):
                 # Dump only the items in the bucket whose family this release
                 # object belongs to, i.e. 1.5.0 should only nab the 1.0
                 # family's unreleased feature items.
-                releases.append({
-                    'obj': focus,
-                    'entries': manager[focus.family]['unreleased_feature'][:],
-                })
-                manager[focus.family]['unreleased_feature'] = []
+                releases.append(
+                    {
+                        "obj": focus,
+                        "entries": manager[focus.family]["unreleased_feature"][
+                            :
+                        ],
+                    }
+                )
+                manager[focus.family]["unreleased_feature"] = []
 
             # Existing line -> empty out its bucket into new release.
             # Skip 'major' bugs as those "belong" to the next release (and will
@@ -342,14 +352,14 @@ def construct_entry_with_release(focus, issues, manager, log, releases, rest):
                 # dumping the whole thing - why would major bugs be in the
                 # regular bugfix buckets?
                 entries = manager[focus.family][focus.minor][:]
-                releases.append({'obj': focus, 'entries': entries})
+                releases.append({"obj": focus, "entries": entries})
                 manager[focus.family][focus.minor] = []
                 # Clean out the items we just released from
                 # 'unreleased_bugfix'.  (Can't nuke it because there might
                 # be some unreleased bugs for other release lines.)
                 for x in entries:
-                    if x in manager[focus.family]['unreleased_bugfix']:
-                        manager[focus.family]['unreleased_bugfix'].remove(x)
+                    if x in manager[focus.family]["unreleased_bugfix"]:
+                        manager[focus.family]["unreleased_bugfix"].remove(x)
 
 
 def construct_entry_without_release(focus, issues, manager, log, rest):
@@ -374,7 +384,7 @@ lists.
             raise ValueError(msg.format(buried[0], str(buried[0].parent)))
         # OK, it looks legit - make it a bug.
         log("Found line item w/ no real issue object, creating bug")
-        nodelist = issue_nodelist('bug')
+        nodelist = issue_nodelist("bug")
         # Skip nodelist entirely if we're in unstable prehistory -
         # classification doesn't matter there.
         if manager.unstable_prehistory:
@@ -382,13 +392,9 @@ lists.
         # Undo the 'pop' from outer scope. TODO: rework things so we don't have
         # to do this dumb shit uggggh
         rest[0].insert(0, focus)
-        focus = Issue(
-            type_='bug',
-            nodelist=nodelist,
-            description=rest,
-        )
+        focus = Issue(type_="bug", nodelist=nodelist, description=rest)
     else:
-        focus.attributes['description'] = rest
+        focus.attributes["description"] = rest
 
     # Add to global list (for use by explicit releases) or die trying
     issues[focus.number] = issues.get(focus.number, []) + [focus]
@@ -399,7 +405,7 @@ lists.
     # Release's methods should probably go that way
     if manager.unstable_prehistory:
         log("Unstable prehistory -> adding to 0.x unreleased bucket")
-        manager[0]['unreleased'].append(focus)
+        manager[0]["unreleased"].append(focus)
     else:
         log("Adding to release line manager")
         focus.add_to_manager(manager)
@@ -499,7 +505,7 @@ def construct_releases(entries, app):
             # correctly sorted into that major release by default (re: logic in
             # Release.add_to_manager)
             handle_upcoming_major_release(
-                stripped_entries[index + 1:], manager
+                stripped_entries[index + 1 :], manager
             )
 
         # Entries get copied into release line buckets as follows:
@@ -521,13 +527,15 @@ def construct_releases(entries, app):
             construct_entry_without_release(focus, issues, manager, log, rest)
 
     if manager.unstable_prehistory:
-        releases.append(generate_unreleased_entry(
-            header="Next release",
-            line="unreleased",
-            issues=manager[0]['unreleased'],
-            manager=manager,
-            app=app,
-        ))
+        releases.append(
+            generate_unreleased_entry(
+                header="Next release",
+                line="unreleased",
+                issues=manager[0]["unreleased"],
+                manager=manager,
+                app=app,
+            )
+        )
     else:
         append_unreleased_entries(app, manager, releases)
 
@@ -540,18 +548,18 @@ def construct_nodes(releases):
     result = []
     # Reverse the list again so the final display is newest on top
     for d in reversed(releases):
-        if not d['entries']:
+        if not d["entries"]:
             continue
-        obj = d['obj']
+        obj = d["obj"]
         entries = []
-        for entry in d['entries']:
+        for entry in d["entries"]:
             # Use nodes.Node.deepcopy to deepcopy the description
             # node.  If this is not done, multiple references to the same
             # object (e.g. a reference object in the description of #649, which
             # is then copied into 2 different release lists) will end up in the
             # doctree, which makes subsequent parse steps very angry (index()
             # errors).
-            desc = entry['description'].deepcopy()
+            desc = entry["description"].deepcopy()
             # Additionally, expand any other issue roles found in the
             # description - sometimes we refer to related issues inline. (They
             # can't be left as issue() objects at render time since that's
@@ -560,22 +568,22 @@ def construct_nodes(releases):
             for index, node in enumerate(desc[:]):
                 for subindex, subnode in enumerate(node[:]):
                     if isinstance(subnode, Issue):
-                        lst = subnode['nodelist']
-                        desc[index][subindex:subindex + 1] = lst
+                        lst = subnode["nodelist"]
+                        desc[index][subindex : subindex + 1] = lst
             # Rework this entry to insert the now-rendered issue nodes in front
             # of the 1st paragraph of the 'description' nodes (which should be
             # the preserved LI + nested paragraph-or-more from original
             # markup.)
             # FIXME: why is there no "prepend a list" method?
-            for node in reversed(entry['nodelist']):
+            for node in reversed(entry["nodelist"]):
                 desc[0].insert(0, node)
             entries.append(desc)
         # Entry list
-        list_ = nodes.bullet_list('', *entries)
+        list_ = nodes.bullet_list("", *entries)
         # Insert list into release nodelist (as it's a section)
-        obj['nodelist'][0].append(list_)
+        obj["nodelist"][0].append(list_)
         # Release header
-        header = nodes.paragraph('', '', *obj['nodelist'])
+        header = nodes.paragraph("", "", *obj["nodelist"])
         result.extend(header)
     return result
 
@@ -616,22 +624,22 @@ def setup(app):
     for key, default in (
         # Issue base URI setting: releases_issue_uri
         # E.g. 'https://github.com/fabric/fabric/issues/'
-        ('issue_uri', None),
+        ("issue_uri", None),
         # Release-tag base URI setting: releases_release_uri
         # E.g. 'https://github.com/fabric/fabric/tree/'
-        ('release_uri', None),
+        ("release_uri", None),
         # Convenience Github version of above
-        ('github_path', None),
+        ("github_path", None),
         # Which document to use as the changelog
-        ('document_name', ['changelog']),
+        ("document_name", ["changelog"]),
         # Debug output
-        ('debug', False),
+        ("debug", False),
         # Whether to enable linear history during 0.x release timeline
         # TODO: flip this to True by default in our 2.0 release
-        ('unstable_prehistory', False),
+        ("unstable_prehistory", False),
     ):
         app.add_config_value(
-            name='releases_{}'.format(key), default=default, rebuild='html'
+            name="releases_{}".format(key), default=default, rebuild="html"
         )
     # if a string is given for `document_name`, convert it to a list
     # done to maintain backwards compatibility
@@ -642,18 +650,18 @@ def setup(app):
     else:
         string_types = (str,)
 
-    if isinstance(app.config.releases_document_name, string_types):
+    if isinstance(app.config.releases_document_name, six.string_types):
         app.config.releases_document_name = [app.config.releases_document_name]
 
     # Register intermediate roles
-    for x in list(ISSUE_TYPES) + ['issue']:
+    for x in list(ISSUE_TYPES) + ["issue"]:
         add_role(app, x, issues_role)
-    add_role(app, 'release', release_role)
+    add_role(app, "release", release_role)
     # Hook in our changelog transmutation at appropriate step
-    app.connect('doctree-resolved', generate_changelog)
+    app.connect("doctree-resolved", generate_changelog)
 
     # identifies the version of our extension
-    return {'version': __version__}
+    return {"version": __version__}
 
 
 def add_role(app, name, role_obj):

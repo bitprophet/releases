@@ -1,6 +1,4 @@
-from docutils.nodes import (
-    list_item, paragraph,
-)
+from docutils.nodes import list_item, paragraph
 from mock import Mock
 import six
 
@@ -18,33 +16,38 @@ def inliner(app=None):
     app = app or make_app()
     return Mock(document=Mock(settings=Mock(env=Mock(app=app))))
 
+
 # Obtain issue() object w/o wrapping all parse steps
 def issue(type_, number, **kwargs):
     text = str(number)
-    if kwargs.get('backported', False):
+    if kwargs.get("backported", False):
         text += " backported"
-    if kwargs.get('major', False):
+    if kwargs.get("major", False):
         text += " major"
-    if kwargs.get('spec', None):
-        text += " (%s)" % kwargs['spec']
-    app = kwargs.get('app', None)
+    if kwargs.get("spec", None):
+        text += " (%s)" % kwargs["spec"]
+    app = kwargs.get("app", None)
     return issues_role(
         name=type_,
-        rawtext='',
+        rawtext="",
         text=text,
         lineno=None,
         inliner=inliner(app=app),
     )[0][0]
 
+
 # Even shorter shorthand!
 def b(number, **kwargs):
-    return issue('bug', str(number), **kwargs)
+    return issue("bug", str(number), **kwargs)
+
 
 def f(number, **kwargs):
-    return issue('feature', str(number), **kwargs)
+    return issue("feature", str(number), **kwargs)
+
 
 def s(number, **kwargs):
-    return issue('support', str(number), **kwargs)
+    return issue("support", str(number), **kwargs)
+
 
 def entry(i):
     """
@@ -57,22 +60,24 @@ def entry(i):
     """
     if not isinstance(i, (Issue, Release)):
         return i
-    return list_item('', paragraph('', '', i))
+    return list_item("", paragraph("", "", i))
+
 
 def release(number, **kwargs):
-    app = kwargs.get('app', None)
+    app = kwargs.get("app", None)
     nodes = release_role(
         name=None,
-        rawtext='',
-        text='%s <2013-11-20>' % number,
+        rawtext="",
+        text="%s <2013-11-20>" % number,
         lineno=None,
         inliner=inliner(app=app),
     )[0]
-    return list_item('', paragraph('', '', *nodes))
+    return list_item("", paragraph("", "", *nodes))
+
 
 def release_list(*entries, **kwargs):
-    skip_initial = kwargs.pop('skip_initial', False)
-    entries = list(entries) # lol tuples
+    skip_initial = kwargs.pop("skip_initial", False)
+    entries = list(entries)  # lol tuples
     # Translate simple objs into changelog-friendly ones
     for index, item in enumerate(entries):
         if isinstance(item, six.string_types):
@@ -81,12 +86,14 @@ def release_list(*entries, **kwargs):
             entries[index] = entry(item)
     # Insert initial/empty 1st release to start timeline
     if not skip_initial:
-        entries.append(release('1.0.0'))
+        entries.append(release("1.0.0"))
     return entries
 
+
 def releases(*entries, **kwargs):
-    app = kwargs.pop('app', None) or make_app()
+    app = kwargs.pop("app", None) or make_app()
     return construct_releases(release_list(*entries, **kwargs), app)[0]
+
 
 def setup_issues(self):
     self.f = f(12)
@@ -96,11 +103,12 @@ def setup_issues(self):
     self.bf = f(27, backported=True)
     self.bs = s(29, backported=True)
 
+
 def expect_releases(entries, release_map, skip_initial=False, app=None):
-    kwargs = {'skip_initial': skip_initial}
+    kwargs = {"skip_initial": skip_initial}
     # Let high level tests tickle config settings via make_app()
     if app is not None:
-        kwargs['app'] = app
+        kwargs["app"] = app
     changelog = changelog2dict(releases(*entries, **kwargs))
     snapshot = dict(changelog)
     err = "Got unexpected contents for {}: wanted {}, got {}"

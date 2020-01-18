@@ -10,29 +10,26 @@ class Version(StrictVersion):
     """
     Version subclass toggling ``partial=True`` by default.
     """
+
     def __init__(self, version_string, partial=True):
         super(Version, self).__init__(version_string, partial)
 
 
 # Issue type list (keys) + color values
-ISSUE_TYPES = {
-    'bug': 'A04040',
-    'feature': '40A056',
-    'support': '4070A0',
-}
+ISSUE_TYPES = {"bug": "A04040", "feature": "40A056", "support": "4070A0"}
 
 
 class Issue(nodes.Element):
     # Technically, we just need number, but heck, you never know...
-    _cmp_keys = ('type', 'number', 'backported', 'major')
+    _cmp_keys = ("type", "number", "backported", "major")
 
     @property
     def type(self):
-        return self['type_']
+        return self["type_"]
 
     @property
     def is_featurelike(self):
-        if self.type == 'bug':
+        if self.type == "bug":
             return self.major
         else:
             return not self.backported
@@ -43,19 +40,19 @@ class Issue(nodes.Element):
 
     @property
     def backported(self):
-        return self.get('backported', False)
+        return self.get("backported", False)
 
     @property
     def major(self):
-        return self.get('major', False)
+        return self.get("major", False)
 
     @property
     def number(self):
-        return self.get('number', None)
+        return self.get("number", None)
 
     @property
     def spec(self):
-        return self.get('spec', None)
+        return self.get("spec", None)
 
     def __eq__(self, other):
         for attr in self._cmp_keys:
@@ -75,8 +72,9 @@ class Issue(nodes.Element):
         # elsewhere. (This may be fodder for changing how we roll up
         # pre-major-release features though...?)
         return [
-            key for key, value in six.iteritems(manager)
-            if any(x for x in value if not x.startswith('unreleased'))
+            key
+            for key, value in six.iteritems(manager)
+            if any(x for x in value if not x.startswith("unreleased"))
         ]
 
     def default_spec(self, manager):
@@ -142,7 +140,7 @@ class Issue(nodes.Element):
             candidates = [
                 Version(x)
                 for x in manager[family]
-                if not x.startswith('unreleased')
+                if not x.startswith("unreleased")
             ]
             # Select matching release lines (& stringify)
             buckets = []
@@ -155,7 +153,7 @@ class Issue(nodes.Element):
                 # major release/family hasn't actually seen any releases yet
                 # and only exists for features to go into.
                 if bugfix_buckets:
-                    buckets.append('unreleased_bugfix')
+                    buckets.append("unreleased_bugfix")
             # Obtain list of minor releases to check for "haven't had ANY
             # releases yet" corner case, in which case ALL issues get thrown in
             # unreleased_feature for the first release to consume.
@@ -163,41 +161,42 @@ class Issue(nodes.Element):
             # but...really? why would your first release be a bugfix one??
             no_releases = not self.minor_releases(manager)
             if self.is_featurelike or self.backported or no_releases:
-                buckets.append('unreleased_feature')
+                buckets.append("unreleased_feature")
             # Now that we know which buckets are appropriate, add ourself to
             # all of them. TODO: or just...do it above...instead...
             for bucket in buckets:
                 manager[family][bucket].append(self)
 
     def __repr__(self):
-        flag = ''
+        flag = ""
         if self.backported:
-            flag = 'backported'
+            flag = "backported"
         elif self.major:
-            flag = 'major'
+            flag = "major"
         elif self.spec:
             flag = self.spec
         if flag:
-            flag = ' ({})'.format(flag)
-        return '<{issue.type} #{issue.number}{flag}>'.format(issue=self,
-                                                             flag=flag)
+            flag = " ({})".format(flag)
+        return "<{issue.type} #{issue.number}{flag}>".format(
+            issue=self, flag=flag
+        )
 
 
 class Release(nodes.Element):
     @property
     def number(self):
-        return self['number']
+        return self["number"]
 
     @property
     def minor(self):
         # TODO: use Version
-        return '.'.join(self.number.split('.')[:-1])
+        return ".".join(self.number.split(".")[:-1])
 
     @property
     def family(self):
         # TODO: use Version.major
         # TODO: and probs just rename to .major, 'family' is dumb tbh
-        return int(self.number.split('.')[0])
+        return int(self.number.split(".")[0])
 
     def __repr__(self):
-        return '<release {}>'.format(self.number)
+        return "<release {}>".format(self.number)

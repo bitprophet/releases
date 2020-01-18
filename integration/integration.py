@@ -14,21 +14,22 @@ class integration(object):
     def teardown(self):
         os.chdir(self.cwd)
 
-    def _build(self, folder, opts, target, asserts=None, conf='.', warn=False):
+    def _build(self, folder, opts, target, asserts=None, conf=".", warn=False):
         # Dynamic sphinx opt overrides
         if opts:
-            pairs = map(lambda x: '='.join(x), (opts or {}).items())
-            flags = map(lambda x: '-D {}'.format(x), pairs)
-            flagstr = ' '.join(flags)
+            pairs = map(lambda x: "=".join(x), (opts or {}).items())
+            flags = map(lambda x: "-D {}".format(x), pairs)
+            flagstr = " ".join(flags)
         else:
-            flagstr = ''
+            flagstr = ""
         # Setup
-        os.chdir(os.path.join('integration', '_support'))
-        build = os.path.join(folder, '_build')
+        os.chdir(os.path.join("integration", "_support"))
+        build = os.path.join(folder, "_build")
         try:
             # Build
-            cmd = 'sphinx-build {} -c {} -W {} {}'.format(
-                flagstr, conf, folder, build)
+            cmd = "sphinx-build {} -c {} -W {} {}".format(
+                flagstr, conf, folder, build
+            )
             result = run(cmd, warn=warn, hide=True, in_stream=False)
             if callable(asserts):
                 if isinstance(target, string_types):
@@ -45,9 +46,9 @@ class integration(object):
                 os.path.join(folder, ".doctrees"), ignore_errors=True
             )
 
-    def _assert_worked(self, folder, opts=None, target='changelog', conf='.'):
+    def _assert_worked(self, folder, opts=None, target="changelog", conf="."):
         self._build(
-            folder, opts, target, asserts=self._basic_asserts, conf=conf,
+            folder, opts, target, asserts=self._basic_asserts, conf=conf
         )
 
     def _basic_asserts(self, result, build, target):
@@ -55,7 +56,7 @@ class integration(object):
         msg = "Build failed w/ stderr: {}"
         assert result.ok, msg.format(result.stderr)
         # Check for vaguely correct output
-        changelog = os.path.join(build, '{}.html'.format(target))
+        changelog = os.path.join(build, "{}.html".format(target))
         with open(changelog) as fd:
             text = fd.read()
             assert "1.0.1" in text
@@ -63,23 +64,23 @@ class integration(object):
 
     def vanilla_invocation(self):
         # Doctree with just-a-changelog-named-changelog
-        self._assert_worked('vanilla')
+        self._assert_worked("vanilla")
 
     def customized_filename_with_identical_title(self):
         # Changelog named not 'changelog', same title
         self._assert_worked(
-            folder='custom_identical',
-            opts={'releases_document_name': 'notachangelog'},
-            target='notachangelog',
+            folder="custom_identical",
+            opts={"releases_document_name": "notachangelog"},
+            target="notachangelog",
         )
 
     def customized_filename_with_different_title(self):
         # Changelog named not 'changelog', title distinct
         # NOTE: the difference here is in the fixture!
         self._assert_worked(
-            folder='custom_different',
-            opts={'releases_document_name': 'notachangelog'},
-            target='notachangelog',
+            folder="custom_different",
+            opts={"releases_document_name": "notachangelog"},
+            target="notachangelog",
         )
 
     def useful_error_if_changelog_is_missed(self):
@@ -90,10 +91,7 @@ class integration(object):
         # Don't unknown-node error if broken ReST causes 'hidden' issue nodes.
         # E.g. an accidental definition-list wrapping one.
         result = self._build(
-            folder='hidden_issues',
-            opts=None,
-            target='changelog',
-            warn=True,
+            folder="hidden_issues", opts=None, target="changelog", warn=True
         )
         assert result.failed
         assert "ValueError" in result.stderr
@@ -103,9 +101,9 @@ class integration(object):
     def multiple_changelogs(self):
         # support multiple changelogs
         self._assert_worked(
-            folder='multiple_changelogs',
+            folder="multiple_changelogs",
             opts=None,
-            conf='multiple_changelogs',
+            conf="multiple_changelogs",
             # Ensure the asserts check both changelogs
-            target=['a_changelog', 'b_changelog'],
+            target=["a_changelog", "b_changelog"],
         )

@@ -7,7 +7,7 @@ import os
 from tempfile import mkdtemp
 
 from docutils.nodes import bullet_list
-from sphinx.application import Sphinx # not exposed at top level
+from sphinx.application import Sphinx  # not exposed at top level
 from sphinx.io import read_doc
 
 from . import construct_releases, setup
@@ -67,17 +67,17 @@ def parse_changelog(path, **kwargs):
     # - nuke unreleased_N.N_Y as their contents will be represented in the
     # per-line buckets
     for key in ret.copy():
-        if key.startswith('unreleased'):
+        if key.startswith("unreleased"):
             del ret[key]
     for family in manager:
         # - remove unreleased_bugfix, as they are accounted for in the per-line
         # buckets too. No need to store anywhere.
-        manager[family].pop('unreleased_bugfix', None)
+        manager[family].pop("unreleased_bugfix", None)
         # - bring over each major family's unreleased_feature as
         # unreleased_N_feature
-        unreleased = manager[family].pop('unreleased_feature', None)
+        unreleased = manager[family].pop("unreleased_feature", None)
         if unreleased is not None:
-            ret['unreleased_{}_feature'.format(family)] = unreleased
+            ret["unreleased_{}_feature".format(family)] = unreleased
         # - bring over all per-line buckets from manager (flattening)
         # Here, all that's left in the per-family bucket should be lines, not
         # unreleased_*
@@ -112,7 +112,7 @@ def get_doctree(path, **kwargs):
     # TODO: this only works for top level changelog files (i.e. ones where
     # their dirname is the project/doc root)
     app = make_app(srcdir=root, **kwargs)
-    app.env.temp_data['docname'] = docname
+    app.env.temp_data["docname"] = docname
     doctree = read_doc(app, app.env, path)
     return app, doctree
 
@@ -123,8 +123,8 @@ def load_conf(srcdir):
 
     :returns: Dictionary derived from the conf module.
     """
-    path = os.path.join(srcdir, 'conf.py')
-    mylocals = {'__file__': path}
+    path = os.path.join(srcdir, "conf.py")
+    mylocals = {"__file__": path}
     with open(path) as fd:
         exec(fd.read(), mylocals)
     return mylocals
@@ -171,17 +171,17 @@ def make_app(**kwargs):
     .. versionchanged:: 1.6
         Added the ``load_extensions`` kwarg.
     """
-    srcdir = kwargs.pop('srcdir', mkdtemp())
-    dstdir = kwargs.pop('dstdir', mkdtemp())
-    doctreedir = kwargs.pop('doctreedir', mkdtemp())
-    load_extensions = kwargs.pop('load_extensions', False)
+    srcdir = kwargs.pop("srcdir", mkdtemp())
+    dstdir = kwargs.pop("dstdir", mkdtemp())
+    doctreedir = kwargs.pop("doctreedir", mkdtemp())
+    load_extensions = kwargs.pop("load_extensions", False)
     real_conf = None
     try:
         # Turn off most logging, which is rarely useful and usually just gums
         # up the output of whatever tool is calling us.
         # NOTE: used to just do 'sphinx' but that stopped working. Unsure why
         # hierarchy not functioning.
-        for name in ('sphinx', 'sphinx.sphinx.application'):
+        for name in ("sphinx", "sphinx.sphinx.application"):
             logging.getLogger(name).setLevel(logging.ERROR)
         # App API seems to work on all versions so far.
         app = Sphinx(
@@ -189,7 +189,7 @@ def make_app(**kwargs):
             confdir=None,
             outdir=dstdir,
             doctreedir=doctreedir,
-            buildername='html',
+            buildername="html",
         )
         # Might as well load the conf file here too.
         if load_extensions:
@@ -208,26 +208,26 @@ def make_app(**kwargs):
     # feasible given the rest of the weird ordering we have to do? If it is,
     # maybe just literally slap this over the return value of load_conf()...
     config = {
-        'releases_release_uri': 'foo_%s',
-        'releases_issue_uri': 'bar_%s',
-        'releases_debug': False,
-        'master_doc': 'index',
+        "releases_release_uri": "foo_%s",
+        "releases_issue_uri": "bar_%s",
+        "releases_debug": False,
+        "master_doc": "index",
     }
     # Allow tinkering with document filename
-    if 'docname' in kwargs:
-        app.env.temp_data['docname'] = kwargs.pop('docname')
+    if "docname" in kwargs:
+        app.env.temp_data["docname"] = kwargs.pop("docname")
     # Allow config overrides via kwargs
     for name in kwargs:
-        config['releases_{}'.format(name)] = kwargs[name]
+        config["releases_{}".format(name)] = kwargs[name]
     # Stitch together as the sphinx app init() usually does w/ real conf files
     app.config._raw_config = config
     app.config.init_values()
     # Initialize extensions (the internal call to this happens at init time,
     # which of course had no valid config yet here...)
     if load_extensions:
-        for extension in real_conf.get('extensions', []):
+        for extension in real_conf.get("extensions", []):
             # But don't set up ourselves again, that causes errors
-            if extension == 'releases':
+            if extension == "releases":
                 continue
             app.setup_extension(extension)
     return app
@@ -239,4 +239,4 @@ def changelog2dict(changelog):
 
     See `parse_changelog` docstring for return value details.
     """
-    return {r['obj'].number: r['entries'] for r in changelog}
+    return {r["obj"].number: r["entries"] for r in changelog}
