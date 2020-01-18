@@ -6,15 +6,9 @@ import logging
 import os
 from tempfile import mkdtemp
 
-import sphinx
-from docutils.core import Publisher
-from docutils.io import NullOutput
 from docutils.nodes import bullet_list
 from sphinx.application import Sphinx # not exposed at top level
-from sphinx.io import (
-    SphinxStandaloneReader, SphinxFileInput, SphinxDummyWriter,
-)
-from sphinx.util.docutils import sphinx_domains
+from sphinx.io import read_doc
 
 from . import construct_releases, setup
 
@@ -118,54 +112,9 @@ def get_doctree(path, **kwargs):
     # TODO: this only works for top level changelog files (i.e. ones where
     # their dirname is the project/doc root)
     app = make_app(srcdir=root, **kwargs)
-    # Create & init a BuildEnvironment. Mm, tasty side effects.
-    app._init_env(freshenv=True)
-    env = app.env
-    env.update(
-        config=app.config,
-        srcdir=root,
-        doctreedir=app.doctreedir,
-    )
-    # Update "temp" data (must be done here as it's wiped on update())
-    env.temp_data['docname'] = docname
-    # Code taken from sphinx.environment.read_doc; easier to manually call
-    # it with a working Environment object, instead of doing more random crap
-    # to trick the higher up build system into thinking our single changelog
-    # document was "updated".
-    env.app = app
-    reader_kwargs = {
-        'app': app,
-        'parsers': env.config.source_parsers,
-    }
-    # This monkeypatches (!!!) docutils to 'inject' all registered Sphinx
-    # domains' roles & so forth. Without this, rendering the doctree lacks
-    # almost all Sphinx magic, including things like :ref: and :doc:!
-    with sphinx_domains(env):
-        try:
-            reader = SphinxStandaloneReader(**reader_kwargs)
-        except TypeError:
-            # If we import from io, this happens automagically, not in API
-            del reader_kwargs['parsers']
-            reader = SphinxStandaloneReader(**reader_kwargs)
-        pub = Publisher(reader=reader,
-                        writer=SphinxDummyWriter(),
-                        destination_class=NullOutput)
-        pub.set_components(None, 'restructuredtext', None)
-        pub.process_programmatic_settings(None, env.settings, None)
-        # NOTE: docname derived higher up, from our given path
-        src_path = env.doc2path(docname)
-        source = SphinxFileInput(
-            app,
-            env,
-            source=None,
-            source_path=src_path,
-            encoding=env.config.source_encoding,
-        )
-        pub.source = source
-        pub.settings._source = src_path
-        pub.set_destination(None, None)
-        pub.publish()
-        return app, pub.document
+    app.env.temp_data['docname'] = docname
+    doctree = read_doc(app, app.env, path)
+    return app, doctree
 
 
 def load_conf(srcdir):
