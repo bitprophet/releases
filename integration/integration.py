@@ -1,13 +1,13 @@
 import os
 import shutil
 
-from spec import Spec, skip
+from pytest import skip
 from invoke import run
 
 from invoke.vendor.six import string_types
 
 
-class integration(Spec):
+class integration(object):
     def setup(self):
         self.cwd = os.getcwd()
 
@@ -29,7 +29,7 @@ class integration(Spec):
             # Build
             cmd = 'sphinx-build {} -c {} -W {} {}'.format(
                 flagstr, conf, folder, build)
-            result = run(cmd, warn=warn, hide=True)
+            result = run(cmd, warn=warn, hide=True, in_stream=False)
             if callable(asserts):
                 if isinstance(target, string_types):
                     targets = [target]
@@ -40,6 +40,10 @@ class integration(Spec):
             return result
         finally:
             shutil.rmtree(build)
+            # TODO: there's apparently NO way to just turn this off instead?
+            shutil.rmtree(
+                os.path.join(folder, ".doctrees"), ignore_errors=True
+            )
 
     def _assert_worked(self, folder, opts=None, target='changelog', conf='.'):
         self._build(

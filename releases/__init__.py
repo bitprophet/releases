@@ -600,10 +600,10 @@ class BulletListVisitor(nodes.NodeVisitor):
         pass
 
 
-def generate_changelog(app, doctree):
+def generate_changelog(app, doctree, docname):
     # Don't scan/mutate documents that don't match the configured document name
     # (which by default is ['changelog.rst', ]).
-    if app.env.docname not in app.config.releases_document_name:
+    if docname not in app.config.releases_document_name:
         return
 
     # Find the first bullet-list node & replace it with our organized/parsed
@@ -650,7 +650,7 @@ def setup(app):
         add_role(app, x, issues_role)
     add_role(app, 'release', release_role)
     # Hook in our changelog transmutation at appropriate step
-    app.connect('doctree-read', generate_changelog)
+    app.connect('doctree-resolved', generate_changelog)
 
     # identifies the version of our extension
     return {'version': __version__}

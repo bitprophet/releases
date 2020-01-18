@@ -2,7 +2,6 @@ from docutils.nodes import (
     list_item, paragraph,
 )
 from mock import Mock
-from spec import eq_, ok_
 import six
 
 from releases import (
@@ -108,9 +107,10 @@ def expect_releases(entries, release_map, skip_initial=False, app=None):
     err += "\nFull changelog: {!r}\n"
     for rel, issues in six.iteritems(release_map):
         found = changelog.pop(rel)
-        eq_(set(found), set(issues), err.format(rel, issues, found, snapshot))
+        msg = err.format(rel, issues, found, snapshot)
+        assert set(found) == set(issues), msg
     # Sanity: ensure no leftover issue lists exist (empty ones are OK)
     for key in list(changelog.keys()):
         if not changelog[key]:
             del changelog[key]
-    ok_(not changelog, "Found leftovers: {}".format(changelog))
+    assert not changelog, "Found leftovers: {}".format(changelog)

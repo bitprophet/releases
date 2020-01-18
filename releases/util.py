@@ -6,30 +6,9 @@ import logging
 import os
 from tempfile import mkdtemp
 
-import sphinx
-from docutils.core import Publisher
-from docutils.io import NullOutput
 from docutils.nodes import bullet_list
 from sphinx.application import Sphinx # not exposed at top level
-try:
-    from sphinx.io import (
-        SphinxStandaloneReader, SphinxFileInput, SphinxDummyWriter,
-    )
-except ImportError:
-    # NOTE: backwards compat with Sphinx 1.3
-    from sphinx.environment import (
-        SphinxStandaloneReader, SphinxFileInput, SphinxDummyWriter,
-    )
-# sphinx_domains is only in Sphinx 1.5+, but is presumably necessary from then
-# onwards.
-try:
-    from sphinx.util.docutils import sphinx_domains
-except ImportError:
-    # Just dummy it up.
-    from contextlib import contextmanager
-    @contextmanager
-    def sphinx_domains(env):
-        yield
+from sphinx.io import read_doc
 
 from . import construct_releases, setup
 
@@ -108,16 +87,18 @@ def parse_changelog(path, **kwargs):
 
 def get_doctree(path, **kwargs):
     """
-    Obtain a Sphinx doctree from the RST file at ``path``.
+    Obtain a mostly-rendered Sphinx doctree from the RST file at ``path``.
 
-    Performs no Releases-specific processing; this code would, ideally, be in
-    Sphinx itself, but things there are pretty tightly coupled. So we wrote
-    this.
+    The returned doctree is parsed to the point where Releases' own objects
+    (such as Release and Issue nodes) have been injected, but not yet turned
+    into their final representation (such as HTML tags). This is primarily
+    useful for the use case of `parse_changelog` in this module; if you want a
+    real 100%-rendered doctree, try using ``sphinx.io.read_doc`` directly.
 
     Any additional kwargs are passed unmodified into an internal `make_app`
     call.
 
-    :param str path: A relative or absolute file path string.
+    :param str path: A relative or absolute Sphinx sourcedir path.
 
     :returns:
         A two-tuple of the generated ``sphinx.application.Sphinx`` app and the
@@ -131,67 +112,9 @@ def get_doctree(path, **kwargs):
     # TODO: this only works for top level changelog files (i.e. ones where
     # their dirname is the project/doc root)
     app = make_app(srcdir=root, **kwargs)
-    # Create & init a BuildEnvironment. Mm, tasty side effects.
-    app._init_env(freshenv=True)
-    env = app.env
-    # More arity/API changes: Sphinx 1.3/1.4-ish require one to pass in the app
-    # obj in BuildEnvironment.update(); modern Sphinx performs that inside
-    # Application._init_env() (which we just called above) and so that kwarg is
-    # removed from update(). EAFP.
-    kwargs = dict(
-        config=app.config,
-        srcdir=root,
-        doctreedir=app.doctreedir,
-        app=app,
-    )
-    try:
-        env.update(**kwargs)
-    except TypeError:
-        # Assume newer Sphinx w/o an app= kwarg
-        del kwargs['app']
-        env.update(**kwargs)
-    # Code taken from sphinx.environment.read_doc; easier to manually call
-    # it with a working Environment object, instead of doing more random crap
-    # to trick the higher up build system into thinking our single changelog
-    # document was "updated".
-    env.temp_data['docname'] = docname
-    env.app = app
-    # NOTE: SphinxStandaloneReader API changed in 1.4 :(
-    reader_kwargs = {
-        'app': app,
-        'parsers': env.config.source_parsers,
-    }
-    if sphinx.version_info[:2] < (1, 4):
-        del reader_kwargs['app']
-    # This monkeypatches (!!!) docutils to 'inject' all registered Sphinx
-    # domains' roles & so forth. Without this, rendering the doctree lacks
-    # almost all Sphinx magic, including things like :ref: and :doc:!
-    with sphinx_domains(env):
-        try:
-            reader = SphinxStandaloneReader(**reader_kwargs)
-        except TypeError:
-            # If we import from io, this happens automagically, not in API
-            del reader_kwargs['parsers']
-            reader = SphinxStandaloneReader(**reader_kwargs)
-        pub = Publisher(reader=reader,
-                        writer=SphinxDummyWriter(),
-                        destination_class=NullOutput)
-        pub.set_components(None, 'restructuredtext', None)
-        pub.process_programmatic_settings(None, env.settings, None)
-        # NOTE: docname derived higher up, from our given path
-        src_path = env.doc2path(docname)
-        source = SphinxFileInput(
-            app,
-            env,
-            source=None,
-            source_path=src_path,
-            encoding=env.config.source_encoding,
-        )
-        pub.source = source
-        pub.settings._source = src_path
-        pub.set_destination(None, None)
-        pub.publish()
-        return app, pub.document
+    app.env.temp_data['docname'] = docname
+    doctree = read_doc(app, app.env, path)
+    return app, doctree
 
 
 def load_conf(srcdir):
@@ -254,12 +177,10 @@ def make_app(**kwargs):
     load_extensions = kwargs.pop('load_extensions', False)
     real_conf = None
     try:
-        # Sphinx <1.6ish
-        Sphinx._log = lambda self, message, wfile, nonl=False: None
-        # Sphinx >=1.6ish. Technically still lets Very Bad Things through,
-        # unlike the total muting above, but probably OK.
-        # NOTE: used to just do 'sphinx' but that stopped working, even on
-        # sphinx 1.6.x. Weird. Unsure why hierarchy not functioning.
+        # Turn off most logging, which is rarely useful and usually just gums
+        # up the output of whatever tool is calling us.
+        # NOTE: used to just do 'sphinx' but that stopped working. Unsure why
+        # hierarchy not functioning.
         for name in ('sphinx', 'sphinx.sphinx.application'):
             logging.getLogger(name).setLevel(logging.ERROR)
         # App API seems to work on all versions so far.
@@ -300,13 +221,7 @@ def make_app(**kwargs):
         config['releases_{}'.format(name)] = kwargs[name]
     # Stitch together as the sphinx app init() usually does w/ real conf files
     app.config._raw_config = config
-    # init_values() requires a 'warn' runner on Sphinx 1.3-1.6, so if we seem
-    # to be hitting arity errors, give it a dummy such callable. Hopefully
-    # calling twice doesn't introduce any wacko state issues :(
-    try:
-        app.config.init_values()
-    except TypeError: # boy I wish Python had an ArityError or w/e
-        app.config.init_values(lambda x: x)
+    app.config.init_values()
     # Initialize extensions (the internal call to this happens at init time,
     # which of course had no valid config yet here...)
     if load_extensions:
