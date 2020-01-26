@@ -635,7 +635,7 @@ def setup(app):
         # Debug output
         ("debug", False),
         # Whether to enable linear history during 0.x release timeline
-        # TODO: flip this to True by default in our 2.0 release
+        # TODO: flip this to True by default in our 3.0 release
         ("unstable_prehistory", False),
     ):
         app.add_config_value(

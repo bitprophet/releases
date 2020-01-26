@@ -2,15 +2,18 @@
 Changelog
 =========
 
+- :release:`2.0.0 <2020-01-25>`
 - :support:`-` Dropped support for Sphinx <1.8, which is now pretty rare in the
   wild. This makes it easier to support Sphinx 1.8+ and lets us drop an
   ever-growing amount of compatibility code for Sphinx 1.3-1.7.
 
   .. warning::
-    This change is technically backwards incompatible, but our own API and
-    behavior is not changing, and Sphinx itself did not make breaking changes
-    (that we're aware of) in 1.8, so as long as you upgrade your Sphinx along
-    with your Releases, you should be okay.
+    This change is technically backwards incompatible and we are releasing it
+    as 2.0 because of that, but our own API and behavior is not changing, and
+    Sphinx itself did not make breaking changes (that we're aware of) in 1.8.
+
+    As long as you upgrade your Sphinx along with your Releases, you should not
+    actually experience any breakage in this version.
 
 - :support:`-` Migrated the test suite to use ``pytest-relaxed`` (and thus
   pytest) instead of ``spec``.
