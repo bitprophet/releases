@@ -23,6 +23,9 @@ install:
   - pip install -r dev-requirements.txt
   - pip install "sphinx$SPHINX"
 script:
+  # Don't bother testing if formatting is broken
+  - flake8
+  - inv blacken
   # Primary test suite
   - inv test
   # Integration-level test suite (hard to reliably test full stack in-code :()
