@@ -25,7 +25,7 @@ install:
 script:
   # Don't bother testing if formatting is broken
   - flake8
-  - inv blacken
+  - inv travis.blacken
   # Primary test suite
   - inv test
   # Integration-level test suite (hard to reliably test full stack in-code :()
