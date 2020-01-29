@@ -2,7 +2,7 @@ from functools import reduce
 from operator import xor
 
 from docutils import nodes
-from semantic_version import Version as StrictVersion, Spec
+from semantic_version import Version as SimpleVersion, SimpleSpec
 import six
 
 
@@ -79,17 +79,17 @@ class Issue(nodes.Element):
 
     def default_spec(self, manager):
         """
-        Given the current release-lines structure, return a default Spec.
+        Given the current release-lines structure, return a default SimpleSpec.
 
         Specifics:
 
         * For feature-like issues, only the highest major release is used, so
           given a ``manager`` with top level keys of ``[1, 2]``, this would
-          return ``Spec(">=2")``.
+          return ``SimpleSpec(">=2")``.
 
             * When ``releases_always_forwardport_features`` is ``True``, that
               behavior is nullified, and this function always returns the empty
-              ``Spec`` (which matches any and all versions/lines).
+              ``SimpleSpec`` (which matches any and all versions/lines).
 
         * For bugfix-like issues, we only consider major release families which
           have actual releases already.
@@ -120,7 +120,7 @@ class Issue(nodes.Element):
             buckets = self.minor_releases(manager)
             if buckets:
                 specstr = ">={}".format(max(buckets))
-        return Spec(specstr) if specstr else Spec()
+        return SimpleSpec(specstr) if specstr else SimpleSpec()
 
     def add_to_manager(self, manager):
         """

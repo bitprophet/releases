@@ -7,7 +7,7 @@ from docutils import nodes, utils
 from docutils.parsers.rst import roles
 import six
 
-from .models import Issue, ISSUE_TYPES, Release, Version, Spec
+from .models import Issue, ISSUE_TYPES, Release, Version, SimpleSpec
 from .line_manager import LineManager
 from ._version import __version__
 
@@ -39,7 +39,7 @@ release_line_re = re.compile(r"^(\d+\.\d+)\+$")  # e.g. '1.2+'
 
 def scan_for_spec(keyword):
     """
-    Attempt to return some sort of Spec from given keyword value.
+    Attempt to return some sort of SimpleSpec from given keyword value.
 
     Returns None if one could not be derived.
     """
@@ -48,11 +48,11 @@ def scan_for_spec(keyword):
     # First, test for intermediate '1.2+' style
     matches = release_line_re.findall(keyword)
     if matches:
-        return Spec(">={}".format(matches[0]))
+        return SimpleSpec(">={}".format(matches[0]))
     # Failing that, see if Spec can make sense of it
     try:
-        return Spec(keyword)
-    # I've only ever seen Spec fail with ValueError.
+        return SimpleSpec(keyword)
+    # I've only ever seen SimpleSpec fail with ValueError.
     except ValueError:
         return None
 
