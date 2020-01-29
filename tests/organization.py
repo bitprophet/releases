@@ -143,7 +143,9 @@ class organization(object):
             ("1.1.2", [b50, b42]),
             ("1.2.1", [b50, b42]),
         ):
-            assert set(c[rel]) == set(issues)
+            err = "Expected {} to contain {!r}, but it contained {!r}"
+            got, expected = set(c[rel]), set(issues)
+            assert got == expected, err.format(rel, expected, got)
 
     def releases_can_specify_issues_explicitly(self):
         # Build regular list-o-entries
