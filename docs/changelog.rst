@@ -10,6 +10,7 @@ Changelog
     - We used to expose ``semantic_version``'s ``Spec`` class in our own
       ``__init__`` and ``models`` modules; we're now more properly using
       ``SimpleSpec``.
+    - TODO: are we bumping to >=2.7?
 
 - :support:`-` Dropped support for Sphinx <1.8, which is now pretty rare in the
   wild. This makes it easier to support Sphinx 1.8+ and lets us drop an

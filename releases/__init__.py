@@ -432,6 +432,7 @@ def handle_upcoming_major_release(entries, manager):
     # to the line manager!
     for obj in next_releases:
         # TODO: update when Release gets tied closer w/ Version
+        # TODO: but in meantime...move into new subclass?
         version = Version(obj.full_number)
         if version.minor == 0 and version.patch == 0:
             manager.add_family(obj.family)

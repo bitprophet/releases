@@ -124,16 +124,29 @@ class Issue(nodes.Element):
         # looking in the 1.x family.
         majors = [Version("{}.0.0".format(x)) for x in manager]
         versions = list(spec.filter(majors))
+        # TODO: this and default_spec() feel like they're needlessly focused on
+        # Spec/Version semantics and could potentially just become integers - I
+        # don't see anything in use besides A) major version numbers and B)
+        # "anything goes"
         for version in versions:
+            # TODO: yea see, this is dumb
             family = version.major
             # Within each family, we further limit which bugfix lines match up
             # to what self cares about (ignoring 'unreleased' until later)
+            # TODO: however THIS starts to really need version stuff as it
+            # gets into the minors
             candidates = [
+                # TODO: having to slap .0's on to avoid using partial=True
+                # still feels kinda backwards. Maybe preserving a subclass
+                # would be the right way to go - isolate the silly
                 Version("{}.0".format(x))
                 for x in manager[family]
                 if not x.startswith("unreleased")
             ]
             # Select matching release lines (& stringify)
+            # TODO: couldn't we use the [silly] version objects as dict keys?
+            # but also, won't these stringify wrong now? (eg as 1.2.0 not 1.2)
+            # again, a new class would be rad here
             buckets = []
             bugfix_buckets = ["{0.major}.{0.minor}".format(x) for x in spec.filter(candidates)]
             # Add back in unreleased_* as appropriate
