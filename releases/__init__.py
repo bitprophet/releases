@@ -432,7 +432,7 @@ def handle_upcoming_major_release(entries, manager):
     # to the line manager!
     for obj in next_releases:
         # TODO: update when Release gets tied closer w/ Version
-        version = Version(obj.number)
+        version = Version(obj.full_number)
         if version.minor == 0 and version.patch == 0:
             manager.add_family(obj.family)
 

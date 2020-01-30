@@ -2,17 +2,8 @@ from functools import reduce
 from operator import xor
 
 from docutils import nodes
-from semantic_version import Version as SimpleVersion, SimpleSpec
+from semantic_version import Version, SimpleSpec
 import six
-
-
-class Version(StrictVersion):
-    """
-    Version subclass toggling ``partial=True`` by default.
-    """
-
-    def __init__(self, version_string, partial=True):
-        super(Version, self).__init__(version_string, partial)
 
 
 # Issue type list (keys) + color values
@@ -120,7 +111,7 @@ class Issue(nodes.Element):
             buckets = self.minor_releases(manager)
             if buckets:
                 specstr = ">={}".format(max(buckets))
-        return SimpleSpec(specstr) if specstr else SimpleSpec()
+        return SimpleSpec(specstr) if specstr else SimpleSpec("*")
 
     def add_to_manager(self, manager):
         """
@@ -131,20 +122,20 @@ class Issue(nodes.Element):
         # Only look in appropriate major version/family; if self is an issue
         # declared as living in e.g. >=2, this means we don't even bother
         # looking in the 1.x family.
-        families = [Version(str(x)) for x in manager]
-        versions = list(spec.filter(families))
+        majors = [Version("{}.0.0".format(x)) for x in manager]
+        versions = list(spec.filter(majors))
         for version in versions:
             family = version.major
             # Within each family, we further limit which bugfix lines match up
             # to what self cares about (ignoring 'unreleased' until later)
             candidates = [
-                Version(x)
+                Version("{}.0".format(x))
                 for x in manager[family]
                 if not x.startswith("unreleased")
             ]
             # Select matching release lines (& stringify)
             buckets = []
-            bugfix_buckets = [str(x) for x in spec.filter(candidates)]
+            bugfix_buckets = ["{0.major}.{0.minor}".format(x) for x in spec.filter(candidates)]
             # Add back in unreleased_* as appropriate
             # TODO: probably leverage Issue subclasses for this eventually?
             if self.is_buglike:
@@ -186,6 +177,12 @@ class Release(nodes.Element):
     @property
     def number(self):
         return self["number"]
+
+    @property
+    def full_number(self):
+        if len(self.number.split(".")) == 3 or self.number.endswith("0"):
+            return self.number
+        return "{}.0".format(self.number)
 
     @property
     def minor(self):
