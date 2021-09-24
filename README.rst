@@ -23,7 +23,9 @@ Specifically:
 Some background on why this tool was created can be found in `this blog post
 <http://bitprophet.org/blog/2013/09/14/a-better-changelog/>`_.
 
-For more documentation, please see http://releases.readthedocs.io.
+For more documentation, please see http://releases.readthedocs.io. For a
+roadmap, see the maintainer's `roadmap page
+<http://bitprophet.org/projects#roadmap>`_.
 
 .. note::
     You can install the development version via ``pip install -e
