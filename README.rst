@@ -1,3 +1,21 @@
+|version| |python| |license| |ci| |coverage|
+
+.. |version| image:: https://img.shields.io/pypi/v/releases
+    :target: https://pypi.org/project/releases/
+    :alt: PyPI - Package Version
+.. |python| image:: https://img.shields.io/pypi/pyversions/releases
+    :target: https://pypi.org/project/releases/
+    :alt: PyPI - Python Version
+.. |license| image:: https://img.shields.io/pypi/l/releases
+    :target: https://github.com/bitprophet/releases/blob/main/LICENSE
+    :alt: PyPI - License
+.. |ci| image:: https://img.shields.io/circleci/build/github/bitprophet/releases/main
+    :target: https://app.circleci.com/pipelines/github/bitprophet/releases
+    :alt: CircleCI
+.. |coverage| image:: https://img.shields.io/codecov/c/gh/bitprophet/releases
+    :target: https://app.codecov.io/gh/bitprophet/releases
+    :alt: Codecov
+
 
 What is Releases?
 =================
