@@ -16,6 +16,12 @@ setup(
     author="Jeff Forcier",
     author_email="jeff@bitprophet.org",
     url="https://github.com/bitprophet/releases",
+    project_urls={
+        "Docs": "https://releases.readthedocs.io",
+        "Source": "https://github.com/bitprophet/releases",
+        "Changelog": "https://releases.readthedocs.io/en/latest/changelog.html",  # noqa
+        "CI": "https://app.circleci.com/pipelines/github/bitprophet/releases",
+    },
     packages=["releases"],
     install_requires=["semantic_version<2.7", "sphinx>=1.8"],
     classifiers=[
@@ -27,11 +33,11 @@ setup(
         "Operating System :: POSIX",
         "Operating System :: Microsoft :: Windows",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 3.4",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "Topic :: Software Development",
         "Topic :: Software Development :: Documentation",
         "Topic :: Documentation",

@@ -1,13 +1,13 @@
 from os.path import join
 
-from invocations import docs, checks, travis
+from invocations import docs, checks, ci
 from invocations.pytest import test, integration
 from invocations.packaging import release
 
 from invoke import Collection
 
 
-ns = Collection(test, integration, release, docs, travis, checks.blacken)
+ns = Collection(test, integration, release, docs, ci, checks.blacken)
 ns.configure(
     {
         "travis": {"black": {"version": "18.6b4"}},
