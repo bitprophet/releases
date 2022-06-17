@@ -1,0 +1,43 @@
+version: 2.1
+
+
+orbs:
+  orb: invocations/orb@1.2.0
+
+
+jobs:
+  integration:
+    executor:
+      name: orb/default
+      version: "3.6"
+    steps:
+      - orb/setup
+      - run: inv integration
+      - orb/debug
+
+
+workflows:
+  main:
+    jobs:
+      - orb/lint:
+          name: Lint
+      - orb/format:
+          name: Style check
+      - orb/test:
+          name: Test
+          version: "3.6"
+      - orb/test-release:
+          name: Release test
+          requires: ["Test"]
+      - integration:
+          name: Integration tests
+          requires: ["Test"]
+      - orb/test:
+          name: Test << matrix.version >>
+          requires: ["Test"]
+          matrix:
+            parameters:
+              version: ["3.7", "3.8", "3.9"]
+      - orb/docs:
+          name: "Docs"
+          requires: ["Test"]
