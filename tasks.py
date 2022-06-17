@@ -10,7 +10,6 @@ from invoke import Collection
 ns = Collection(test, integration, release, docs, ci, checks.blacken)
 ns.configure(
     {
-        "travis": {"black": {"version": "18.6b4"}},
         "packaging": {
             "sign": True,
             "wheel": True,
