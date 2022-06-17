@@ -1,11 +1,9 @@
-.. image:: https://secure.travis-ci.org/bitprophet/releases.png?branch=master
-        :target: https://travis-ci.org/bitprophet/releases
 
 What is Releases?
 =================
 
-Releases is a Python (2.7, 3.4+) compatible `Sphinx <http://sphinx-doc.org>`_
-(1.8+) extension designed to help you keep a source control friendly, merge
+Releases is a Python 3.6+ compatible `Sphinx <http://sphinx-doc.org>`_
+(1.3+) extension designed to help you keep a source control friendly, merge
 friendly changelog file & turn it into useful, human readable HTML output.
 
 Specifically:
