@@ -1,10 +1,9 @@
 # Task runner
-invoke>=0.6.0,<2.0
-invocations>=0.14,<2.0
+invoke>=1.7.1,<3
+invocations>=3,<4
 # Tests (N.B. integration suite also uses Invoke as above)
-pytest-relaxed==1.1.5
-pytest==4.6.9
-mock==1.0.1
+pytest-relaxed>=1.1.5,<2.0
+pytest>=4.6.9
 # Just for tests...heh
 six>=1.4.1,<2.0
 # Docs
