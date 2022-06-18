@@ -1,5 +1,5 @@
 from docutils.nodes import list_item, paragraph
-from mock import Mock
+from unittest.mock import Mock
 import six
 
 from releases import (
