@@ -2,7 +2,6 @@
 Changelog
 =========
 
-- :release:`2.0.0 <2020-01-25>`
 - :support:`-` Dropped support for Sphinx <1.8, which is now pretty rare in the
   wild. This makes it easier to support Sphinx 1.8+ and lets us drop an
   ever-growing amount of compatibility code for Sphinx 1.3-1.7.
