@@ -2,6 +2,8 @@
 Changelog
 =========
 
+- :bug:`-` Don't make tmpdirs in ``releases.util.make_app`` when being given
+  explicit directory args.
 - :support:`-` Dropped support for Sphinx <1.8, which is now pretty rare in the
   wild. This makes it easier to support Sphinx 1.8+ and lets us drop an
   ever-growing amount of compatibility code for Sphinx 1.3-1.7.

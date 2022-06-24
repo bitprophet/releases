@@ -171,9 +171,15 @@ def make_app(**kwargs):
     .. versionchanged:: 1.6
         Added the ``load_extensions`` kwarg.
     """
-    srcdir = kwargs.pop("srcdir", mkdtemp())
-    dstdir = kwargs.pop("dstdir", mkdtemp())
-    doctreedir = kwargs.pop("doctreedir", mkdtemp())
+    srcdir = kwargs.pop("srcdir", None)
+    if srcdir is None:
+        srcdir = mkdtemp()
+    dstdir = kwargs.pop("dstdir", None)
+    if dstdir is None:
+        dstdir = mkdtemp()
+    doctreedir = kwargs.pop("doctreedir", None)
+    if doctreedir is None:
+        doctreedir = mkdtemp()
     load_extensions = kwargs.pop("load_extensions", False)
     real_conf = None
     try:
