@@ -3,3 +3,5 @@
 .*.swp
 build/
 docs/_build
+htmlcov
+.coverage
