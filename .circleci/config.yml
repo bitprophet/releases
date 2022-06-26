@@ -23,9 +23,8 @@ workflows:
           name: Lint
       - orb/format:
           name: Style check
-      - orb/test:
+      - orb/coverage:
           name: Test
-          version: "3.6"
       - orb/test-release:
           name: Release test
           requires: ["Test"]
