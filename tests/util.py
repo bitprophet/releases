@@ -1,6 +1,6 @@
 from unittest.mock import patch, MagicMock as Mock
 
-from pytest import skip
+from pytest import skip  # noqa
 from sphinx.application import Sphinx
 from docutils.nodes import bullet_list
 
@@ -53,7 +53,7 @@ class parse_changelog_:
                     "unreleased_feature": "shiny!",
                     "1.2": "hmm",
                 },
-                "2": {"unreleased_feature": "shinier!", "2.2": "also hmm",},
+                "2": {"unreleased_feature": "shinier!", "2.2": "also hmm"},
             }
             return manager
 
