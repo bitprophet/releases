@@ -40,3 +40,4 @@ workflows:
       - orb/docs:
           name: "Docs"
           requires: ["Test"]
+          task: docs
