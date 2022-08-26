@@ -1,6 +1,7 @@
 # Task runner
 invoke>=1.7.1
-invocations>=3
+#invocations>=3
+invocations>=2
 # Tests (N.B. integration suite also uses Invoke as above)
 pytest-relaxed>=1.1.5
 pytest-cov>=2.4
