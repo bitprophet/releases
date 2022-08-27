@@ -4,6 +4,7 @@ Utility functions, such as helpers for standalone changelog parsing.
 
 import logging
 import os
+from pathlib import Path
 from tempfile import mkdtemp
 
 from docutils.nodes import bullet_list
@@ -107,13 +108,13 @@ def get_doctree(path, **kwargs):
     .. versionchanged:: 1.6
         Added support for passing kwargs to `make_app`.
     """
-    root, filename = os.path.split(path)
-    docname, _ = os.path.splitext(filename)
+    path = Path(path)
     # TODO: this only works for top level changelog files (i.e. ones where
     # their dirname is the project/doc root)
-    app = make_app(srcdir=root, **kwargs)
-    app.env.temp_data["docname"] = docname
-    doctree = read_doc(app, app.env, path)
+    # NOTE: using absolute to avoid docutils bugs
+    app = make_app(srcdir=path.parent.absolute(), **kwargs)
+    app.env.temp_data["docname"] = path.stem
+    doctree = read_doc(app, app.env, str(path.absolute()))
     return app, doctree
 
 

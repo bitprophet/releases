@@ -1,3 +1,4 @@
+from pathlib import Path
 from unittest.mock import patch, MagicMock as Mock
 
 from pytest import skip  # noqa
@@ -68,22 +69,29 @@ class parse_changelog_:
 
 
 class get_doctree_:
+    def setup(self):
+        self.cwd = Path.cwd()
+
     @patch("releases.util.make_app")
     @patch("releases.util.read_doc")
     def returns_app_and_doctree_for_file_path(self, read_doc, make_app):
+        # NOTE: using relative path and testing that an absolute one is used,
+        # as this prevents internal docutils pseudo-bugs
         path = "nonsense/path.rst"
         app = make_app.return_value
         expected = (app, read_doc.return_value)
         assert get_doctree(path) == expected
-        make_app.assert_called_once_with(srcdir="nonsense")
-        read_doc.assert_called_once_with(app, app.env, path)
+        make_app.assert_called_once_with(srcdir=self.cwd / "nonsense")
+        # NOTE: still enforcing the STRING form of path is handed to read_doc,
+        # as it is not yet Pathlib-aware (apparently)
+        read_doc.assert_called_once_with(app, app.env, str(self.cwd / path))
 
     @patch("releases.util.make_app")
     @patch("releases.util.read_doc")
     def passes_kwargs_to_make_app(self, read_doc, make_app):
         path = "nonsense/path.rst"
         get_doctree(path, whatever="kwargs")
-        make_app.assert_called_once_with(srcdir="nonsense", whatever="kwargs")
+        make_app.assert_called_once_with(srcdir=self.cwd / "nonsense", whatever="kwargs")
 
 
 class make_app_:
