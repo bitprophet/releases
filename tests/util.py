@@ -91,7 +91,9 @@ class get_doctree_:
     def passes_kwargs_to_make_app(self, read_doc, make_app):
         path = "nonsense/path.rst"
         get_doctree(path, whatever="kwargs")
-        make_app.assert_called_once_with(srcdir=self.cwd / "nonsense", whatever="kwargs")
+        make_app.assert_called_once_with(
+            srcdir=self.cwd / "nonsense", whatever="kwargs"
+        )
 
 
 class make_app_:
