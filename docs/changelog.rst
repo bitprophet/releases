@@ -2,6 +2,8 @@
 Changelog
 =========
 
+- :support:`-` Dropped support for Python 2.7, Python 3.4, and Python 3.5, to
+  align slightly better with upstream (and ecosystem) EOLs.
 - :bug:`-` Don't make tmpdirs in ``releases.util.make_app`` when being given
   explicit directory args.
 - :support:`-` Dropped support for Sphinx <1.8, which is now pretty rare in the
@@ -10,8 +12,9 @@ Changelog
 
   .. warning::
     This change is technically backwards incompatible and we are releasing it
-    as 2.0 because of that, but our own API and behavior is not changing, and
-    Sphinx itself did not make breaking changes (that we're aware of) in 1.8.
+    as 2.0 because of that (and dropping Python 2, see rest of changelog), but
+    our own API and behavior is not changing, and Sphinx itself did not make
+    breaking changes (that we're aware of) in 1.8.
 
     As long as you upgrade your Sphinx along with your Releases, you should not
     actually experience any breakage in this version.
