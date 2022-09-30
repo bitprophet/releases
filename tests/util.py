@@ -5,7 +5,12 @@ from pytest import skip  # noqa
 from sphinx.application import Sphinx
 from docutils.nodes import bullet_list
 
-from releases.util import make_app, parse_changelog, get_doctree
+from releases.util import (
+    make_app,
+    parse_changelog,
+    get_doctree,
+    _faux_write_doctree,
+)
 
 
 class parse_changelog_:
@@ -73,22 +78,28 @@ class get_doctree_:
         self.cwd = Path.cwd()
 
     @patch("releases.util.make_app")
-    @patch("releases.util.read_doc")
-    def returns_app_and_doctree_for_file_path(self, read_doc, make_app):
+    def returns_app_and_doctree_for_file_path(self, make_app):
         # NOTE: using relative path and testing that an absolute one is used,
         # as this prevents internal docutils pseudo-bugs
         path = "nonsense/path.rst"
         app = make_app.return_value
-        expected = (app, read_doc.return_value)
-        assert get_doctree(path) == expected
+        # Expect awful monkeypatch workaround re: assignment/extraction of read
+        # doctree
+        assert get_doctree(path) == (app, app.builder._read_doctree)
         make_app.assert_called_once_with(srcdir=self.cwd / "nonsense")
+        # Ensure our monkeypatch is active
+        # NOTE: this doesn't test inside the monkeypatch; integration/util.py
+        # should though
+        assert app.builder.__class__.write_doctree is _faux_write_doctree
         # NOTE: still enforcing the STRING form of path is handed to read_doc,
         # as it is not yet Pathlib-aware (apparently)
-        read_doc.assert_called_once_with(app, app.env, str(self.cwd / path))
+        # NOTE: use of .stem, a change from sphinx 1.x
+        app.builder.read_doc.assert_called_once_with(
+            str(self.cwd / "nonsense" / "path")
+        )
 
     @patch("releases.util.make_app")
-    @patch("releases.util.read_doc")
-    def passes_kwargs_to_make_app(self, read_doc, make_app):
+    def passes_kwargs_to_make_app(self, make_app):
         path = "nonsense/path.rst"
         get_doctree(path, whatever="kwargs")
         make_app.assert_called_once_with(

@@ -9,7 +9,6 @@ from tempfile import mkdtemp
 
 from docutils.nodes import bullet_list
 from sphinx.application import Sphinx  # not exposed at top level
-from sphinx.builders import Builder
 
 from . import construct_releases, setup
 
