@@ -9,7 +9,7 @@ from tempfile import mkdtemp
 
 from docutils.nodes import bullet_list
 from sphinx.application import Sphinx  # not exposed at top level
-from sphinx.io import read_doc
+from sphinx.builders import Builder
 
 from . import construct_releases, setup
 
@@ -86,15 +86,22 @@ def parse_changelog(path, **kwargs):
     return ret
 
 
+def _faux_write_doctree(self, docname, doctree):
+    self._read_doctree = doctree
+
+
 def get_doctree(path, **kwargs):
     """
     Obtain a mostly-rendered Sphinx doctree from the RST file at ``path``.
 
     The returned doctree is parsed to the point where Releases' own objects
     (such as Release and Issue nodes) have been injected, but not yet turned
-    into their final representation (such as HTML tags). This is primarily
-    useful for the use case of `parse_changelog` in this module; if you want a
-    real 100%-rendered doctree, try using ``sphinx.io.read_doc`` directly.
+    into their final representation (such as HTML tags).
+
+    .. note::
+      This is primarily useful for the use case of `parse_changelog` in this
+      module and is not intended as a generic-use in-memory Sphinx build
+      function!
 
     Any additional kwargs are passed unmodified into an internal `make_app`
     call.
@@ -114,8 +121,12 @@ def get_doctree(path, **kwargs):
     # NOTE: using absolute to avoid docutils bugs
     app = make_app(srcdir=path.parent.absolute(), **kwargs)
     app.env.temp_data["docname"] = path.stem
-    doctree = read_doc(app, app.env, str(path.absolute()))
-    return app, doctree
+    # NOTE: prior to v7, sphinx.io.read_doc was used and just returned the
+    # generated document. its alternative tries literally writing to disk, so
+    # we neuter that part via a nasty monkeypatch in order to obtain the value
+    app.builder.__class__.write_doctree = _faux_write_doctree
+    app.builder.read_doc(str(path.absolute().with_suffix("")))
+    return app, app.builder._read_doctree
 
 
 def load_conf(srcdir):
