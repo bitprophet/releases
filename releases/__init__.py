@@ -5,7 +5,6 @@ from functools import partial
 
 from docutils import nodes, utils
 from docutils.parsers.rst import roles
-import six
 
 from .models import Issue, ISSUE_TYPES, Release, Version, Spec
 from .line_manager import LineManager
@@ -212,7 +211,7 @@ def append_unreleased_entries(app, manager, releases):
 
     When only one major release line exists, that dimension is ignored.
     """
-    for family, lines in six.iteritems(manager):
+    for family, lines in manager.items():
         for type_ in ("bugfix", "feature"):
             bucket = "unreleased_{}".format(type_)
             if bucket not in lines:  # Implies unstable prehistory + 0.x fam
@@ -641,7 +640,7 @@ def setup(app):
         app.add_config_value(
             name="releases_{}".format(key), default=default, rebuild="html"
         )
-    if isinstance(app.config.releases_document_name, six.string_types):
+    if isinstance(app.config.releases_document_name, str):
         app.config.releases_document_name = [app.config.releases_document_name]
 
     # Register intermediate roles

@@ -3,7 +3,6 @@ from operator import xor
 
 from docutils import nodes
 from semantic_version import Version as StrictVersion, Spec
-import six
 
 
 class Version(StrictVersion):
@@ -73,7 +72,7 @@ class Issue(nodes.Element):
         # pre-major-release features though...?)
         return [
             key
-            for key, value in six.iteritems(manager)
+            for key, value in manager.items()
             if any(x for x in value if not x.startswith("unreleased"))
         ]
 

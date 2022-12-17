@@ -1,4 +1,3 @@
-import six
 from pytest import skip
 from pytest_relaxed import raises
 from docutils.nodes import list_item, raw, paragraph, Text
@@ -171,7 +170,7 @@ class organization(object):
 
     def explicit_release_list_split_works_with_unicode(self):
         changelog = release_list("1.0.1", b(17))
-        changelog[0][0].append(Text(six.text_type("17")))
+        changelog[0][0].append(Text(str("17")))
         # When using naive method calls, this explodes
         construct_releases(changelog, make_app())
 

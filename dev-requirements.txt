@@ -8,8 +8,6 @@ pytest-cov>=2.4
 pytest>=4.6.9
 coverage==4.4.2
 codecov==2.1.11
-# Just for tests...heh
-six>=1.4.1,<2.0
 # Docs (including self, because dogfood)
 -e .
 sphinx_rtd_theme>=0.1.5,<2.0

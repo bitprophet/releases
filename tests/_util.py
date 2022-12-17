@@ -1,6 +1,5 @@
 from docutils.nodes import list_item, paragraph
 from unittest.mock import Mock
-import six
 
 from releases import (
     Issue,
@@ -80,7 +79,7 @@ def release_list(*entries, **kwargs):
     entries = list(entries)  # lol tuples
     # Translate simple objs into changelog-friendly ones
     for index, item in enumerate(entries):
-        if isinstance(item, six.string_types):
+        if isinstance(item, str):
             entries[index] = release(item)
         else:
             entries[index] = entry(item)
@@ -113,7 +112,7 @@ def expect_releases(entries, release_map, skip_initial=False, app=None):
     snapshot = dict(changelog)
     err = "Got unexpected contents for {}: wanted {}, got {}"
     err += "\nFull changelog: {!r}\n"
-    for rel, issues in six.iteritems(release_map):
+    for rel, issues in release_map.items():
         found = changelog.pop(rel)
         msg = err.format(rel, issues, found, snapshot)
         assert set(found) == set(issues), msg

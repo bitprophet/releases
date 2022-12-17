@@ -4,8 +4,6 @@ import shutil
 from pytest import skip
 from invoke import run
 
-from invoke.vendor.six import string_types
-
 
 class integration(object):
     def setup(self):
@@ -32,7 +30,7 @@ class integration(object):
             )
             result = run(cmd, warn=warn, hide=True, in_stream=False)
             if callable(asserts):
-                if isinstance(target, string_types):
+                if isinstance(target, str):
                     targets = [target]
                 else:
                     targets = target
