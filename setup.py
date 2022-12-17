@@ -26,6 +26,7 @@ setup(
     # NOTE: seems to work OK with Sphinx 1.8 still even tho we only "really"
     # support 4.x. May as well not artificially limit folks for now.
     install_requires=["semantic_version<2.7", "sphinx>=1.8"],
+    python_requires=">=3.6",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
@@ -40,6 +41,7 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "Topic :: Software Development",
         "Topic :: Software Development :: Documentation",
         "Topic :: Documentation",
