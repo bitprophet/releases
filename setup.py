@@ -23,9 +23,16 @@ setup(
         "CI": "https://app.circleci.com/pipelines/github/bitprophet/releases",
     },
     packages=["releases"],
-    # NOTE: seems to work OK with Sphinx 1.8 still even tho we only "really"
-    # support 4.x. May as well not artificially limit folks for now.
-    install_requires=["semantic_version<2.7", "sphinx>=1.8"],
+    install_requires=[
+        # NOTE: seems to work OK with Sphinx 1.8 still even tho we only
+        # "really" support 4.x. May as well not artificially limit folks for
+        # now.
+        "sphinx>=1.8",
+        # Continuing to pin an old semantic_version until I have time to update
+        # and finish the branch I made for
+        # https://github.com/bitprophet/releases/pull/86#issuecomment-580037996
+        "semantic_version<2.7",
+    ],
     python_requires=">=3.6",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
