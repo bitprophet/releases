@@ -12,5 +12,5 @@ codecov==2.1.11
 -e .
 sphinx_rtd_theme>=0.1.5,<2.0
 # Formatting
-flake8==3.7.8
-black==19.10b0
+flake8==5.0.4
+black==22.8.0
