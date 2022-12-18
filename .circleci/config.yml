@@ -2,7 +2,7 @@ version: 2.1
 
 
 orbs:
-  orb: invocations/orb@dev:integration
+  orb: invocations/orb@1.3.0
 
 
 workflows:
@@ -22,18 +22,16 @@ workflows:
           task: integration
           requires: ["Test"]
           matrix:
-            # outer bounds (-ish) only for now. only so may free credits!
             parameters:
               version: ["3.6", "3.11"]
-              pip-overrides: ["sphinx\\>=1.8,\\<2", "sphinx\\>2"]
+              pip-overrides: ["sphinx\\<5", "sphinx\\>4"]
       - orb/test:
           name: << matrix.version >> & << matrix.pip-overrides >>
           requires: ["Test"]
           matrix:
             parameters:
               version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
-              # Just test oldest/newest Sphinxes for now
-              pip-overrides: ["sphinx\\>=1.8,\\<2", "sphinx\\>2"]
+              pip-overrides: ["sphinx\\<5", "sphinx\\>4"]
       - orb/docs:
           name: "Docs"
           requires: ["Test"]

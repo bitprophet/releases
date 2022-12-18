@@ -9,13 +9,13 @@ Changelog
   align slightly better with upstream (and ecosystem) EOLs.
 - :bug:`- major` Don't make tmpdirs in ``releases.util.make_app`` when being
   given explicit directory args.
-- :support:`-` Dropped support for Sphinx <1.8, which is now pretty rare in the
-  wild. This makes it easier to support Sphinx 1.8+ and lets us drop an
-  ever-growing amount of compatibility code for Sphinx 1.3-1.7.
+- :support:`-` Dropped support for Sphinx <4. We tried to support 1.8+, but too
+  many transitive dependencies have clearly "moved on" and cause various cells
+  in the test matrix to fail hard.
 
   .. warning::
     This change is backwards incompatible if your Sphinx docs don't already
-    work on newer Sphinx versions.
+    work on recent Sphinx versions.
 
 - :support:`-` Migrated the test suite to use ``pytest-relaxed`` (and thus
   pytest) instead of ``spec``.

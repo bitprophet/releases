@@ -24,10 +24,11 @@ setup(
     },
     packages=["releases"],
     install_requires=[
-        # NOTE: seems to work OK with Sphinx 1.8 still even tho we only
-        # "really" support 4.x. May as well not artificially limit folks for
-        # now.
-        "sphinx>=1.8",
+        # We mostly still work on Sphinx>=1.8, but a number of transitive
+        # dependencies do not, and trying to square that circle is definitely
+        # not worth the effort at this time. PRs that can pass the entire test
+        # matrix are welcome, if you disagree!
+        "sphinx>=4",
         # Continuing to pin an old semantic_version until I have time to update
         # and finish the branch I made for
         # https://github.com/bitprophet/releases/pull/86#issuecomment-580037996
