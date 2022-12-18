@@ -11,13 +11,8 @@ Changelog
   ever-growing amount of compatibility code for Sphinx 1.3-1.7.
 
   .. warning::
-    This change is technically backwards incompatible and we are releasing it
-    as 2.0 because of that (and dropping Python 2, see rest of changelog), but
-    our own API and behavior is not changing, and Sphinx itself did not make
-    breaking changes (that we're aware of) in 1.8.
-
-    As long as you upgrade your Sphinx along with your Releases, you should not
-    actually experience any breakage in this version.
+    This change is backwards incompatible if your Sphinx docs don't already
+    work on newer Sphinx versions.
 
 - :support:`-` Migrated the test suite to use ``pytest-relaxed`` (and thus
   pytest) instead of ``spec``.
