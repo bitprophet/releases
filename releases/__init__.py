@@ -56,6 +56,12 @@ def scan_for_spec(keyword):
         return None
 
 
+def interpolate(text, number):
+    if "%s" in text:
+        return text % number
+    return text.format(number=number)
+
+
 def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     """
     Use: :issue|bug|feature|support:`ticket_number`
@@ -78,8 +84,7 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
     if issue_no not in ("-", "0"):
         ref = None
         if config.releases_issue_uri:
-            # TODO: deal with % vs .format()
-            ref = config.releases_issue_uri % issue_no
+            ref = interpolate(text=config.releases_issue_uri, number=issue_no)
         elif config.releases_github_path:
             ref = "https://github.com/{}/issues/{}".format(
                 config.releases_github_path, issue_no
@@ -136,8 +141,7 @@ def release_nodes(text, slug, date, config):
     # about a PDF of a changelog? :x
     uri = None
     if config.releases_release_uri:
-        # TODO: % vs .format()
-        uri = config.releases_release_uri % slug
+        uri = interpolate(text=config.releases_release_uri, number=slug)
     elif config.releases_github_path:
         uri = "https://github.com/{}/tree/{}".format(
             config.releases_github_path, slug

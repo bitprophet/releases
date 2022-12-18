@@ -13,8 +13,9 @@ Specifically:
 
     * Also set the ``releases_release_uri`` and ``releases_issue_uri`` top
       level options - they determine the targets of the issue & release links
-      in the HTML output. Both should have an unevaluated ``%s`` where the
-      release/issue number would go.
+      in the HTML output. Both must include a ``{number}`` slug (for use
+      with `str.format`) where the release/issue number should go; the older
+      ``%s`` style is also acceptable.
 
         * Alternately, if your project is hosted on Github, set the
           ``releases_github_path`` setting instead, to e.g.

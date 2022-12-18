@@ -2,6 +2,9 @@
 Changelog
 =========
 
+- :support:`-` The ``releases_release_uri``/``releases_issue_uri`` settings now
+  allow modern (``.format``/f-strings) string formatting, in addition to the
+  old ``%s``-based interpolation.
 - :support:`-` Dropped support for Python 2.7, Python 3.4, and Python 3.5, to
   align slightly better with upstream (and ecosystem) EOLs.
 - :bug:`- major` Don't make tmpdirs in ``releases.util.make_app`` when being

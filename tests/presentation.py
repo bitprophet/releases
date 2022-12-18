@@ -97,6 +97,15 @@ class presentation(object):
         }
         self._test_link(kwargs, "release", "explicit_release_1.0.2")
 
+    def links_allow_curlybrace_number_formatting_too(self):
+        kwargs = {
+            "release_uri": "release_{number}",
+            "issue_uri": "issue_{number}",
+            "github_path": None,
+        }
+        self._test_link(kwargs, "release", "release_1.0.2")
+        self._test_link(kwargs, "issue", "issue_15")
+
     def completely_blank_uri_settings_does_not_asplode(self):
         kwargs = {"release_uri": None, "issue_uri": None, "github_path": None}
         # Get nodes for direct inspection
