@@ -225,7 +225,7 @@ def reorder_release_entries(releases):
     """
     order = {"feature": 0, "bug": 1, "support": 2}
     for release in releases:
-        entries = release["entries"][:]
+        entries = release["entries"].copy()
         release["entries"] = sorted(entries, key=lambda x: order[x.type])
 
 
@@ -299,7 +299,7 @@ def construct_entry_with_release(focus, issues, manager, log, releases, rest):
                     "obj": focus,
                     # NOTE: explicitly dumping 0, not focus.family, since this
                     # might be the last pre-historical release and thus not 0.x
-                    "entries": manager[0]["unreleased"][:],
+                    "entries": manager[0]["unreleased"].copy(),
                 }
             )
             manager[0]["unreleased"] = []
@@ -342,7 +342,7 @@ def construct_entry_with_release(focus, issues, manager, log, releases, rest):
                 # TODO: as in other branch, I don't get why this wasn't just
                 # dumping the whole thing - why would major bugs be in the
                 # regular bugfix buckets?
-                entries = manager[focus.family][focus.minor][:]
+                entries = manager[focus.family][focus.minor].copy()
                 releases.append({"obj": focus, "entries": entries})
                 manager[focus.family][focus.minor] = []
                 # Clean out the items we just released from
@@ -555,7 +555,9 @@ def construct_nodes(releases):
             # description - sometimes we refer to related issues inline. (They
             # can't be left as issue() objects at render time since that's
             # undefined.)
-            # Use [:] slicing to avoid mutation during the loops.
+            # Use [:] slicing (even under modern Python; the objects here are
+            # docutils Nodes whose .copy() is weird) to avoid mutation during
+            # the loops.
             for index, node in enumerate(desc[:]):
                 for subindex, subnode in enumerate(node[:]):
                     if isinstance(subnode, Issue):
