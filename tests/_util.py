@@ -24,7 +24,7 @@ def issue(type_, number, **kwargs):
     if kwargs.get("major", False):
         text += " major"
     if kwargs.get("spec", None):
-        text += " (%s)" % kwargs["spec"]
+        text += f" ({kwargs['spec']})"
     app = kwargs.get("app", None)
     return issues_role(
         name=type_,
@@ -67,7 +67,7 @@ def release(number, **kwargs):
     nodes = release_role(
         name=None,
         rawtext="",
-        text="%s <2013-11-20>" % number,
+        text=f"{number} <2013-11-20>",
         lineno=None,
         inliner=inliner(app=app),
     )[0]

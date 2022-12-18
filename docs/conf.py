@@ -11,8 +11,7 @@ source_suffix = ".rst"
 master_doc = "index"
 
 project = "Releases"
-year = datetime.now().year
-copyright = "%d Jeff Forcier" % year
+copyright = f"{datetime.now().year} Jeff Forcier"
 
 # Ensure project directory is on PYTHONPATH for version, autodoc access
 sys.path.insert(0, os.path.abspath(os.path.join(os.getcwd(), "..")))

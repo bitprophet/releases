@@ -23,10 +23,7 @@ def _log(txt, config):
 
 
 def issue_nodelist(name, identifier=None):
-    which = '[<span style="color: #%s;">%s</span>]' % (
-        ISSUE_TYPES[name],
-        name.capitalize(),
-    )
+    which = f'[<span style="color: #{ISSUE_TYPES[name]};">{name.capitalize()}</span>]'  # noqa
     signifier = [nodes.raw(text=which, format="html")]
     id_nodelist = [nodes.inline(text=" "), identifier] if identifier else []
     trail = [] if identifier else [nodes.inline(text=" ")]
@@ -47,7 +44,7 @@ def scan_for_spec(keyword):
     # First, test for intermediate '1.2+' style
     matches = release_line_re.findall(keyword)
     if matches:
-        return Spec(">={}".format(matches[0]))
+        return Spec(f">={matches[0]}")
     # Failing that, see if Spec can make sense of it
     try:
         return Spec(keyword)
@@ -86,9 +83,7 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
         if config.releases_issue_uri:
             ref = interpolate(text=config.releases_issue_uri, number=issue_no)
         elif config.releases_github_path:
-            ref = "https://github.com/{}/issues/{}".format(
-                config.releases_github_path, issue_no
-            )
+            ref = f"https://github.com/{config.releases_github_path}/issues/{issue_no}"  # noqa
         # Only generate a reference/link if we were able to make a URI
         if ref:
             identifier = nodes.reference(
@@ -117,8 +112,9 @@ def issues_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
                 if part in ("backported", "major"):
                     keyword = part
                 else:
-                    err = "Gave unknown keyword {!r} for issue no. {}"
-                    raise ValueError(err.format(keyword, issue_no))
+                    raise ValueError(
+                        f"Gave unknown keyword {keyword!r} for issue no. {issue_no}"  # noqa
+                    )
         # Create temporary node w/ data & final nodes to publish
         node = Issue(
             number=issue_no,
@@ -143,22 +139,16 @@ def release_nodes(text, slug, date, config):
     if config.releases_release_uri:
         uri = interpolate(text=config.releases_release_uri, number=slug)
     elif config.releases_github_path:
-        uri = "https://github.com/{}/tree/{}".format(
-            config.releases_github_path, slug
-        )
+        uri = f"https://github.com/{config.releases_github_path}/tree/{slug}"
     # Only construct link tag if user actually configured release URIs somehow
     if uri:
-        link = '<a class="reference external" href="{}">{}</a>'.format(
-            uri, text
-        )
+        link = f'<a class="reference external" href="{uri}">{text}</a>'
     else:
         link = text
     datespan = ""
     if date:
-        datespan = ' <span style="font-size: 75%;">{}</span>'.format(date)
-    header = '<h2 style="margin-bottom: 0.3em;">{}{}</h2>'.format(
-        link, datespan
-    )
+        datespan = f' <span style="font-size: 75%;">{date}</span>'
+    header = f'<h2 style="margin-bottom: 0.3em;">{link}{datespan}</h2>'
     return nodes.section(
         "", nodes.raw(rawtext="", text=header, format="html"), ids=[text]
     )
@@ -200,7 +190,7 @@ def generate_unreleased_entry(header, line, issues, manager, app):
             app.config,
         )
     ]
-    log("Creating {!r} faux-release with {!r}".format(line, issues))
+    log(f"Creating {line!r} faux-release with {issues!r}")
     return {
         "obj": Release(number=line, date=None, nodelist=nodelist),
         "entries": issues,
@@ -217,13 +207,13 @@ def append_unreleased_entries(app, manager, releases):
     """
     for family, lines in manager.items():
         for type_ in ("bugfix", "feature"):
-            bucket = "unreleased_{}".format(type_)
+            bucket = f"unreleased_{type_}"
             if bucket not in lines:  # Implies unstable prehistory + 0.x fam
                 continue
             issues = lines[bucket]
-            fam_prefix = "{}.x ".format(family) if len(manager) > 1 else ""
-            header = "Next {}{} release".format(fam_prefix, type_)
-            line = "unreleased_{}.x_{}".format(family, type_)
+            fam_prefix = f"{family}.x " if len(manager) > 1 else ""
+            header = f"Next {fam_prefix}{type_} release"
+            line = f"unreleased_{family}.x_{type_}"
             releases.append(
                 generate_unreleased_entry(header, line, issues, manager, app)
             )
@@ -246,21 +236,19 @@ def construct_entry_with_release(focus, issues, manager, log, releases, rest):
     Release lines, once the release obj is removed, should be empty or a
     comma-separated list of issue numbers.
     """
-    log("release for line %r" % focus.minor)
+    log(f"release for line {focus.minor!r}")
     # Check for explicitly listed issues first
     explicit = None
     if rest[0].children:
         explicit = [x.strip() for x in rest[0][0].split(",")]
     # Do those by themselves since they override all other logic
     if explicit:
-        log("Explicit issues requested: %r" % (explicit,))
+        log(f"Explicit issues requested: {explicit!r}")
         # First scan global issue dict, dying if not found
         missing = [i for i in explicit if i not in issues]
         if missing:
             raise ValueError(
-                "Couldn't find issue(s) #{} in the changelog!".format(
-                    ", ".join(missing)
-                )
+                f"Couldn't find issue(s) #{', '.join(missing)} in the changelog!"  # noqa
             )
         # Obtain the explicitly named issues from global list
         entries = []
@@ -268,7 +256,7 @@ def construct_entry_with_release(focus, issues, manager, log, releases, rest):
             for flattened_issue_item in itertools.chain(issues[i]):
                 entries.append(flattened_issue_item)
         # Create release
-        log("entries in this release: %r" % (entries,))
+        log(f"entries in this release: {entries!r}")
         releases.append({"obj": focus, "entries": entries})
         # Introspect these entries to determine which buckets they should get
         # removed from (it's not "all of them"!)
@@ -276,23 +264,23 @@ def construct_entry_with_release(focus, issues, manager, log, releases, rest):
             if obj.type == "bug":
                 # Major bugfix: remove from unreleased_feature
                 if obj.major:
-                    log("Removing #%s from unreleased" % obj.number)
+                    log(f"Removing #{obj.number} from unreleased")
                     # TODO: consider making a LineManager method somehow
                     manager[focus.family]["unreleased_feature"].remove(obj)
                 # Regular bugfix: remove from bucket for this release's
                 # line + unreleased_bugfix
                 else:
                     if obj in manager[focus.family]["unreleased_bugfix"]:
-                        log("Removing #%s from unreleased" % obj.number)
+                        log(f"Removing #{obj.number} from unreleased")
                         manager[focus.family]["unreleased_bugfix"].remove(obj)
                     if obj in manager[focus.family][focus.minor]:
-                        log("Removing #%s from %s" % (obj.number, focus.minor))
+                        log(f"Removing #{obj.number} from {focus.minor}")
                         manager[focus.family][focus.minor].remove(obj)
             # Regular feature/support: remove from unreleased_feature
             # Backported feature/support: remove from bucket for this
             # release's line (if applicable) + unreleased_feature
             else:
-                log("Removing #%s from unreleased" % obj.number)
+                log(f"Removing #{obj.number} from unreleased")
                 manager[focus.family]["unreleased_feature"].remove(obj)
                 if obj in manager[focus.family].get(focus.minor, []):
                     manager[focus.family][focus.minor].remove(obj)
@@ -373,10 +361,10 @@ def construct_entry_without_release(focus, issues, manager, log, rest):
         # being buried within something else.
         buried = focus.traverse(Issue)
         if buried:
-            msg = """
-Found issue node ({!r}) buried inside another node:
+            msg = f"""
+Found issue node ({buried[0]!r}) buried inside another node:
 
-{}
+{buried[0].parent}
 
 Please double-check your ReST syntax! There is probably text in the above
 output that will show you which part of your changelog to look at.
@@ -384,7 +372,7 @@ output that will show you which part of your changelog to look at.
 For example, indentation problems can accidentally generate nested definition
 lists.
 """
-            raise ValueError(msg.format(buried[0], str(buried[0].parent)))
+            raise ValueError(msg)
         # OK, it looks legit - make it a bug.
         log("Found line item w/ no real issue object, creating bug")
         nodelist = issue_nodelist("bug")
@@ -642,7 +630,7 @@ def setup(app):
         ("unstable_prehistory", False),
     ):
         app.add_config_value(
-            name="releases_{}".format(key), default=default, rebuild="html"
+            name=f"releases_{key}", default=default, rebuild="html"
         )
     if isinstance(app.config.releases_document_name, str):
         app.config.releases_document_name = [app.config.releases_document_name]

@@ -21,7 +21,7 @@ def _obj2name(obj):
 def _expect_type(node, cls):
     type_ = _obj2name(node)
     name = _obj2name(cls)
-    msg = "Expected %r to be a %s, but it's a %s" % (node, name, type_)
+    msg = f"Expected {node!r} to be a {name}, but it's a {type_}"
     assert isinstance(node, cls), msg
 
 
