@@ -2,18 +2,7 @@ version: 2.1
 
 
 orbs:
-  orb: invocations/orb@1.2.1
-
-
-jobs:
-  integration:
-    executor:
-      name: orb/default
-      version: "3.6"
-    steps:
-      - orb/setup
-      - run: inv integration
-      - orb/debug
+  orb: invocations/orb@dev:integration
 
 
 workflows:
@@ -28,11 +17,17 @@ workflows:
       - orb/test-release:
           name: Release test
           requires: ["Test"]
-      - integration:
-          name: Integration tests
-          requires: ["Test"]
       - orb/test:
-          name: Python << matrix.version >> / << matrix.pip-overrides >>
+          name: Integration (<< matrix.version >> & << matrix.pip-overrides >>)
+          task: integration
+          requires: ["Test"]
+          matrix:
+            # outer bounds (-ish) only for now. only so may free credits!
+            parameters:
+              version: ["3.6", "3.11"]
+              pip-overrides: ["sphinx\\>=1.8,\\<2", "sphinx\\>2"]
+      - orb/test:
+          name: << matrix.version >> & << matrix.pip-overrides >>
           requires: ["Test"]
           matrix:
             parameters:
