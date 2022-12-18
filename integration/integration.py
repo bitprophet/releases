@@ -6,7 +6,7 @@ from invoke import run
 
 
 class integration(object):
-    def setup(self):
+    def setup_method(self):
         self.cwd = os.getcwd()
 
     def teardown(self):

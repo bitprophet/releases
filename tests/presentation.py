@@ -30,7 +30,7 @@ class presentation(object):
     Expansion/extension of docutils nodes (rendering)
     """
 
-    def setup(self):
+    def setup_method(self):
         setup_issues(self)
 
     def _generate(self, *entries, **kwargs):

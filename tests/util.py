@@ -74,7 +74,7 @@ class parse_changelog_:
 
 
 class get_doctree_:
-    def setup(self):
+    def setup_method(self):
         self.cwd = Path.cwd()
 
     @patch("releases.util.make_app")

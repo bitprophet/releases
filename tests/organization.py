@@ -22,7 +22,7 @@ class organization(object):
     Organization of issues into releases (parsing)
     """
 
-    def setup(self):
+    def setup_method(self):
         setup_issues(self)
 
     def _expect_entries(self, all_entries, in_, not_in):
