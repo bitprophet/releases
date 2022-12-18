@@ -32,11 +32,13 @@ workflows:
           name: Integration tests
           requires: ["Test"]
       - orb/test:
-          name: Test << matrix.version >>
+          name: Python << matrix.version >> / << matrix.pip-overrides >>
           requires: ["Test"]
           matrix:
             parameters:
               version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
+              # Just test oldest/newest Sphinxes for now
+              pip-overrides: ["sphinx\\>=1.8,\\<2", "sphinx\\>2"]
       - orb/docs:
           name: "Docs"
           requires: ["Test"]

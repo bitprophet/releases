@@ -92,7 +92,12 @@ class integration(object):
             folder="hidden_issues", opts=None, target="changelog", warn=True
         )
         assert result.failed
-        assert "ValueError" in result.stderr
+        assert (
+            # Sphinx <4
+            ("Exception occurred" in result.stderr)
+            # Sphinx >=4
+            or ("Extension error" in result.stderr)
+        )
         assert "double-check" in result.stderr
         assert "innocuous" in result.stderr
 
