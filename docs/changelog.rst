@@ -2,6 +2,9 @@
 Changelog
 =========
 
+- :support:`-` Administrivia overhaul: enhanced README, packaging metadata
+  cleaned up/expanded, CI moved to Circle-CI, renamed dev branch to ``main``,
+  and more besides.
 - :support:`-` The ``releases_release_uri``/``releases_issue_uri`` settings now
   allow modern (``.format``/f-strings) string formatting, in addition to the
   old ``%s``-based interpolation.
