@@ -581,34 +581,56 @@ def construct_nodes(releases):
 
 
 class BulletListVisitor(nodes.NodeVisitor):
-    def __init__(self, document, app):
+    def __init__(self, document, app, docnames, is_singlepage):
         nodes.NodeVisitor.__init__(self, document)
         self.found_changelog = False
         self.app = app
+        # document names to seek out (eg "changelog")
+        self.docnames = docnames
+        self.is_singlepage = is_singlepage
 
     def visit_bullet_list(self, node):
-        # The first found bullet list (which should be the first one at the top
-        # level of the document) is the changelog.
-        if not self.found_changelog:
-            self.found_changelog = True
-            # Walk + parse into release mapping
-            releases, _ = construct_releases(node.children, self.app)
-            # Construct new set of nodes to replace the old, and we're done
-            node.replace_self(construct_nodes(releases))
+        # Short circuit if already mutated a changelog bullet list or if the
+        # one being visited doesn't appear to apply.
+        if self.found_changelog:
+            return
+        # Also short circuit if we're in singlepage mode and the node's parent
+        # doesn't seem to be named after an expected changelog docname. In this
+        # mode, this is the earliest we can actually tell whether a given
+        # bullet list is or is not "the changelog".
+        if (
+            self.is_singlepage
+            and node.parent.attributes.get("docname", None)
+            not in self.docnames
+        ):
+            return
+        # At this point, we can safely assume the node we're visiting is the
+        # right one to mutate.
+        self.found_changelog = True
+        # Walk + parse into release mapping
+        releases, _ = construct_releases(node.children, self.app)
+        # Construct new set of nodes to replace the old, and we're done
+        node.replace_self(construct_nodes(releases))
 
     def unknown_visit(self, node):
         pass
 
 
 def generate_changelog(app, doctree, docname):
-    # Don't scan/mutate documents that don't match the configured document name
-    # (which by default is ['changelog.rst', ]).
-    if docname not in app.config.releases_document_name:
+    desired_docnames = app.config.releases_document_name
+    # Ensure we still work mostly-correctly in singlehtml builder situations
+    # (must use name substring test as RTD's singlehtml builder doesn't
+    # actually inherit from Sphinx's own!)
+    is_singlepage = "singlehtml" in app.builder.name
+    changelog_names = ["index"] if is_singlepage else desired_docnames
+    if docname not in changelog_names:
         return
 
-    # Find the first bullet-list node & replace it with our organized/parsed
-    # elements.
-    changelog_visitor = BulletListVisitor(doctree, app)
+    # Find an appropriate bullet-list node & replace it with our
+    # organized/parsed elements.
+    changelog_visitor = BulletListVisitor(
+        doctree, app, desired_docnames, is_singlepage
+    )
     doctree.walk(changelog_visitor)
 
 
