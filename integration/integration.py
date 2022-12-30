@@ -12,14 +12,25 @@ class integration(object):
     def teardown(self):
         os.chdir(self.cwd)
 
-    def _build(self, folder, opts, target, asserts=None, conf=".", warn=False):
+    def _build(
+        self,
+        folder,
+        conf_opts,
+        extra_flags,
+        target,
+        asserts=None,
+        conf=".",
+        warn=False,
+    ):
         # Dynamic sphinx opt overrides
-        if opts:
-            pairs = map(lambda x: "=".join(x), (opts or {}).items())
+        if conf_opts:
+            pairs = map(lambda x: "=".join(x), (conf_opts or {}).items())
             flags = map(lambda x: "-D {}".format(x), pairs)
             flagstr = " ".join(flags)
         else:
             flagstr = ""
+        if extra_flags:
+            flagstr = flagstr + " " + extra_flags
         # Setup
         os.chdir(os.path.join("integration", "_support"))
         build = os.path.join(folder, "_build")
@@ -44,9 +55,21 @@ class integration(object):
                 os.path.join(folder, ".doctrees"), ignore_errors=True
             )
 
-    def _assert_worked(self, folder, opts=None, target="changelog", conf="."):
+    def _assert_worked(
+        self,
+        folder,
+        conf_opts=None,
+        extra_flags=None,
+        target="changelog",
+        conf=".",
+    ):
         self._build(
-            folder, opts, target, asserts=self._basic_asserts, conf=conf
+            folder=folder,
+            conf_opts=conf_opts,
+            extra_flags=extra_flags,
+            target=target,
+            asserts=self._basic_asserts,
+            conf=conf,
         )
 
     def _basic_asserts(self, result, build, target):
@@ -68,7 +91,7 @@ class integration(object):
         # Changelog named not 'changelog', same title
         self._assert_worked(
             folder="custom_identical",
-            opts={"releases_document_name": "notachangelog"},
+            conf_opts={"releases_document_name": "notachangelog"},
             target="notachangelog",
         )
 
@@ -77,7 +100,7 @@ class integration(object):
         # NOTE: the difference here is in the fixture!
         self._assert_worked(
             folder="custom_different",
-            opts={"releases_document_name": "notachangelog"},
+            conf_opts={"releases_document_name": "notachangelog"},
             target="notachangelog",
         )
 
@@ -89,7 +112,11 @@ class integration(object):
         # Don't unknown-node error if broken ReST causes 'hidden' issue nodes.
         # E.g. an accidental definition-list wrapping one.
         result = self._build(
-            folder="hidden_issues", opts=None, target="changelog", warn=True
+            folder="hidden_issues",
+            conf_opts=None,
+            extra_flags=None,
+            target="changelog",
+            warn=True,
         )
         assert result.failed
         assert (
@@ -105,7 +132,7 @@ class integration(object):
         # support multiple changelogs
         self._assert_worked(
             folder="multiple_changelogs",
-            opts=None,
+            conf_opts=None,
             conf="multiple_changelogs",
             # Ensure the asserts check both changelogs
             target=["a_changelog", "b_changelog"],
