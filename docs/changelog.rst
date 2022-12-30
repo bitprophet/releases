@@ -2,6 +2,9 @@
 Changelog
 =========
 
+- :bug:`- major` Changelog transformation sometimes failed to occur when
+  running under a 'single HTML file' Sphinx builder (eg ``singlehtml``), which
+  resulted in 'unknown node' errors. This has been fixed.
 - :support:`-` Administrivia overhaul: enhanced README, packaging metadata
   cleaned up/expanded, CI moved to Circle-CI, renamed dev branch to ``main``,
   and more besides.

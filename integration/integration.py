@@ -87,6 +87,25 @@ class integration(object):
         # Doctree with just-a-changelog-named-changelog
         self._assert_worked("vanilla")
 
+    def vanilla_singlehtml(self):
+        # This started breaking sometime after Sphinx >1.8.x support was added,
+        # first noticed via RTD's singlehtml-derived builder, but happily it's
+        # testable via the default singlehtml builder too.
+        self._assert_worked(
+            folder="vanilla",
+            target="index",  # singlehtml only ever builds one index.html
+            extra_flags="-b singlehtml",
+            conf_opts={"releases_debug": "1"},
+        )
+
+    def singlehtml_with_multiple_lists(self):
+        self._assert_worked(
+            folder="singlehtml_multilist",
+            target="index",  # singlehtml only ever builds one index.html
+            extra_flags="-b singlehtml",
+            conf_opts={"releases_debug": "1"},
+        )
+
     def customized_filename_with_identical_title(self):
         # Changelog named not 'changelog', same title
         self._assert_worked(
