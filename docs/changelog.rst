@@ -2,6 +2,7 @@
 Changelog
 =========
 
+- :release:`2.0.0 <2022-12-31>`
 - :bug:`- major` Changelog transformation sometimes failed to occur when
   running under a 'single HTML file' Sphinx builder (eg ``singlehtml``), which
   resulted in 'unknown node' errors. This has been fixed.
