@@ -1,8 +1,8 @@
 # Task runner
-invoke @ git+https://github.com/pyinvoke/invoke@main
-invocations @ git+https://github.com/pyinvoke/invocations@main
+invoke>=1.7.3
+invocations>=3
 # Tests (N.B. integration suite also uses Invoke as above)
-pytest-relaxed @ git+https://github.com/bitprophet/pytest-relaxed@main
+pytest-relaxed>=2
 pytest-cov>=2.4
 pytest>=4.6.9
 coverage==4.4.2
