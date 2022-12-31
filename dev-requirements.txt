@@ -13,3 +13,5 @@ sphinx_rtd_theme>=0.1.5,<2.0
 # Formatting
 flake8==5.0.4
 black==22.8.0
+# Miscellany
+icecream==2.1.3
