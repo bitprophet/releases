@@ -5,7 +5,7 @@ from pytest import skip
 from invoke import run
 
 
-class integration(object):
+class integration:
     def setup_method(self):
         self.cwd = os.getcwd()
 

@@ -17,7 +17,7 @@ from _util import (
 )
 
 
-class organization(object):
+class organization:
     """
     Organization of issues into releases (parsing)
     """

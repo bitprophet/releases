@@ -18,7 +18,7 @@ vanilla = os.path.join(support, "vanilla", "changelog.rst")
 unreleased_bugs = os.path.join(support, "unreleased_bugs", "changelog.rst")
 
 
-class get_doctree_(object):
+class get_doctree_:
     def obtains_app_and_doctree_from_filepath(self):
         app, doctree = get_doctree(vanilla)
         # Expect doctree & app
@@ -38,7 +38,7 @@ class get_doctree_(object):
         assert bug.number == "1"
 
 
-class parse_changelog_(object):
+class parse_changelog_:
     def yields_releases_dict_from_changelog_path(self):
         changelog = parse_changelog(vanilla)
         assert changelog

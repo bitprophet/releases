@@ -11,7 +11,7 @@ class LineManager(dict):
 
         :param app: The core Sphinx app object. Mostly used for config.
         """
-        super(LineManager, self).__init__()
+        super().__init__()
         self.app = app
 
     @property
