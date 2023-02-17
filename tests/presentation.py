@@ -222,41 +222,42 @@ class presentation:
         assert para[6].astext() == "#5"
         assert "Support" in para[4].astext()
 
-    def unreleased_buckets_omit_major_version_when_only_one_exists(self):
-        result = self._generate(b(1), raw=True)[0][0][0]
-        html = str(result)  # since repr() from test-fail hides actual text
-        assert "Next bugfix release" in html
+    class unreleased:
+        def buckets_omit_major_version_when_only_one_exists(self):
+            result = self._generate(b(1), raw=True)[0][0][0]
+            html = str(result)  # since repr() from test-fail hides actual text
+            assert "Next bugfix release" in html
 
-    def unreleased_buckets_display_major_version_when_multiple(self):
-        entries = (
-            b(3),  # should appear in unreleased bugs for 2.x
-            "2.0.0",
-            b(2),  # should appear in unreleased bugs for 1.x
-            "1.0.1",
-            b(1),
-        )
-        # Expectation: [2.x unreleased, 1.x unreleased, 1.0.1]
-        two_x, one_x, _ = self._generate(*entries, raw=True)
-        html = str(two_x[0][0])
-        assert "Next 2.x bugfix release" in html
-        html = str(one_x[0][0])
-        assert "Next 1.x bugfix release" in html
+        def buckets_display_major_version_when_multiple(self):
+            entries = (
+                b(3),  # should appear in unreleased bugs for 2.x
+                "2.0.0",
+                b(2),  # should appear in unreleased bugs for 1.x
+                "1.0.1",
+                b(1),
+            )
+            # Expectation: [2.x unreleased, 1.x unreleased, 1.0.1]
+            two_x, one_x, _ = self._generate(*entries, raw=True)
+            html = str(two_x[0][0])
+            assert "Next 2.x bugfix release" in html
+            html = str(one_x[0][0])
+            assert "Next 1.x bugfix release" in html
 
-    def unreleased_displays_version_when_only_some_lines_displayed(self):
-        # I.e. if there's unreleased 1.x stuff but no unreleased 2.x, still
-        # display the "1.x".
-        entries = (
-            # Note lack of any bugfixes post 2.0.0
-            "2.0.0",
-            b(2),
-            "1.0.1",
-            b(1),
-        )
-        # Expectation: [1.x unreleased, 1.0.1] - no 2.x.
-        result = self._generate(*entries, raw=True)
-        assert len(result) == 2
-        html = str(result[0][0][0])
-        assert "Next 1.x bugfix release" in html
+        def displays_version_when_only_some_lines_displayed(self):
+            # I.e. if there's unreleased 1.x stuff but no unreleased 2.x, still
+            # display the "1.x".
+            entries = (
+                # Note lack of any bugfixes post 2.0.0
+                "2.0.0",
+                b(2),
+                "1.0.1",
+                b(1),
+            )
+            # Expectation: [1.x unreleased, 1.0.1] - no 2.x.
+            result = self._generate(*entries, raw=True)
+            assert len(result) == 2
+            html = str(result[0][0][0])
+            assert "Next 1.x bugfix release" in html
 
     def unstable_prehistory_active_means_only_one_unreleased_release(self):
         app = make_app(unstable_prehistory=True)
