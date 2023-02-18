@@ -52,6 +52,8 @@ def scan_for_spec(keyword):
         return None
 
 
+# TODO 3.0: make this less dumb, do away with %s, just have callers do
+# f-strings or un-opinionated .format
 def interpolate(text, number):
     if "%s" in text:
         return text % number
@@ -649,7 +651,7 @@ def setup(app):
         # Debug output
         ("debug", False),
         # Whether to enable linear history during 0.x release timeline
-        # TODO: flip this to True by default in our 3.0 release
+        # TODO 3.0: flip this to True by default?
         ("unstable_prehistory", False),
     ):
         app.add_config_value(
