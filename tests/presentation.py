@@ -39,15 +39,17 @@ class presentation:
         # By default, yield the contents of the bullet list.
         return nodes if raw else nodes[0][1][0]
 
-    def _test_link(self, kwargs, type_, expected):
+    def _test_link(self, kwargs, type_, expected, entries=None):
         app = make_app(**kwargs)
+        # Lazy-evaluated entries: (callable, *args)
+        entries = entries or [
+            (release, "1.0.2"),
+            (b, 15),
+            (release, "1.0.0"),
+        ]
         nodes = construct_nodes(
             construct_releases(
-                [
-                    release("1.0.2", app=app),
-                    entry(b(15, app=app)),
-                    release("1.0.0"),
-                ],
+                [entry(x[0](*x[1:], app=app)) for x in entries],
                 app=app,
             )[0]
         )
