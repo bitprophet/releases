@@ -183,10 +183,7 @@ def generate_unreleased_entry(header, line, issues, manager, app):
     nodelist = [
         release_nodes(
             header,
-            # TODO: should link to master for newest family and...what
-            # exactly, for the others? Expectation isn't necessarily to
-            # have a branch per family? Or is there? Maybe there must be..
-            "master",
+            app.config.releases_development_branch,
             None,
             app.config,
         )
@@ -646,6 +643,9 @@ def setup(app):
         ("release_uri", None),
         # Convenience Github version of above
         ("github_path", None),
+        # Which branch to use for unreleased feature items
+        # TODO 3.0: s/master/main/
+        ("development_branch", "master"),
         # Which document to use as the changelog
         ("document_name", ["changelog"]),
         # Debug output

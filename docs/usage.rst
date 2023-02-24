@@ -41,6 +41,10 @@ Specifically:
           through and add bug/feature/support/etc roles.
         * See :ref:`the appropriate conceptual docs <unstable-prehistory>` for
           details on this behavior.
+    * If your development branch which is linked to for unreleased changelog
+      items, does not match the current default (``master`` as of version 2.0,
+      to be changed to ``main`` in 3.0), you may override it via
+      ``releases_development_branch``.
 
 * Create a Sphinx document named ``changelog.rst`` containing a bulleted list
   somewhere at its topmost level.

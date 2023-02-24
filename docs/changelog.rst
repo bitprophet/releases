@@ -2,6 +2,9 @@
 Changelog
 =========
 
+- :feature:`-` Allow controlling the name of your development branch for source
+  code links (eg "Next 1.x feature release" section headers) via the new
+  ``releases_development_branch`` config option.
 - :release:`2.0.0 <2022-12-31>`
 - :bug:`- major` Changelog transformation sometimes failed to occur when
   running under a 'single HTML file' Sphinx builder (eg ``singlehtml``), which

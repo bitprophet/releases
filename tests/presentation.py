@@ -261,6 +261,24 @@ class presentation:
             html = str(result[0][0][0])
             assert "Next 1.x bugfix release" in html
 
+        def feature_section_links_go_to_development_branch(self):
+            self._test_link(
+                kwargs=dict(release_uri="releasey_%s"),
+                type_="release",
+                expected="releasey_master",
+                entries=[(f, 15), (release, "1.0.0")],
+            )
+
+        def feature_section_links_can_configure_branch_name(self):
+            self._test_link(
+                kwargs=dict(
+                    development_branch="main", release_uri="releasey_%s"
+                ),
+                type_="release",
+                expected="releasey_main",
+                entries=[(f, 15), (release, "1.0.0")],
+            )
+
     def unstable_prehistory_active_means_only_one_unreleased_release(self):
         app = make_app(unstable_prehistory=True)
         entries = (b(2), f(3), "0.1.0", b(1))
