@@ -204,6 +204,10 @@ def append_unreleased_entries(app, manager, releases):
     When only one major release line exists, that dimension is ignored.
     """
     for family, lines in manager.items():
+        # Skip over any unsupported lines
+        supported = app.config.releases_supported_versions
+        if supported is not None and family not in supported:
+            continue
         for type_ in ("bugfix", "feature"):
             bucket = f"unreleased_{type_}"
             if bucket not in lines:  # Implies unstable prehistory + 0.x fam

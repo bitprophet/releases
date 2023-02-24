@@ -218,16 +218,40 @@ class organization:
                         assert f"unreleased_{major}.x_{type_}" in releases
 
         def one_old_family_hidden(self):
-            skip()
+            changelog = release_list(*self._entries)
+            releases = changelog2dict(
+                construct_releases(
+                    changelog, make_app(supported_versions=[2, 3])
+                )[0]
+            )
+            for type_ in ("bugfix", "feature"):
+                assert f"unreleased_1.x_{type_}" not in releases
+                assert f"unreleased_2.x_{type_}" in releases
+                assert f"unreleased_3.x_{type_}" in releases
 
         def multiple_old_families_hidden(self):
-            skip()
+            changelog = release_list(*self._entries)
+            releases = changelog2dict(
+                construct_releases(
+                    changelog, make_app(supported_versions=[3])
+                )[0]
+            )
+            for type_ in ("bugfix", "feature"):
+                assert f"unreleased_1.x_{type_}" not in releases
+                assert f"unreleased_2.x_{type_}" not in releases
+                assert f"unreleased_3.x_{type_}" in releases
 
-        def in_between_family_hidden_tho_why_would_you_lol(self):
-            skip()
-
-        # TODO: real degenerate shit like hiding only newer stuff?
-
+        def in_between_family_hidden_for_mysterious_reasons(self):
+            changelog = release_list(*self._entries)
+            releases = changelog2dict(
+                construct_releases(
+                    changelog, make_app(supported_versions=[1, 3])
+                )[0]
+            )
+            for type_ in ("bugfix", "feature"):
+                assert f"unreleased_1.x_{type_}" in releases
+                assert f"unreleased_2.x_{type_}" not in releases
+                assert f"unreleased_3.x_{type_}" in releases
 
     def explicit_bugfix_releases_get_removed_from_unreleased(self):
         b1 = b(1)
