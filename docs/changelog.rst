@@ -2,6 +2,12 @@
 Changelog
 =========
 
+- :feature:`-` By default, unreleased bugfix releases link to your development
+  branch (the value of ``releases_development_branch``, which defaults to
+  ``master``). This can be problematic if you rely on stable release branches
+  such as ``1.0``, ``1.1`` etc. A new option has been added,
+  ``releases_bugfix_line_branches``, which when set to ``True``, will assume
+  branches named after the relevant minor release.
 - :feature:`-` Allow controlling the name of your development branch for source
   code links (eg "Next 1.x feature release" section headers) via the new
   ``releases_development_branch`` config option.

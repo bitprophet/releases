@@ -180,16 +180,11 @@ def release_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
 
 def generate_unreleased_entry(header, line, issues, manager, app):
     log = partial(_log, config=app.config)
+    slug = app.config.releases_development_branch
+    if is_bugfix and app.config.releases_bugfix_line_branches:
+        slug = line
     nodelist = [
-        release_nodes(
-            header,
-            # TODO: should link to master for newest family and...what
-            # exactly, for the others? Expectation isn't necessarily to
-            # have a branch per family? Or is there? Maybe there must be..
-            app.config.releases_development_branch,
-            None,
-            app.config,
-        )
+        release_nodes(text=header, slug=slug, date=None, config=app.config)
     ]
     log(f"Creating {line!r} faux-release with {issues!r}")
     return {
@@ -649,6 +644,8 @@ def setup(app):
         # Which branch to use for unreleased feature items
         # TODO 3.0: s/master/main/
         ("development_branch", "master"),
+        # Whether to link to line branches on next-bugfix sections
+        ("bugfix_line_branches", False),
         # Which document to use as the changelog
         ("document_name", ["changelog"]),
         # Debug output

@@ -41,6 +41,9 @@ Specifically:
           through and add bug/feature/support/etc roles.
         * See :ref:`the appropriate conceptual docs <unstable-prehistory>` for
           details on this behavior.
+    * Unreleased bugfix items also link to the development branch by default,
+      but you can make them link to the appropriate release branch (eg ``1.0``)
+      by configuring ``releases_next_bugfix_line_branches`` so it is ``True``.
 
 * Create a Sphinx document named ``changelog.rst`` containing a bulleted list
   somewhere at its topmost level.

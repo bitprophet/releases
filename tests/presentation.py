@@ -281,6 +281,26 @@ class presentation:
                 expected="releasey_main",
                 entries=[(f, 15), (release, "1.0.0")],
             )
+
+        def bugfix_section_links_go_to_dev_branch_by_default(self):
+            self._test_link(
+                kwargs=dict(
+                    development_branch="main", release_uri="releasey_%s"
+                ),
+                type_="release",
+                expected="releasey_main",
+                entries=[(b, 15), (release, "1.0.0")],
+            )
+
+        def bugfix_section_links_go_to_stable_branch_if_configured(self):
+            self._test_link(
+                kwargs=dict(
+                    bugfix_line_branches=True, release_uri="releasey_%s"
+                ),
+                type_="release",
+                expected="releasey_1.0",
+                entries=[(b, 15), (release, "1.0.0")],
+            )
     def unstable_prehistory_active_means_only_one_unreleased_release(self):
         app = make_app(unstable_prehistory=True)
         entries = (b(2), f(3), "0.1.0", b(1))
