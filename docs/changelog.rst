@@ -2,6 +2,7 @@
 Changelog
 =========
 
+- :release:`2.1.0 <2023-02-24>`
 - :feature:`-` Add a new configuration setting,
   ``releases_supported_versions``, allowing you to limit how many "Next 1.x
   feature release" (or bugfix, etc) sections appear at the top of your
