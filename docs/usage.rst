@@ -45,6 +45,11 @@ Specifically:
       items, does not match the current default (``master`` as of version 2.0,
       to be changed to ``main`` in 3.0), you may override it via
       ``releases_development_branch``.
+    * Projects with a long history of major release versions may want to
+      specify which of them get 'unreleased' entries at the top of the
+      changelog; set ``releases_supported_versions`` to a list of major version
+      numbers, eg ``releases_supported_versions = [2, 3]`` to drop any "Next
+      1.x (feature|bugfix)" buckets.
 
 * Create a Sphinx document named ``changelog.rst`` containing a bulleted list
   somewhere at its topmost level.

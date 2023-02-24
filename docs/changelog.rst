@@ -2,6 +2,10 @@
 Changelog
 =========
 
+- :feature:`-` Add a new configuration setting,
+  ``releases_supported_versions``, allowing you to limit how many "Next 1.x
+  feature release" (or bugfix, etc) sections appear at the top of your
+  changelog.
 - :feature:`-` Allow controlling the name of your development branch for source
   code links (eg "Next 1.x feature release" section headers) via the new
   ``releases_development_branch`` config option.

@@ -646,6 +646,8 @@ def setup(app):
         # Which branch to use for unreleased feature items
         # TODO 3.0: s/master/main/
         ("development_branch", "master"),
+        # Which versions to show unreleased buckets for
+        ("supported_versions", None),
         # Which document to use as the changelog
         ("document_name", ["changelog"]),
         # Debug output

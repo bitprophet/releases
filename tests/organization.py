@@ -189,6 +189,46 @@ class organization:
         # now-released feature 2 should not be in unreleased_feature
         assert f2 not in rendered["unreleased_1.x_feature"]
 
+    class unsupported_families_not_included_in_unreleased:
+        _entries = (
+            f(7),  # should appear in unreleased features for 3.x
+            b(6),  # should appear in unreleased bugs for 3.x
+            "3.0.0",
+            f(5),  # should appear in unreleased features for 2.x
+            b(4),  # should appear in unreleased bugs for 2.x
+            "2.0.0",
+            f(3),  # should appear in unreleased features for 1.x
+            b(2),  # should appear in unreleased bugs for 1.x
+            "1.0.1",
+            b(1),  # prehistory
+        )
+
+        def no_actual_hiding_when_given_but_contains_all_families(self):
+            # Expectation: everything
+            families = [1, 2, 3]
+            for option in (None, families):  # Also test default None
+                changelog = release_list(*self._entries)
+                releases = changelog2dict(
+                    construct_releases(
+                        changelog, make_app(supported_versions=option)
+                    )[0]
+                )
+                for major in families:
+                    for type_ in ("bugfix", "feature"):
+                        assert f"unreleased_{major}.x_{type_}" in releases
+
+        def one_old_family_hidden(self):
+            skip()
+
+        def multiple_old_families_hidden(self):
+            skip()
+
+        def in_between_family_hidden_tho_why_would_you_lol(self):
+            skip()
+
+        # TODO: real degenerate shit like hiding only newer stuff?
+
+
     def explicit_bugfix_releases_get_removed_from_unreleased(self):
         b1 = b(1)
         b2 = b(2)
