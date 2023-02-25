@@ -25,3 +25,4 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 # Dogfood
 extensions.append("releases")
 releases_github_path = "bitprophet/releases"
+releases_supported_versions = [2]
