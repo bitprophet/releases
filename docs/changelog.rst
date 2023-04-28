@@ -2,6 +2,11 @@
 Changelog
 =========
 
+- :release:`2.1.1 <2023-04-28>`
+- :release:`2.0.1 <2023-04-28>`
+- :bug:`-` Fix up an internal utility which monkeypatches a Sphinx/docutils
+  internal, so that it accepts arbitrary args/kwargs instead of exploding on
+  newer Sphinxes.
 - :release:`2.1.0 <2023-02-24>`
 - :feature:`-` Add a new configuration setting,
   ``releases_supported_versions``, allowing you to limit how many "Next 1.x
