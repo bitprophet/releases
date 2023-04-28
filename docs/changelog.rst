@@ -2,6 +2,9 @@
 Changelog
 =========
 
+- :bug:`-` Fix up an internal utility which monkeypatches a Sphinx/docutils
+  internal, so that it accepts arbitrary args/kwargs instead of exploding on
+  newer Sphinxes.
 - :release:`2.0.0 <2022-12-31>`
 - :bug:`- major` Changelog transformation sometimes failed to occur when
   running under a 'single HTML file' Sphinx builder (eg ``singlehtml``), which
