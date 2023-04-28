@@ -85,7 +85,7 @@ def parse_changelog(path, **kwargs):
     return ret
 
 
-def _faux_write_doctree(self, docname, doctree):
+def _faux_write_doctree(self, docname, doctree, *args, **kwargs):
     self._read_doctree = doctree
 
 
