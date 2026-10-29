@@ -5,3 +5,5 @@ recursive-include docs *
 recursive-exclude docs/_build *
 recursive-include tests *
 recursive-exclude tests *.pyc *.pyo
+
+include pytest.ini
